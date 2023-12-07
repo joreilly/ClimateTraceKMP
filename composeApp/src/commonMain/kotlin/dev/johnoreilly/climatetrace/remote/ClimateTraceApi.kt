@@ -19,49 +19,21 @@ data class Asset(
     val assetType: String,
     @SerialName("Thumbnail")
     val thumbnail: String,
-
 )
-
-/*
-{
-"Id": 25452242,
-"Name": "Taichung power station",
-"NativeId": "TRRACTMTIE",
-"Country": "TWN",
-"Sector": "electricity-generation",
-"AssetType": "coal, oil",
- */
 
 @Serializable
 data class AssetsResult(val assets: List<Asset>)
 
 
-@Serializable
-data class AstroResult(val message: String, val number: Int, val people: List<Assignment>)
-
-@Serializable
-data class Assignment(val craft: String, val name: String, var personImageUrl: String? = "", var personBio: String? = "")
-
-@Serializable
-data class IssPosition(val latitude: Double, val longitude: Double)
-
-@Serializable
-data class IssResponse(val message: String, val iss_position: IssPosition, val timestamp: Long)
-
 class ClimateTraceApi(
-    var baseUrl: String = "https://people-in-space-proxy.ew.r.appspot.com",
+    var baseUrl: String = "https://api.climatetrace.org/v4/assets",
 )  {
 
-    val baseUrl2 = "https://api.climatetrace.org/v4/assets"
-
-    val client = HttpClient() {
+    private val client = HttpClient {
         install(ContentNegotiation) {
             json(Json { isLenient = true; ignoreUnknownKeys = true })
         }
     }
 
-    suspend fun fetchAssets() = client.get("$baseUrl2").body<AssetsResult>()
-
-    suspend fun fetchPeople() = client.get("$baseUrl/astros.json").body<AstroResult>()
-    suspend fun fetchISSPosition() = client.get("$baseUrl/iss-now.json").body<IssResponse>()
+    suspend fun fetchAssets() = client.get("$baseUrl").body<AssetsResult>()
 }
