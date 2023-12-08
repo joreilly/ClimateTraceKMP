@@ -20,6 +20,8 @@ data class Asset(
     val name: String,
     @SerialName("AssetType")
     val assetType: String,
+    @SerialName("Sector")
+    val sector: String,
     @SerialName("Thumbnail")
     val thumbnail: String,
 )
@@ -69,5 +71,6 @@ class ClimateTraceApi(
     // TODO need to implement paging on top of this
     suspend fun fetchAssets() = client.get("$baseUrl/assets").body<AssetsResult>()
 
+    suspend fun fetchCountryAssets(countryCode: String) = client.get("$baseUrl/assets?countries=$countryCode").body<AssetsResult>()
     suspend fun fetchCountryEmissionsInfo(countryCode: String) = client.get("$baseUrl/country/emissions?countries=$countryCode").body<List<CountryEmissionsInfo>>()
 }
