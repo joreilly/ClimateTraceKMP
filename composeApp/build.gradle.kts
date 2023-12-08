@@ -45,12 +45,6 @@ kotlin {
     sourceSets {
         val desktopMain by getting
         
-        androidMain.dependencies {
-            implementation(libs.compose.ui.tooling.preview)
-            implementation(libs.androidx.activity.compose)
-
-            implementation(libs.ktor.client.android)
-        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -64,8 +58,17 @@ kotlin {
             implementation("org.jetbrains.kotlinx:atomicfu:0.23.1")
             implementation(libs.kotlinx.coroutines)
 
+            api(libs.bundles.multiplatform.settings)
             //implementation(libs.imageLoader)
         }
+
+        androidMain.dependencies {
+            implementation(libs.compose.ui.tooling.preview)
+            implementation(libs.androidx.activity.compose)
+
+            implementation(libs.ktor.client.android)
+        }
+
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
 

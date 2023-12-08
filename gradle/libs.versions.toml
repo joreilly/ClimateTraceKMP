@@ -18,6 +18,7 @@ junit = "4.13.2"
 kotlin = "1.9.21"
 kotlinx-coroutines = "1.8.0-RC"
 ktor = "3.0.0-wasm1"
+multiplatformSettings = "1.1.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -38,6 +39,7 @@ compose-material = { module = "androidx.compose.material:material", version.ref 
 
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 
+ktor = { group = "io.ktor", name = "ktor", version.ref = "ktor" }
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
@@ -50,10 +52,13 @@ ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref =
 
 imageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
+multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatformSettings" }
+
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
-
+multiplatform-settings = ["multiplatform-settings"] #, "multiplatform-settings-coroutines"]
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
