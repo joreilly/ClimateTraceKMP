@@ -14,54 +14,60 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.sp
-import dev.johnoreilly.climatetrace.remote.Asset
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
+import dev.johnoreilly.climatetrace.remote.Country
+import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
 
 
 @Composable
 fun ClimateTraceSreen() {
-    var assetList by remember { mutableStateOf(emptyList<Asset>()) }
-    var selectedAsset by remember { mutableStateOf<Asset?>(null) }
+    val climateTraceApi = remember { ClimateTraceApi() }
 
-    val climateTraceApi =  ClimateTraceApi()
+    var countryList by remember { mutableStateOf(emptyList<Country>()) }
+    var selectedCountry by remember { mutableStateOf<Country?>(null) }
+    var countryEmissionInfo by remember { mutableStateOf<CountryEmissionsInfo?>(null) }
+
 
     LaunchedEffect(true) {
-        assetList = climateTraceApi.fetchAssets().assets
+        countryList = climateTraceApi.fetchCountries().sortedBy { it.name }
+    }
+
+    LaunchedEffect(selectedCountry) {
+        selectedCountry?.let {
+            val countryEmissionInfoList = climateTraceApi.fetchCountryEmissionsInfo(it.alpha3)
+            countryEmissionInfo = countryEmissionInfoList[0]
+        }
     }
 
     Row(Modifier.fillMaxSize()) {
 
         Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
-            AssetListView(assetList, selectedAsset) {
-                selectedAsset = it
+            CountryListView(countryList, selectedCountry) {
+                selectedCountry = it
             }
         }
 
         Spacer(modifier = Modifier.width(1.dp).fillMaxHeight())
 
         Box(Modifier.fillMaxHeight()) {
-            selectedAsset?.let {
-                AssetDetailsView(it)
+            selectedCountry?.let {
+                CountryInfoDetailedView(it, countryEmissionInfo)
             }
         }
     }
 }
 
+
 @Composable
-fun AssetListView(
-    assetList: List<Asset>,
-    selectedAsset: Asset?,
-    assetSelected: (asset: Asset) -> Unit
+fun CountryListView(
+    countryList: List<Country>,
+    selectedCountry: Country?,
+    countrySelected: (country: Country) -> Unit
 ) {
 
-    // workaround for compose desktop but if LazyColumn is empty
-    if (assetList.isNotEmpty()) {
-        LazyColumn {
-            items(assetList) { asset ->
-                AssetRow(asset, selectedAsset, assetSelected)
-            }
+    LazyColumn {
+        items(countryList) { country ->
+            CountryRow(country, selectedCountry, countrySelected)
         }
     }
 }
@@ -69,31 +75,29 @@ fun AssetListView(
 
 
 
+
 @Composable
-fun AssetRow(
-    asset: Asset,
-    selectedAsset: Asset?,
-    assetSelected: (asset: Asset) -> Unit
+fun CountryRow(
+    country: Country,
+    selectedCountry: Country?,
+    countrySelected: (country: Country) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = { assetSelected(asset) })
+        modifier = Modifier.fillMaxWidth().clickable(onClick = { countrySelected(country) })
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Column {
             Text(
-                asset.name,
-                style = if (asset.name == selectedAsset?.name) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge
+                country.name,
+                style = if (country.name == selectedCountry?.name) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge
             )
-
-            Text(text = asset.assetType, style = TextStyle(color = Color.DarkGray, fontSize = 14.sp))
         }
     }
 }
 
 @Composable
-fun AssetDetailsView(asset: Asset) {
+fun CountryInfoDetailedView(country: Country, countryEmissionInfo: CountryEmissionsInfo?) {
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -102,10 +106,13 @@ fun AssetDetailsView(asset: Asset) {
     ) {
         Spacer(modifier = Modifier.size(12.dp))
 
-        Text(
-            asset.name,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(16.dp)
-        )
+        Text(country.name, style = MaterialTheme.typography.titleLarge)
+
+        countryEmissionInfo?.let {
+            val co2 = (countryEmissionInfo.emissions.co2/1_000_000).toInt()
+            Text("co2 = $co2 Million Tonnes")
+            Text("rank = ${countryEmissionInfo.rank}")
+        }
+
     }
 }
