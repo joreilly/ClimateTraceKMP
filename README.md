@@ -7,6 +7,6 @@ Development has only just started on this and making it public at this point as 
 Basic code using Ktor to request data and UI for Compose for Desktop and Web (Wasm) so far.
 
 
-<img width="1053" alt="Screenshot 2023-12-08 at 17 24 57" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/9d4df515-cd26-409a-a96a-65f1ee4a9b6c">
+<img width="1193" alt="Screenshot 2023-12-08 at 22 14 08" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/fecd89ee-d9b9-48ff-b8c6-c4af49b6d0d7">
 
-<img width="1052" alt="Screenshot 2023-12-08 at 17 25 43" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/6b88b984-9f10-4e07-8099-dc6adc835b7e">
+<img width="1191" alt="Screenshot 2023-12-08 at 22 14 13" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/709e2722-5ca4-4c19-ae0a-7ca18d0170f2">
