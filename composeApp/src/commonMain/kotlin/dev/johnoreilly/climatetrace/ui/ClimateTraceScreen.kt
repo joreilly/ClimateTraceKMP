@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import dev.johnoreilly.climatetrace.remote.Asset
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
@@ -26,6 +27,7 @@ fun ClimateTraceSreen() {
     var countryList by remember { mutableStateOf(emptyList<Country>()) }
     var selectedCountry by remember { mutableStateOf<Country?>(null) }
     var countryEmissionInfo by remember { mutableStateOf<CountryEmissionsInfo?>(null) }
+    var countryAssets by remember { mutableStateOf<List<Asset>?>(null) }
 
 
     LaunchedEffect(true) {
@@ -36,6 +38,8 @@ fun ClimateTraceSreen() {
         selectedCountry?.let {
             val countryEmissionInfoList = climateTraceApi.fetchCountryEmissionsInfo(it.alpha3)
             countryEmissionInfo = countryEmissionInfoList[0]
+
+            countryAssets = climateTraceApi.fetchCountryAssets(it.alpha3).assets
         }
     }
 
@@ -51,7 +55,7 @@ fun ClimateTraceSreen() {
 
         Box(Modifier.fillMaxHeight()) {
             selectedCountry?.let {
-                CountryInfoDetailedView(it, countryEmissionInfo)
+                CountryInfoDetailedView(it, countryEmissionInfo, countryAssets)
             }
         }
     }
@@ -97,12 +101,16 @@ fun CountryRow(
 }
 
 @Composable
-fun CountryInfoDetailedView(country: Country, countryEmissionInfo: CountryEmissionsInfo?) {
+fun CountryInfoDetailedView(
+    country: Country,
+    countryEmissionInfo: CountryEmissionsInfo?,
+    countryAssets: List<Asset>?
+) {
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxWidth()
+            .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.size(12.dp))
 
@@ -110,9 +118,16 @@ fun CountryInfoDetailedView(country: Country, countryEmissionInfo: CountryEmissi
 
         countryEmissionInfo?.let {
             val co2 = (countryEmissionInfo.emissions.co2/1_000_000).toInt()
+
+            val percentage = (100 * countryEmissionInfo.emissions.co2/countryEmissionInfo.worldEmissions.co2).toInt()
             Text("co2 = $co2 Million Tonnes")
-            Text("rank = ${countryEmissionInfo.rank}")
+            Text("rank = ${countryEmissionInfo.rank} ($percentage%)")
         }
 
+        Spacer(modifier = Modifier.size(32.dp))
+
+        countryAssets?.forEach { asset ->
+            Text("${asset.name} (sector = ${asset.sector}, asset type = ${asset.assetType})")
+        }
     }
 }

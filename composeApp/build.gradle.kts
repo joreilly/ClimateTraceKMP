@@ -53,13 +53,12 @@ kotlin {
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
 
-            implementation(libs.bundles.ktor.common)
-
             implementation("org.jetbrains.kotlinx:atomicfu:0.23.1")
             implementation(libs.kotlinx.coroutines)
 
+            implementation(libs.bundles.ktor.common)
+
             api(libs.bundles.multiplatform.settings)
-            //implementation(libs.imageLoader)
         }
 
         androidMain.dependencies {
