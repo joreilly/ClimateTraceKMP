@@ -1,12 +1,11 @@
 Kotlin/Compose Multiplatform project to show data from https://climatetrace.org/data.
 
 Running on
-* iOS
+* iOS (currently build issue due to https://kotlinlang.slack.com/archives/CDFP59223/p1701968310319679)
 * Android
 * Desktop
 * Web
 
-Development has only just started on the project and making it public at this point as reproducer for issue reported in https://kotlinlang.slack.com/archives/CDFP59223/p1701968310319679
 
 <br>
 Code uses Ktor to request data from remote endpoint and includes basic Compose Multiplatform UI (showing for Web and Desktop below).  Same Compose code also
