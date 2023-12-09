@@ -8,7 +8,7 @@ Running on
 
 
 <br/>
-Code uses Ktor to request data from remote endpoint and includes very basic Compose Multiplatform UI (shown for Android Desktop and Web below).  
+Code uses Ktor to request data from remote endpoint and includes very basic Compose Multiplatform UI (shown for Android, Desktop and Web below).  
 
 
 
