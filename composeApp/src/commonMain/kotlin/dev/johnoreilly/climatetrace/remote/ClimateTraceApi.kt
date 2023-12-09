@@ -43,12 +43,22 @@ data class CountryEmissionsInfo(
     val worldEmissions: EmissionInfo
 )
 
+@Serializable
+data class CountryAssetEmissionsInfo(
+    @SerialName("Country")
+    val country: String,
+    @SerialName("Emissions")
+    val emissions: Float,
+    @SerialName("Sector")
+    val sector: String
+)
+
 
 @Serializable
 data class EmissionInfo(
-    val co2: Double,
-    val co2e_100yr: Double,
-    val co2e_20yr: Double
+    val co2: Float,
+    val co2e_100yr: Float,
+    val co2e_20yr: Float
 )
 
 
@@ -73,4 +83,10 @@ class ClimateTraceApi(
 
     suspend fun fetchCountryAssets(countryCode: String) = client.get("$baseUrl/assets?countries=$countryCode").body<AssetsResult>()
     suspend fun fetchCountryEmissionsInfo(countryCode: String) = client.get("$baseUrl/country/emissions?countries=$countryCode").body<List<CountryEmissionsInfo>>()
+
+    suspend fun fetchCountryAssetEmissionsInfo(countryCode: String) = client.get("$baseUrl/assets/emissions?countries=$countryCode").body<Map<String, List<CountryAssetEmissionsInfo>>>()
+
+
+    // https://api.climatetrace.org/v4/assets/emissions?countries=IRL
+    // https://api.climatetrace.org/v4/country/emissions?since=2018&to=2022&countries=FRA
 }
