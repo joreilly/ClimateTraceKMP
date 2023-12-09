@@ -59,6 +59,7 @@ kotlin {
             implementation(libs.bundles.ktor.common)
 
             api(libs.bundles.multiplatform.settings)
+            implementation("io.github.koalaplot:koalaplot-core:0.5.0")
         }
 
         androidMain.dependencies {
