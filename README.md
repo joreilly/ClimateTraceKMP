@@ -15,12 +15,15 @@ Code uses Ktor to request data from remote endpoint and includes very basic Comp
 
 ### Android (Compose)
 
-![Screenshot_20231209_003321](https://github.com/joreilly/ClimateTraceKMP/assets/6302/8d8c31ae-b5dd-416b-9517-151c4233c305)
+![Screenshot_20231209_143741](https://github.com/joreilly/ClimateTraceKMP/assets/6302/a209794a-cc03-437f-8cf3-44a07e0f3520)
+
 
 ### Compose for Desktop 
 
-<img width="1193" alt="Screenshot 2023-12-08 at 22 14 08" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/fecd89ee-d9b9-48ff-b8c6-c4af49b6d0d7">
+<img width="1163" alt="Screenshot 2023-12-09 at 14 32 58" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/442ff726-9702-4dbc-8643-601c5b01abee">
+
 
 ### Compose for Web (Wasm)
 
-<img width="1191" alt="Screenshot 2023-12-08 at 22 14 13" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/709e2722-5ca4-4c19-ae0a-7ca18d0170f2">
+
+<img width="1159" alt="Screenshot 2023-12-09 at 14 31 50" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/23087c01-82a4-4156-ae11-4ec9e03e7934">
