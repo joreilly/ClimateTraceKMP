@@ -7,10 +7,6 @@ Running on
 * Web
 
 
-<br/>
-Code uses Ktor to request data from remote endpoint and includes very basic Compose Multiplatform UI (shown for Android, Desktop and Web below).  
-
-
 
 
 ### Android (Compose)
