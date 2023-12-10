@@ -4,7 +4,11 @@ import ComposeApp
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.MainViewController()
+        MainViewControllerKt.CountryListViewController { countryCode in
+            print(countryCode)
+            
+            // TODO navigate to country emissions detail screen
+        }
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
@@ -12,8 +16,13 @@ struct ComposeView: UIViewControllerRepresentable {
 
 struct ContentView: View {
     var body: some View {
-        ComposeView()
-                .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
+        
+        NavigationView {
+            VStack {
+                ComposeView()
+            }
+            .navigationBarTitle("ClimateTrace", displayMode: .inline)
+        }
     }
 }
 
