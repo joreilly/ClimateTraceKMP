@@ -67,6 +67,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.ktor.client.android)
+
+            implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc10")
         }
 
         desktopMain.dependencies {
