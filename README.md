@@ -1,4 +1,4 @@
-Kotlin/Compose Multiplatform project to show data from https://climatetrace.org/data. Development just started so very much work in progress right now!
+Kotlin/Compose Multiplatform project to show climate related emission data from https://climatetrace.org/data. Development just started so very much work in progress right now!
 
 Running on
 * iOS 
