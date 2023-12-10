@@ -15,7 +15,8 @@ and need to evaulate whether this could/should be used for other clients (again 
 ### Android (Compose)
 
 
-![Screenshot_20231210_112724](https://github.com/joreilly/ClimateTraceKMP/assets/6302/20a6ffef-1ce5-4580-a086-8027598a8ded)
+![Screenshot_20231210_180223](https://github.com/joreilly/ClimateTraceKMP/assets/6302/7ae517ec-ef48-4f85-a267-5b4bdef2e25f)
+
 
 
 
@@ -26,10 +27,10 @@ and need to evaulate whether this could/should be used for other clients (again 
 
 ### Compose for Desktop 
 
-<img width="1163" alt="Screenshot 2023-12-09 at 14 32 58" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/442ff726-9702-4dbc-8643-601c5b01abee">
+<img width="1157" alt="Screenshot 2023-12-10 at 18 01 30" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/dc60bd59-789d-47a5-aa9c-02a636735f58">
 
 
 ### Compose for Web (Wasm)
 
+<img width="1157" alt="Screenshot 2023-12-10 at 18 00 16" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/3cb377c1-16a3-4250-8e98-b8e033d38db3">
 
-<img width="1159" alt="Screenshot 2023-12-09 at 14 31 50" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/23087c01-82a4-4156-ae11-4ec9e03e7934">
