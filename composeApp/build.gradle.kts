@@ -53,13 +53,10 @@ kotlin {
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
 
-            implementation("org.jetbrains.kotlinx:atomicfu:0.23.1")
             implementation(libs.kotlinx.coroutines)
-
             implementation(libs.bundles.ktor.common)
 
-            api(libs.bundles.multiplatform.settings)
-            implementation("io.github.koalaplot:koalaplot-core:0.5.0")
+            implementation(libs.koalaplot)
         }
 
         androidMain.dependencies {
@@ -67,8 +64,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.ktor.client.android)
-
-            implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc10")
+            implementation(libs.voyager)
         }
 
         desktopMain.dependencies {
