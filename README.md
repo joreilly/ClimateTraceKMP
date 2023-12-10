@@ -1,4 +1,5 @@
 Kotlin/Compose Multiplatform project to show climate related emission data from https://climatetrace.org/data. Development just started so very much work in progress right now!
+Have started with showing sector emission data per country but ton of other info available as well (ideas very welcome!).
 
 Running on
 * iOS 
