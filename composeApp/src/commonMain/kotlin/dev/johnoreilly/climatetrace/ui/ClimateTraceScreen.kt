@@ -161,8 +161,11 @@ fun SectorEmissionsPieChart(
     assetEmissionsInfoList: List<CountryAssetEmissionsInfo>,
     modifier: Modifier = Modifier,
 ) {
+    val numberOfEntries = assetEmissionsInfoList.size
     val filteredEmissionsList = assetEmissionsInfoList
-        .sortedByDescending { it.emissions }.take(10)
+        .filter { it.emissions > 0 }
+        .sortedByDescending { it.emissions }
+        .take(10)
     val values = filteredEmissionsList.map { it.emissions }
     val labels = filteredEmissionsList.map { it.sector }
     val total = values.sum()
