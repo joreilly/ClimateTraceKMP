@@ -19,10 +19,11 @@ and need to evaulate whether this could/should be used for other clients (again 
 
 
 
-
 ### iOS (SwiftUI/Compose)
 
-![Simulator Screenshot - iPad Pro (11-inch) (4th generation) - 2023-12-09 at 15 16 08](https://github.com/joreilly/ClimateTraceKMP/assets/6302/2225be51-2eba-4e48-977d-4d8c29bae361)
+![Simulator Screenshot - iPhone 15 Pro - 2023-12-10 at 19 31 59](https://github.com/joreilly/ClimateTraceKMP/assets/6302/ed0f6b1c-ce30-4f99-98d5-9bbdae49bcd3)
+
+
 
 
 ### Compose for Desktop 
