@@ -46,6 +46,9 @@ fun ClimateTraceScreen() {
 
     LaunchedEffect(selectedCountry) {
         selectedCountry?.let {
+            countryEmissionInfo = null
+            countryAssetEmissons = null
+
             val countryEmissionInfoList = climateTraceApi.fetchCountryEmissionsInfo(it.alpha3)
             countryEmissionInfo = countryEmissionInfoList[0]
             countryAssetEmissons = climateTraceApi.fetchCountryAssetEmissionsInfo(it.alpha3)[it.alpha3]
