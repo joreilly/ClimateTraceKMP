@@ -82,11 +82,7 @@ class ClimateTraceApi(
     suspend fun fetchAssets() = client.get("$baseUrl/assets").body<AssetsResult>()
 
     suspend fun fetchCountryAssets(countryCode: String) = client.get("$baseUrl/assets?countries=$countryCode").body<AssetsResult>()
-    suspend fun fetchCountryEmissionsInfo(countryCode: String) = client.get("$baseUrl/country/emissions?countries=$countryCode").body<List<CountryEmissionsInfo>>()
+    suspend fun fetchCountryEmissionsInfo(countryCode: String) = client.get("$baseUrl/country/emissions?since=2022&to=2022&countries=$countryCode").body<List<CountryEmissionsInfo>>()
 
     suspend fun fetchCountryAssetEmissionsInfo(countryCode: String) = client.get("$baseUrl/assets/emissions?countries=$countryCode").body<Map<String, List<CountryAssetEmissionsInfo>>>()
-
-
-    // https://api.climatetrace.org/v4/assets/emissions?countries=IRL
-    // https://api.climatetrace.org/v4/country/emissions?since=2018&to=2022&countries=FRA
 }
