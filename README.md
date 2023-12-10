@@ -11,7 +11,9 @@ Running on
 
 ### Android (Compose)
 
-![Screenshot_20231209_143741](https://github.com/joreilly/ClimateTraceKMP/assets/6302/a209794a-cc03-437f-8cf3-44a07e0f3520)
+
+![Screenshot_20231210_112724](https://github.com/joreilly/ClimateTraceKMP/assets/6302/20a6ffef-1ce5-4580-a086-8027598a8ded)
+
 
 
 ### iOS (SwiftUI/Compose)
