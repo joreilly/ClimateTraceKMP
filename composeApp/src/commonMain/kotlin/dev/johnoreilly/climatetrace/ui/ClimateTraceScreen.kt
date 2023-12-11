@@ -1,3 +1,7 @@
+@file:OptIn(ExperimentalMaterial3WindowSizeClassApi::class,
+    ExperimentalMaterial3WindowSizeClassApi::class
+)
+
 package dev.johnoreilly.climatetrace.ui
 
 import androidx.compose.foundation.layout.*
@@ -13,6 +17,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +38,11 @@ import io.github.koalaplot.core.util.toString
 
 @Composable
 fun ClimateTraceScreen() {
+
+    val windowSizeClass = calculateWindowSizeClass()
+    println(windowSizeClass)
+
+
     val climateTraceApi = remember { ClimateTraceApi() }
 
     var countryList by remember { mutableStateOf(emptyList<Country>()) }
@@ -114,6 +125,7 @@ fun CountryInfoDetailedView(
     countryEmissionInfo: CountryEmissionsInfo?,
     countryAssetEmissionsList: List<CountryAssetEmissionsInfo>?
 ) {
+
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())

@@ -57,6 +57,7 @@ kotlin {
             implementation(libs.bundles.ktor.common)
 
             implementation(libs.koalaplot)
+            api(libs.compose.window.size)
         }
 
         androidMain.dependencies {
@@ -69,7 +70,6 @@ kotlin {
 
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
-
             implementation(libs.ktor.client.java)
         }
 
