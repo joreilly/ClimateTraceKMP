@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
@@ -270,7 +271,11 @@ fun CountryInfoDetailedView(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(country.name, style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = country.name,
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center
+        )
 
         Spacer(modifier = Modifier.size(16.dp))
 
