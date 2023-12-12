@@ -1,7 +1,3 @@
-@file:OptIn(ExperimentalMaterial3WindowSizeClassApi::class,
-    ExperimentalMaterial3WindowSizeClassApi::class
-)
-
 package dev.johnoreilly.climatetrace.ui
 
 import androidx.compose.foundation.layout.*
@@ -18,6 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass.Companion.Compact
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,9 +34,9 @@ import io.github.koalaplot.core.util.generateHueColorPalette
 import io.github.koalaplot.core.util.toString
 
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ClimateTraceScreen() {
-
     val windowSizeClass = calculateWindowSizeClass()
     println(windowSizeClass)
 
@@ -68,17 +66,33 @@ fun ClimateTraceScreen() {
 
     Row(Modifier.fillMaxSize()) {
 
-        Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
-            CountryListView(countryList, selectedCountry) {
-                selectedCountry = it
+        if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
+            Column(Modifier.fillMaxWidth()) {
+
+                Box(Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)) {
+                    CountryListView(countryList, selectedCountry) {
+                        selectedCountry = it
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
+                selectedCountry?.let {
+                    CountryInfoDetailedView(it, countryEmissionInfo, countryAssetEmissons)
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.width(1.dp).fillMaxHeight())
+        } else {
+            Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
+                CountryListView(countryList, selectedCountry) {
+                    selectedCountry = it
+                }
+            }
 
-        Box(Modifier.fillMaxHeight()) {
-            selectedCountry?.let {
-                CountryInfoDetailedView(it, countryEmissionInfo, countryAssetEmissons)
+            Spacer(modifier = Modifier.width(1.dp).fillMaxHeight())
+            Box(Modifier.fillMaxHeight()) {
+                selectedCountry?.let {
+                    CountryInfoDetailedView(it, countryEmissionInfo, countryAssetEmissons)
+                }
             }
         }
     }
