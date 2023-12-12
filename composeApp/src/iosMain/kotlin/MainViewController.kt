@@ -15,12 +15,18 @@ fun CountryListViewController(onCountryClicked: (country: Country) -> Unit) = Co
     val climateTraceApi = remember { ClimateTraceApi() }
     var countryList by remember { mutableStateOf(emptyList<Country>()) }
     var selectedCountry by remember { mutableStateOf<Country?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(true) {
-        countryList = climateTraceApi.fetchCountries().sortedBy { it.name }
+        isLoading = true
+        try {
+            countryList = climateTraceApi.fetchCountries().sortedBy { it.name }
+        } finally {
+            isLoading = false
+        }
     }
 
-    CountryListView(countryList, selectedCountry) {
+    CountryListView(countryList, selectedCountry, isLoading) {
         selectedCountry = it
         onCountryClicked(it)
     }

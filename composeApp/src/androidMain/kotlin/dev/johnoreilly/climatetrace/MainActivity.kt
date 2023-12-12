@@ -2,7 +2,6 @@
 
 package dev.johnoreilly.climatetrace
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -36,7 +35,7 @@ import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
 import dev.johnoreilly.climatetrace.ui.CountryListView
 
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,9 +62,15 @@ class CountryListScreen : Screen {
 
         var countryList by remember { mutableStateOf(emptyList<Country>()) }
         val selectedCountry by remember { mutableStateOf<Country?>(null) }
+        var isLoading by remember { mutableStateOf(true) }
 
         LaunchedEffect(true) {
-            countryList = climateTraceApi.fetchCountries().sortedBy { it.name }
+            isLoading = true
+            try {
+                countryList = climateTraceApi.fetchCountries().sortedBy { it.name }
+            } finally {
+                isLoading = false
+            }
         }
 
         Scaffold(
@@ -76,8 +81,8 @@ class CountryListScreen : Screen {
             }
         ) {
             Column(Modifier.padding(it)) {
-                CountryListView(countryList, selectedCountry) {
-                    navigator.push(CountryEmissionsScreen(it))
+                CountryListView(countryList, selectedCountry, isLoading) { country ->
+                    navigator.push(CountryEmissionsScreen(country))
                 }
             }
         }
