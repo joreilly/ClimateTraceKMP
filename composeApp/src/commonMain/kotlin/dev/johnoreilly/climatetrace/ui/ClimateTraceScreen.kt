@@ -133,6 +133,7 @@ fun CountryListView(
     isLoading: Boolean,
     countrySelected: (country: Country) -> Unit
 ) {
+    val searchQuery = remember { mutableStateOf("") }
 
     if (isLoading) {
         Column(
@@ -143,19 +144,17 @@ fun CountryListView(
         ) {
             CircularProgressIndicator()
         }
-    }
-
-    val searchQuery = remember { mutableStateOf("") }
-
-    Column {
-        SearchableList(
-            isLoading = isLoading,
-            searchQuery = searchQuery,
-            onSearchQueryChange = { query -> searchQuery.value = query },
-            countryList = countryList,
-            selectedCountry = selectedCountry,
-            countrySelected = countrySelected
-        )
+    } else {
+        Column {
+            SearchableList(
+                isLoading = isLoading,
+                searchQuery = searchQuery,
+                onSearchQueryChange = { query -> searchQuery.value = query },
+                countryList = countryList,
+                selectedCountry = selectedCountry,
+                countrySelected = countrySelected
+            )
+        }
     }
 }
 
