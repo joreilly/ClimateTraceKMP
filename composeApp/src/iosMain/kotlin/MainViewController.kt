@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.ComposeUIViewController
+import dev.johnoreilly.climatetrace.ktx.performAsyncOperation
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
@@ -15,12 +16,17 @@ fun CountryListViewController(onCountryClicked: (country: Country) -> Unit) = Co
     val climateTraceApi = remember { ClimateTraceApi() }
     var countryList by remember { mutableStateOf(emptyList<Country>()) }
     var selectedCountry by remember { mutableStateOf<Country?>(null) }
+    val isLoading = remember { mutableStateOf(true) }
 
     LaunchedEffect(true) {
-        countryList = climateTraceApi.fetchCountries().sortedBy { it.name }
+        performAsyncOperation(
+            isLoadingState = isLoading,
+            operation = { climateTraceApi.fetchCountries().sortedBy { it.name } },
+            onSuccess = { countries -> countryList = countries }
+        )
     }
 
-    CountryListView(countryList, selectedCountry) {
+    CountryListView(countryList, selectedCountry, isLoading.value) {
         selectedCountry = it
         onCountryClicked(it)
     }
@@ -34,7 +40,7 @@ fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewControlle
 
     LaunchedEffect(country) {
         val countryEmissionInfoList = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3)
-        countryEmissionInfo = countryEmissionInfoList[0]
+        countryEmissionInfo = countryEmissionInfoList.firstOrNull()
         countryAssetEmissons = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
     }
 

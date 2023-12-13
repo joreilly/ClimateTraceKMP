@@ -2,7 +2,6 @@
 
 package dev.johnoreilly.climatetrace
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,6 +27,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.johnoreilly.climatetrace.ktx.performAsyncOperation
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
@@ -36,7 +36,7 @@ import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
 import dev.johnoreilly.climatetrace.ui.CountryListView
 
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,9 +63,14 @@ class CountryListScreen : Screen {
 
         var countryList by remember { mutableStateOf(emptyList<Country>()) }
         val selectedCountry by remember { mutableStateOf<Country?>(null) }
+        val isLoading = remember { mutableStateOf(true) }
 
         LaunchedEffect(true) {
-            countryList = climateTraceApi.fetchCountries().sortedBy { it.name }
+            performAsyncOperation(
+                isLoadingState = isLoading,
+                operation = { climateTraceApi.fetchCountries().sortedBy { it.name } },
+                onSuccess = { countries -> countryList = countries }
+            )
         }
 
         Scaffold(
@@ -76,8 +81,8 @@ class CountryListScreen : Screen {
             }
         ) {
             Column(Modifier.padding(it)) {
-                CountryListView(countryList, selectedCountry) {
-                    navigator.push(CountryEmissionsScreen(it))
+                CountryListView(countryList, selectedCountry, isLoading.value) { country ->
+                    navigator.push(CountryEmissionsScreen(country))
                 }
             }
         }
@@ -99,11 +104,9 @@ class CountryListScreen : Screen {
             }
 
             LaunchedEffect(country) {
-                val countryEmissionInfoList =
-                    climateTraceApi.fetchCountryEmissionsInfo(country.alpha3)
+                val countryEmissionInfoList = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3)
                 countryEmissionInfo = countryEmissionInfoList[0]
-                countryAssetEmissions =
-                    climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
+                countryAssetEmissions = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
             }
 
             Scaffold(
