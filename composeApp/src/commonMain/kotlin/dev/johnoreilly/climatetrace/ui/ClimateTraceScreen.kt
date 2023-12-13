@@ -1,5 +1,8 @@
 package dev.johnoreilly.climatetrace.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -190,7 +193,11 @@ fun SearchableList(
             )
         },
         trailingIcon = {
-            if (searchQuery.value.isNotEmpty() && isLoading.not()) {
+            AnimatedVisibility(
+                visible = searchQuery.value.isNotBlank(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
                 IconButton(onClick = {
                     onSearchQueryChange("")
                     keyboardController?.hide()
