@@ -27,6 +27,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.johnoreilly.climatetrace.ktx.performAsyncOperation
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
@@ -62,15 +63,14 @@ class CountryListScreen : Screen {
 
         var countryList by remember { mutableStateOf(emptyList<Country>()) }
         val selectedCountry by remember { mutableStateOf<Country?>(null) }
-        var isLoading by remember { mutableStateOf(true) }
+        val isLoading = remember { mutableStateOf(true) }
 
         LaunchedEffect(true) {
-            isLoading = true
-            try {
-                countryList = climateTraceApi.fetchCountries().sortedBy { it.name }
-            } finally {
-                isLoading = false
-            }
+            performAsyncOperation(
+                isLoadingState = isLoading,
+                operation = { climateTraceApi.fetchCountries().sortedBy { it.name } },
+                onSuccess = { countries -> countryList = countries }
+            )
         }
 
         Scaffold(
@@ -81,7 +81,7 @@ class CountryListScreen : Screen {
             }
         ) {
             Column(Modifier.padding(it)) {
-                CountryListView(countryList, selectedCountry, isLoading) { country ->
+                CountryListView(countryList, selectedCountry, isLoading.value) { country ->
                     navigator.push(CountryEmissionsScreen(country))
                 }
             }

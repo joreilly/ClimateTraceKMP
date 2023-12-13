@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import dev.johnoreilly.climatetrace.ktx.performAsyncOperation
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
@@ -66,24 +67,20 @@ import io.github.koalaplot.core.util.toString
 @Composable
 fun ClimateTraceScreen() {
     val windowSizeClass = calculateWindowSizeClass()
-    println(windowSizeClass)
-
-
     val climateTraceApi = remember { ClimateTraceApi() }
 
     var countryList by remember { mutableStateOf(emptyList<Country>()) }
     var selectedCountry by remember { mutableStateOf<Country?>(null) }
     var countryEmissionInfo by remember { mutableStateOf<CountryEmissionsInfo?>(null) }
     var countryAssetEmissons by remember { mutableStateOf<List<CountryAssetEmissionsInfo>?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
+    val isLoading = remember { mutableStateOf(true) }
 
     LaunchedEffect(true) {
-        isLoading = true
-        try {
-            countryList = climateTraceApi.fetchCountries().sortedBy { it.name }
-        } finally {
-            isLoading = false
-        }
+        performAsyncOperation(
+            isLoadingState = isLoading,
+            operation = { climateTraceApi.fetchCountries().sortedBy { it.name } },
+            onSuccess = { countries -> countryList = countries }
+        )
     }
 
     LaunchedEffect(selectedCountry) {
@@ -100,7 +97,7 @@ fun ClimateTraceScreen() {
             Column(Modifier.fillMaxWidth()) {
 
                 Box(Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)) {
-                    CountryListView(countryList, selectedCountry, isLoading) {
+                    CountryListView(countryList, selectedCountry, isLoading.value) {
                         selectedCountry = it
                     }
                 }
@@ -112,7 +109,7 @@ fun ClimateTraceScreen() {
             }
         } else {
             Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
-                CountryListView(countryList, selectedCountry, isLoading) {
+                CountryListView(countryList, selectedCountry, isLoading.value) {
                     selectedCountry = it
                 }
             }
@@ -189,16 +186,19 @@ fun SearchableList(
             Icon(
                 imageVector = Icons.Default.Search,
                 tint = MaterialTheme.colorScheme.onSurface,
-                contentDescription = "Search"
+                contentDescription = "search"
             )
         },
         trailingIcon = {
             if (searchQuery.value.isNotEmpty() && isLoading.not()) {
-                IconButton(onClick = { onSearchQueryChange("") }) {
+                IconButton(onClick = {
+                    onSearchQueryChange("")
+                    keyboardController?.hide()
+                }) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         tint = MaterialTheme.colorScheme.onSurface,
-                        contentDescription = "Clear search"
+                        contentDescription = "clear_search"
                     )
                 }
             }
