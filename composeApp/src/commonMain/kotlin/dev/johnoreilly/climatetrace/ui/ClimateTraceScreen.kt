@@ -72,7 +72,7 @@ fun ClimateTraceScreen() {
     var countryList by remember { mutableStateOf(emptyList<Country>()) }
     var selectedCountry by remember { mutableStateOf<Country?>(null) }
     var countryEmissionInfo by remember { mutableStateOf<CountryEmissionsInfo?>(null) }
-    var countryAssetEmissons by remember { mutableStateOf<List<CountryAssetEmissionsInfo>?>(null) }
+    var countryAssetEmissions by remember { mutableStateOf<List<CountryAssetEmissionsInfo>?>(null) }
     val isLoading = remember { mutableStateOf(true) }
 
     LaunchedEffect(true) {
@@ -87,7 +87,8 @@ fun ClimateTraceScreen() {
         selectedCountry?.let { country ->
             val countryEmissionInfoList = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3)
             countryEmissionInfo = countryEmissionInfoList.firstOrNull()
-            countryAssetEmissons = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
+            countryAssetEmissions =
+                climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
         }
     }
 
@@ -97,27 +98,27 @@ fun ClimateTraceScreen() {
             Column(Modifier.fillMaxWidth()) {
 
                 Box(Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)) {
-                    CountryListView(countryList, selectedCountry, isLoading.value) {
-                        selectedCountry = it
+                    CountryListView(countryList, selectedCountry, isLoading.value) { country ->
+                        selectedCountry = country
                     }
                 }
 
                 Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
-                selectedCountry?.let {
-                    CountryInfoDetailedView(it, countryEmissionInfo, countryAssetEmissons)
+                selectedCountry?.let { country ->
+                    CountryInfoDetailedView(country, countryEmissionInfo, countryAssetEmissions)
                 }
             }
         } else {
             Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
-                CountryListView(countryList, selectedCountry, isLoading.value) {
-                    selectedCountry = it
+                CountryListView(countryList, selectedCountry, isLoading.value) { country ->
+                    selectedCountry = country
                 }
             }
 
             Spacer(modifier = Modifier.width(1.dp).fillMaxHeight())
             Box(Modifier.fillMaxHeight()) {
-                selectedCountry?.let {
-                    CountryInfoDetailedView(it, countryEmissionInfo, countryAssetEmissons)
+                selectedCountry?.let { country ->
+                    CountryInfoDetailedView(country, countryEmissionInfo, countryAssetEmissions)
                 }
             }
         }

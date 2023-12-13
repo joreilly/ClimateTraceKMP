@@ -104,11 +104,9 @@ class CountryListScreen : Screen {
             }
 
             LaunchedEffect(country) {
-                val countryEmissionInfoList =
-                    climateTraceApi.fetchCountryEmissionsInfo(country.alpha3)
+                val countryEmissionInfoList = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3)
                 countryEmissionInfo = countryEmissionInfoList[0]
-                countryAssetEmissions =
-                    climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
+                countryAssetEmissions = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
             }
 
             Scaffold(
