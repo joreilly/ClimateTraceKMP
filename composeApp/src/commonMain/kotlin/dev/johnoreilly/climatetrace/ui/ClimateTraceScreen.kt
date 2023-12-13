@@ -204,7 +204,7 @@ fun SearchableList(
             }
         },
         content = {
-            if (filteredCountryList.isEmpty()) {
+            if (filteredCountryList.isEmpty() && isLoading.not()) {
                 CountryListEmptyState()
             } else {
                 LazyColumn {
