@@ -29,10 +29,10 @@ and need to evaulate whether this could/should be used for other clients (again 
 
 ### Compose for Desktop 
 
-<img width="1157" alt="Screenshot 2023-12-10 at 18 01 30" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/dc60bd59-789d-47a5-aa9c-02a636735f58">
+<img width="1148" alt="Screenshot 2023-12-14 at 17 17 23" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/9e93cf4d-429f-4453-b30e-3a2c40cfdd5e">
 
 
 ### Compose for Web (Wasm)
 
-<img width="1157" alt="Screenshot 2023-12-10 at 18 00 16" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/3cb377c1-16a3-4250-8e98-b8e033d38db3">
+<img width="1141" alt="Screenshot 2023-12-14 at 17 16 17" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/70e02dc8-f82b-4ed2-b940-495e513ce3b1">
 
