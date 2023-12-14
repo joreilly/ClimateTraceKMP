@@ -1,6 +1,7 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -40,6 +41,10 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
         }
+    }
+
+    compilerOptions {
+        languageVersion.set(KOTLIN_1_9)
     }
     
     sourceSets {
@@ -128,3 +133,4 @@ compose.desktop {
 compose.experimental {
     web.application {}
 }
+
