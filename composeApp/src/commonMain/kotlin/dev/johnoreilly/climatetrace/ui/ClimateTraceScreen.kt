@@ -336,10 +336,7 @@ fun CountryInfoDetailedView(
 
                 countryEmissionInfo?.let {
                     val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
-                    val percentage =
-                        (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(
-                            2
-                        )
+                    val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
                     Text("co2 = $co2 Million Tonnes (2022)")
                     Text("rank = ${countryEmissionInfo.rank} ($percentage)")
                 }
