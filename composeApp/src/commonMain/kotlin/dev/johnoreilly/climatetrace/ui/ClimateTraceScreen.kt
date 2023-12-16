@@ -118,9 +118,12 @@ fun ClimateTraceScreen() {
                 }
 
                 Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
-                selectedCountry?.let { country ->
-                    CountryInfoDetailedView(country, countryEmissionInfo, countryAssetEmissions, isLoadingCountryDetails.value)
-                }
+                CountryInfoDetailedView(
+                    country = selectedCountry,
+                    countryEmissionInfo = countryEmissionInfo,
+                    countryAssetEmissionsList = countryAssetEmissions,
+                    isLoading = isLoadingCountryDetails.value
+                )
             }
         } else {
             Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
@@ -131,19 +134,16 @@ fun ClimateTraceScreen() {
 
             Spacer(modifier = Modifier.width(1.dp).fillMaxHeight())
             Box(Modifier.fillMaxHeight()) {
-                selectedCountry?.let { country ->
-                    CountryInfoDetailedView(
-                        country,
-                        countryEmissionInfo,
-                        countryAssetEmissions,
-                        isLoadingCountryDetails.value
-                    )
-                }
+                CountryInfoDetailedView(
+                    country = selectedCountry,
+                    countryEmissionInfo = countryEmissionInfo,
+                    countryAssetEmissionsList = countryAssetEmissions,
+                    isLoading = isLoadingCountryDetails.value
+                )
             }
         }
     }
 }
-
 
 @Composable
 fun CountryListView(
@@ -216,7 +216,6 @@ fun SearchableList(
             ) {
                 IconButton(onClick = {
                     onSearchQueryChange("")
-                    keyboardController?.hide()
                 }) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -232,7 +231,11 @@ fun SearchableList(
             } else {
                 LazyColumn {
                     items(filteredCountryList) { country ->
-                        CountryRow(country, selectedCountry, countrySelected)
+                        CountryRow(
+                            country = country,
+                            selectedCountry = selectedCountry,
+                            countrySelected = countrySelected
+                        )
                     }
                 }
             }
@@ -282,51 +285,70 @@ fun CountryRow(
 
 @Composable
 fun CountryInfoDetailedView(
-    country: Country,
+    country: Country?,
     countryEmissionInfo: CountryEmissionsInfo?,
     countryAssetEmissionsList: List<CountryAssetEmissionsInfo>?,
     isLoading: Boolean
 ) {
 
-    if (isLoading) {
+    if (country == null) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .fillMaxHeight()
                 .wrapContentSize(Alignment.Center)
         ) {
-            CircularProgressIndicator()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .fillMaxHeight()
+                    .wrapContentSize(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("No Country Selected!", style = MaterialTheme.typography.titleLarge)
+            }
         }
     } else {
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = country.name,
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.size(16.dp))
-
-            countryEmissionInfo?.let {
-                val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
-                val percentage =
-                    (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(
-                        2
-                    )
-                Text("co2 = $co2 Million Tonnes (2022)")
-                Text("rank = ${countryEmissionInfo.rank} ($percentage)")
+        if (isLoading) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .fillMaxHeight()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                CircularProgressIndicator()
             }
+        } else {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = country.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
+                )
 
-            Spacer(modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.size(16.dp))
 
-            countryAssetEmissionsList?.let {
-                SectorEmissionsPieChart(countryAssetEmissionsList)
+                countryEmissionInfo?.let {
+                    val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
+                    val percentage =
+                        (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(
+                            2
+                        )
+                    Text("co2 = $co2 Million Tonnes (2022)")
+                    Text("rank = ${countryEmissionInfo.rank} ($percentage)")
+                }
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                countryAssetEmissionsList?.let {
+                    SectorEmissionsPieChart(countryAssetEmissionsList)
+                }
             }
         }
     }
