@@ -76,11 +76,12 @@ fun ClimateTraceScreen() {
     var selectedCountry by remember { mutableStateOf<Country?>(null) }
     var countryEmissionInfo by remember { mutableStateOf<CountryEmissionsInfo?>(null) }
     var countryAssetEmissions by remember { mutableStateOf<List<CountryAssetEmissionsInfo>?>(null) }
-    val isLoading = remember { mutableStateOf(true) }
+    val isLoadingCountries = remember { mutableStateOf(true) }
+    val isLoadingCountryDetails = remember { mutableStateOf(true) }
 
     LaunchedEffect(true) {
         performAsyncOperation(
-            isLoadingState = isLoading,
+            isLoadingState = isLoadingCountries,
             operation = { climateTraceApi.fetchCountries().sortedBy { it.name } },
             onSuccess = { countries -> countryList = countries }
         )
@@ -89,14 +90,14 @@ fun ClimateTraceScreen() {
     LaunchedEffect(selectedCountry) {
         selectedCountry?.let { country ->
             performAsyncOperation(
-                isLoadingState = isLoading,
+                isLoadingState = isLoadingCountryDetails,
                 operation = { climateTraceApi.fetchCountryEmissionsInfo(country.alpha3) },
                 onSuccess = { countryEmissionInfoList ->
                     countryEmissionInfo = countryEmissionInfoList.firstOrNull()
                 }
             )
             performAsyncOperation(
-                isLoadingState = isLoading,
+                isLoadingState = isLoadingCountryDetails,
                 operation = { climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3] },
                 onSuccess = { countryAssetEmissionsDetails ->
                     countryAssetEmissions = countryAssetEmissionsDetails
@@ -111,19 +112,19 @@ fun ClimateTraceScreen() {
             Column(Modifier.fillMaxWidth()) {
 
                 Box(Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)) {
-                    CountryListView(countryList, selectedCountry, isLoading.value) { country ->
+                    CountryListView(countryList, selectedCountry, isLoadingCountries.value) { country ->
                         selectedCountry = country
                     }
                 }
 
                 Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
                 selectedCountry?.let { country ->
-                    CountryInfoDetailedView(country, countryEmissionInfo, countryAssetEmissions, isLoading.value)
+                    CountryInfoDetailedView(country, countryEmissionInfo, countryAssetEmissions, isLoadingCountryDetails.value)
                 }
             }
         } else {
             Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
-                CountryListView(countryList, selectedCountry, isLoading.value) { country ->
+                CountryListView(countryList, selectedCountry, isLoadingCountries.value) { country ->
                     selectedCountry = country
                 }
             }
@@ -135,7 +136,7 @@ fun ClimateTraceScreen() {
                         country,
                         countryEmissionInfo,
                         countryAssetEmissions,
-                        isLoading.value
+                        isLoadingCountryDetails.value
                     )
                 }
             }
