@@ -36,13 +36,25 @@ fun CountryListViewController(onCountryClicked: (country: Country) -> Unit) = Co
 fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewController {
     val climateTraceApi = remember { ClimateTraceApi() }
     var countryEmissionInfo by remember { mutableStateOf<CountryEmissionsInfo?>(null) }
-    var countryAssetEmissons by remember { mutableStateOf<List<CountryAssetEmissionsInfo>?>(null) }
+    var countryAssetEmissions by remember { mutableStateOf<List<CountryAssetEmissionsInfo>?>(null) }
+    val isLoading = remember { mutableStateOf(true) }
 
     LaunchedEffect(country) {
-        val countryEmissionInfoList = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3)
-        countryEmissionInfo = countryEmissionInfoList.firstOrNull()
-        countryAssetEmissons = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
+        performAsyncOperation(
+            isLoadingState = isLoading,
+            operation = { climateTraceApi.fetchCountryEmissionsInfo(country.alpha3) },
+            onSuccess = { countryEmissionInfoList ->
+                countryEmissionInfo = countryEmissionInfoList.firstOrNull()
+            }
+        )
+        performAsyncOperation(
+            isLoadingState = isLoading,
+            operation = { climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3] },
+            onSuccess = { countryAssetEmissionsDetails ->
+                countryAssetEmissions = countryAssetEmissionsDetails
+            }
+        )
     }
 
-    CountryInfoDetailedView(country, countryEmissionInfo, countryAssetEmissons)
+    CountryInfoDetailedView(country, countryEmissionInfo, countryAssetEmissions, isLoading.value)
 }

@@ -95,6 +95,7 @@ class CountryListScreen : Screen {
         override fun Content() {
             val navigator = LocalNavigator.currentOrThrow
 
+            val isLoading = remember { mutableStateOf(true) }
             val climateTraceApi = remember { ClimateTraceApi() }
             var countryEmissionInfo by remember { mutableStateOf<CountryEmissionsInfo?>(null) }
             var countryAssetEmissions by remember {
@@ -104,9 +105,20 @@ class CountryListScreen : Screen {
             }
 
             LaunchedEffect(country) {
-                val countryEmissionInfoList = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3)
-                countryEmissionInfo = countryEmissionInfoList[0]
-                countryAssetEmissions = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
+                performAsyncOperation(
+                    isLoadingState = isLoading,
+                    operation = { climateTraceApi.fetchCountryEmissionsInfo(country.alpha3) },
+                    onSuccess = { countryEmissionInfoList ->
+                        countryEmissionInfo = countryEmissionInfoList.firstOrNull()
+                    }
+                )
+                performAsyncOperation(
+                    isLoadingState = isLoading,
+                    operation = { climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3] },
+                    onSuccess = { countryAssetEmissionsDetails ->
+                        countryAssetEmissions = countryAssetEmissionsDetails
+                    }
+                )
             }
 
             Scaffold(
@@ -124,7 +136,12 @@ class CountryListScreen : Screen {
                 }
             ) {
                 Column(Modifier.padding(it)) {
-                    CountryInfoDetailedView(country, countryEmissionInfo, countryAssetEmissions)
+                    CountryInfoDetailedView(
+                        country,
+                        countryEmissionInfo,
+                        countryAssetEmissions,
+                        isLoading.value
+                    )
                 }
             }
         }
