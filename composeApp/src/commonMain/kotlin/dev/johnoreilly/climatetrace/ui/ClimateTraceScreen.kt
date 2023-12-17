@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -112,7 +113,11 @@ fun ClimateTraceScreen() {
             Column(Modifier.fillMaxWidth()) {
 
                 Box(Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)) {
-                    CountryListView(countryList, selectedCountry, isLoadingCountries.value) { country ->
+                    CountryListView(
+                        countryList,
+                        selectedCountry,
+                        isLoadingCountries.value
+                    ) { country ->
                         selectedCountry = country
                     }
                 }
@@ -227,7 +232,7 @@ fun SearchableList(
         },
         content = {
             if (filteredCountryList.isEmpty() && isLoading.not()) {
-                CountryListEmptyState()
+                EmptyState(message = "search differently")
             } else {
                 LazyColumn {
                     items(filteredCountryList) { country ->
@@ -247,16 +252,19 @@ fun SearchableList(
 }
 
 @Composable
-fun CountryListEmptyState() {
+fun EmptyState(
+    title: String? = null,
+    message: String? = null
+) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .fillMaxHeight()
-            .wrapContentSize(Alignment.Center),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Text("No Countries Found!", style = MaterialTheme.typography.titleMedium)
-        Text("search differently", style = MaterialTheme.typography.bodyLarge)
+        Text(title ?: "No Countries Found!", style = MaterialTheme.typography.titleMedium)
+        message?.let {
+            Text(message, style = MaterialTheme.typography.bodyLarge)
+        }
     }
 }
 
@@ -290,7 +298,6 @@ fun CountryInfoDetailedView(
     countryAssetEmissionsList: List<CountryAssetEmissionsInfo>?,
     isLoading: Boolean
 ) {
-
     if (country == null) {
         Column(
             modifier = Modifier
@@ -305,9 +312,11 @@ fun CountryInfoDetailedView(
                     .wrapContentSize(Alignment.Center),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("No Country Selected!", style = MaterialTheme.typography.titleLarge)
+                Text(text = "No Country Selected!", style = MaterialTheme.typography.titleLarge)
             }
         }
+    } else if ((countryEmissionInfo == null || countryAssetEmissionsList.isNullOrEmpty()) && isLoading.not()) {
+        EmptyState(title = "No data found for ${country.name}")
     } else {
         if (isLoading) {
             Column(
@@ -326,25 +335,26 @@ fun CountryInfoDetailedView(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = country.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.size(16.dp))
-
                 countryEmissionInfo?.let {
-                    val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
-                    val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
-                    Text("co2 = $co2 Million Tonnes (2022)")
-                    Text("rank = ${countryEmissionInfo.rank} ($percentage)")
-                }
+                    countryAssetEmissionsList?.let {
+                        Text(
+                            text = country.name,
+                            style = MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center
+                        )
 
-                Spacer(modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.size(16.dp))
 
-                countryAssetEmissionsList?.let {
-                    SectorEmissionsPieChart(countryAssetEmissionsList)
+                        val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
+                        val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
+
+                        Text(text = "co2 = $co2 Million Tonnes (2022)")
+                        Text(text = "rank = ${countryEmissionInfo.rank} ($percentage)")
+
+                        Spacer(modifier = Modifier.size(16.dp))
+
+                        SectorEmissionsPieChart(countryAssetEmissionsList)
+                    }
                 }
             }
         }

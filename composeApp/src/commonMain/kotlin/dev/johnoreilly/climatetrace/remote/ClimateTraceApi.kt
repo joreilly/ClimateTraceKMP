@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -66,9 +67,10 @@ data class EmissionInfo(
 class ClimateTraceApi(
     private val baseUrl: String = "https://api.climatetrace.org/v4",
 )  {
+    @OptIn(ExperimentalSerializationApi::class)
     private val client = HttpClient {
         install(ContentNegotiation) {
-            json(Json { isLenient = true; ignoreUnknownKeys = true })
+            json(Json { isLenient = true; ignoreUnknownKeys = true; explicitNulls = false})
         }
     }
 
