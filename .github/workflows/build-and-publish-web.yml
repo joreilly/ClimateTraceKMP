@@ -18,7 +18,7 @@ jobs:
 
       # Check out current repository
       - name: Fetch Sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # Build application
       - name: Test and Build
