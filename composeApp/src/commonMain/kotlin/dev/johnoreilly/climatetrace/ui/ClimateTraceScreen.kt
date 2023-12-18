@@ -114,9 +114,9 @@ fun ClimateTraceScreen() {
 
                 Box(Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)) {
                     CountryListView(
-                        countryList,
-                        selectedCountry,
-                        isLoadingCountries.value
+                        countryList = countryList,
+                        selectedCountry = selectedCountry,
+                        isLoading = isLoadingCountries.value
                     ) { country ->
                         selectedCountry = country
                     }
@@ -132,7 +132,11 @@ fun ClimateTraceScreen() {
             }
         } else {
             Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
-                CountryListView(countryList, selectedCountry, isLoadingCountries.value) { country ->
+                CountryListView(
+                    countryList = countryList,
+                    selectedCountry = selectedCountry,
+                    isLoading = isLoadingCountries.value
+                ) { country ->
                     selectedCountry = country
                 }
             }
@@ -298,63 +302,67 @@ fun CountryInfoDetailedView(
     countryAssetEmissionsList: List<CountryAssetEmissionsInfo>?,
     isLoading: Boolean
 ) {
-    if (country == null) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .fillMaxHeight()
-                .wrapContentSize(Alignment.Center)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .fillMaxHeight()
-                    .wrapContentSize(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = "No Country Selected!", style = MaterialTheme.typography.titleLarge)
-            }
-        }
-    } else if ((countryEmissionInfo == null || countryAssetEmissionsList.isNullOrEmpty()) && isLoading.not()) {
-        EmptyState(title = "No data found for ${country.name}")
-    } else {
-        if (isLoading) {
+    when {
+        country == null -> {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .fillMaxHeight()
                     .wrapContentSize(Alignment.Center)
             ) {
-                CircularProgressIndicator()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .fillMaxHeight()
+                        .wrapContentSize(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "No Country Selected!", style = MaterialTheme.typography.titleLarge)
+                }
             }
-        } else {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                countryEmissionInfo?.let {
-                    countryAssetEmissionsList?.let {
-                        Text(
-                            text = country.name,
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center
-                        )
+        }
+        (countryEmissionInfo == null || countryAssetEmissionsList.isNullOrEmpty()) && isLoading.not() -> {
+            EmptyState(title = "No data found for ${country.name}")
+        }
+        else -> {
+            if (isLoading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .fillMaxHeight()
+                        .wrapContentSize(Alignment.Center)
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    countryEmissionInfo?.let {
+                        countryAssetEmissionsList?.let {
+                            Text(
+                                text = country.name,
+                                style = MaterialTheme.typography.titleLarge,
+                                textAlign = TextAlign.Center
+                            )
 
-                        Spacer(modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.size(16.dp))
 
-                        val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
-                        val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
+                            val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
+                            val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
 
-                        Text(text = "co2 = $co2 Million Tonnes (2022)")
-                        Text(text = "rank = ${countryEmissionInfo.rank} ($percentage)")
+                            Text(text = "co2 = $co2 Million Tonnes (2022)")
+                            Text(text = "rank = ${countryEmissionInfo.rank} ($percentage)")
 
-                        Spacer(modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.size(16.dp))
 
-                        SectorEmissionsPieChart(countryAssetEmissionsList)
-                    }
+                            SectorEmissionsPieChart(countryAssetEmissionsList)
+                        } ?: EmptyState(title = "No data found for ${country.name}")
+                    } ?: EmptyState(title = "No data found for ${country.name}")
                 }
             }
         }
@@ -397,11 +405,27 @@ fun SectorEmissionsPieChart(
         PieChart(
             values = values,
             modifier = modifier.padding(start = 8.dp),
-            slice = { i: Int ->
+            slice = { index: Int ->
                 DefaultSlice(
-                    color = colors[i],
+                    color = colors[index],
                     hoverExpandFactor = 1.05f,
-                    hoverElement = { HoverSurface { Text(values[i].toString()) } },
+                    hoverElement = {
+                        HoverSurface {
+                            Column(
+                                modifier = Modifier
+                                    .wrapContentSize(Alignment.Center)
+                            ) {
+                                Text(
+                                    text = (values[index] / total).toPercent(1),
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                                Text(
+                                    text = values[index].toString(),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
                 )
             },
             label = { i ->
@@ -417,10 +441,13 @@ fun SectorEmissionsPieChart(
             FlowLegend(
                 itemCount = labels.size,
                 symbol = { i ->
-                    Symbol(modifier = Modifier.size(8.dp), fillBrush = SolidColor(colors[i]))
+                    Symbol(
+                        modifier = Modifier.size(8.dp),
+                        fillBrush = SolidColor(colors[i])
+                    )
                 },
-                label = { i ->
-                    Text(labels[i])
+                label = { labelIndex ->
+                    Text(text = labels[labelIndex])
                 },
                 modifier = Modifier.padding(8.dp)
             )
