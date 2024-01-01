@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.kmpNativeCoroutines)
 }
 
 kotlin {
@@ -48,6 +49,10 @@ kotlin {
     }
     
     sourceSets {
+        all {
+            languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
+        }
+
         val desktopMain by getting
         
         commonMain.dependencies {
@@ -56,10 +61,12 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.ui)
             @OptIn(ExperimentalComposeLibrary::class)
-            implementation(compose.components.resources)
+            //implementation(compose.components.resources)
 
             implementation(libs.kotlinx.coroutines)
             implementation(libs.bundles.ktor.common)
+
+            implementation(libs.kmmViewModel)
 
             implementation(libs.koalaplot)
             api(libs.compose.window.size)
@@ -74,6 +81,8 @@ kotlin {
         }
 
         desktopMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${libs.versions.kotlinx.coroutines}")
+
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.java)
         }
@@ -134,3 +143,11 @@ compose.experimental {
     web.application {}
 }
 
+compose {
+    kotlinCompilerPlugin.set(libs.versions.compose.compiler)
+    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=${libs.versions.kotlin}")
+}
+
+kotlin.sourceSets.all {
+    languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
+}

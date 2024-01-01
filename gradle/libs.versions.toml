@@ -3,22 +3,25 @@ agp = "8.2.0"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
-androidx-activityCompose = "1.8.1"
+androidx-activityCompose = "1.8.2"
 androidx-appcompat = "1.6.1"
 androidx-constraintlayout = "2.1.4"
 androidx-core-ktx = "1.12.0"
 androidx-espresso-core = "3.5.1"
 androidx-material = "1.11.0"
 androidx-test-junit = "1.1.5"
-compose = "1.5.4"
-compose-compiler = "1.5.5"
+compose = "1.6.0-alpha01"
+compose-compiler = "1.5.6-dev1-kt2.0.0-Beta2"
 compose-plugin = "1.6.0-alpha01"
 composeWindowSize = "0.5.0-alpha03"
 imageLoader = "1.7.1"
 junit = "4.13.2"
 koalaplot = "0.5.1"
-kotlin = "1.9.21"
-kotlinx-coroutines = "1.8.0-RC"
+kotlin = "2.0.0-Beta1"
+kotlinx-coroutines = "1.8.0-RC2"
+kmpNativeCoroutines = "1.0.0-ALPHA-24-kotlin-2.0.0-Beta2"
+kmmViewModel = "1.0.0-ALPHA-17-kotlin-2.0.0-Beta2"
+ksp = "2.0.0-Beta1-1.0.15"
 ktor = "3.0.0-wasm2"
 multiplatformSettings = "1.1.1"
 voyager= "1.0.0"
@@ -45,6 +48,7 @@ compose-window-size = { module = "dev.chrisbanes.material3:material3-window-size
 
 
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kmmViewModel = { group = "com.rickclephas.kmm", name = "kmm-viewmodel-core", version.ref = "kmmViewModel" }
 
 ktor = { group = "io.ktor", name = "ktor", version.ref = "ktor" }
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
@@ -75,3 +79,6 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
