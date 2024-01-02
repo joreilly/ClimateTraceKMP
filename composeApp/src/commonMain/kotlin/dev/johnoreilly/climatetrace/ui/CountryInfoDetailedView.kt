@@ -65,27 +65,24 @@ fun CountryInfoDetailedView(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    countryEmissionInfo?.let {
-                        countryAssetEmissionsList?.let {
-                            Text(
-                                text = country.name,
-                                style = MaterialTheme.typography.titleLarge,
-                                textAlign = TextAlign.Center
-                            )
+                    if (countryEmissionInfo != null && countryAssetEmissionsList != null) {
+                        Text(
+                            text = country.name,
+                            style = MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center
+                        )
 
-                            Spacer(modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.size(16.dp))
 
-                            val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
-                            val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
+                        val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
+                        val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
 
-                            Text(text = "co2 = $co2 Million Tonnes (2022)")
-                            Text(text = "rank = ${countryEmissionInfo.rank} ($percentage)")
+                        Text(text = "co2 = $co2 Million Tonnes (2022)")
+                        Text(text = "rank = ${countryEmissionInfo.rank} ($percentage)")
 
-                            Spacer(modifier = Modifier.size(16.dp))
-
-                            SectorEmissionsPieChart(countryAssetEmissionsList)
-                        } ?: EmptyState(title = "No data found for ${country.name}")
-                    } ?: EmptyState(title = "No data found for ${country.name}")
+                        Spacer(modifier = Modifier.size(16.dp))
+                        SectorEmissionsPieChart(countryAssetEmissionsList)
+                    }
                 }
             }
         }
