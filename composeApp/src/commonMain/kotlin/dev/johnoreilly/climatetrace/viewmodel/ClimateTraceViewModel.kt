@@ -1,45 +1,47 @@
 package dev.johnoreilly.climatetrace.viewmodel
 
 import com.rickclephas.kmm.viewmodel.KMMViewModel
-import com.rickclephas.kmm.viewmodel.*
+import com.rickclephas.kmm.viewmodel.MutableStateFlow
+import com.rickclephas.kmm.viewmodel.coroutineScope
 import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
 import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 open class ClimateTraceViewModel : KMMViewModel() {
     private val climateTraceApi = ClimateTraceApi()
 
+    private val _countryList = MutableStateFlow<List<Country>>(viewModelScope, emptyList())
     @NativeCoroutinesState
-    val countryList = MutableStateFlow<List<Country>>(emptyList())
+    val countryList = _countryList.asStateFlow()
 
     @NativeCoroutinesState
-    val selectedCountry = MutableStateFlow<Country?>(null)
+    val selectedCountry = MutableStateFlow<Country?>(viewModelScope, null)
 
     @NativeCoroutinesState
-    val countryEmissionInfo = MutableStateFlow<CountryEmissionsInfo?>(null)
+    val countryEmissionInfo = MutableStateFlow<CountryEmissionsInfo?>(viewModelScope, null)
 
     @NativeCoroutinesState
-    val countryAssetEmissions = MutableStateFlow<List<CountryAssetEmissionsInfo>?>(null)
+    val countryAssetEmissions = MutableStateFlow<List<CountryAssetEmissionsInfo>?>(viewModelScope, null)
 
-    val isLoadingCountries = MutableStateFlow(false)
-    val isLoadingCountryDetails = MutableStateFlow(false)
+    val isLoadingCountries = MutableStateFlow(viewModelScope, true)
+    val isLoadingCountryDetails = MutableStateFlow(viewModelScope, true)
 
     init {
+        isLoadingCountries.value = true
         viewModelScope.coroutineScope.launch {
-            isLoadingCountries.value = true
-            countryList.value = climateTraceApi.fetchCountries().sortedBy { it.name }
+            _countryList.value = climateTraceApi.fetchCountries().sortedBy { it.name }
             isLoadingCountries.value = false
         }
     }
 
     fun setCountry(country: Country) {
         selectedCountry.value = country
+        isLoadingCountryDetails.value = true
         viewModelScope.coroutineScope.launch {
-            isLoadingCountryDetails.value = true
             countryEmissionInfo.value = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3).firstOrNull()
             countryAssetEmissions.value = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
             isLoadingCountryDetails.value = false
