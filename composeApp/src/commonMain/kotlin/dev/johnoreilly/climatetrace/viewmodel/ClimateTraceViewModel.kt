@@ -38,7 +38,7 @@ open class ClimateTraceViewModel : KMMViewModel() {
         }
     }
 
-    fun setCountry(country: Country) {
+    fun fetchCountryDetails(country: Country) {
         selectedCountry.value = country
         isLoadingCountryDetails.value = true
         viewModelScope.coroutineScope.launch {

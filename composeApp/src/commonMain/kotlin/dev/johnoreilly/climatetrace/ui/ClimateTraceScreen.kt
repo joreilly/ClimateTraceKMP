@@ -60,7 +60,7 @@ fun ClimateTraceScreen() {
     val countryAssetEmissions by viewModel.countryAssetEmissions.collectAsState()
 
     val isLoadingCountries by viewModel.isLoadingCountries.collectAsState()
-    val isLoadingCountryDetails by viewModel.isLoadingCountries.collectAsState()
+    val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()
 
 
     Row(Modifier.fillMaxSize()) {
@@ -74,7 +74,7 @@ fun ClimateTraceScreen() {
                         selectedCountry = selectedCountry,
                         isLoading = isLoadingCountries
                     ) { country ->
-                        viewModel.setCountry(country)
+                        viewModel.fetchCountryDetails(country)
                     }
                 }
 
@@ -93,7 +93,7 @@ fun ClimateTraceScreen() {
                     selectedCountry = selectedCountry,
                     isLoading = isLoadingCountries
                 ) { country ->
-                    viewModel.setCountry(country)
+                    viewModel.fetchCountryDetails(country)
                 }
             }
 
