@@ -89,10 +89,10 @@ class CountryListScreen : Screen {
             val viewModel = remember { ClimateTraceViewModel() }
             val countryEmissionInfo by viewModel.countryEmissionInfo.collectAsState()
             val countryAssetEmissions by viewModel.countryAssetEmissions.collectAsState()
-            val isLoadingCountryDetails by viewModel.isLoadingCountries.collectAsState()
+            val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()
 
             LaunchedEffect(country) {
-                viewModel.setCountry(country)
+                viewModel.fetchCountryDetails(country)
             }
 
             Scaffold(
