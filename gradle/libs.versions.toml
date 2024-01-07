@@ -22,7 +22,7 @@ kotlinx-coroutines = "1.8.0-RC2"
 kmpNativeCoroutines = "1.0.0-ALPHA-24-kotlin-2.0.0-Beta2"
 kmmViewModel = "1.0.0-ALPHA-17-kotlin-2.0.0-Beta2"
 ksp = "2.0.0-Beta1-1.0.15"
-ktor = "3.0.0-wasm2"
+ktor = "3.2.0"
 multiplatformSettings = "1.1.1"
 voyager= "1.0.0"
 
