@@ -10,9 +10,11 @@ import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
 import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-open class ClimateTraceViewModel : KMMViewModel() {
-    private val climateTraceApi = ClimateTraceApi()
+open class ClimateTraceViewModel : KMMViewModel(), KoinComponent {
+    private val climateTraceApi: ClimateTraceApi by inject()
 
     private val _countryList = MutableStateFlow<List<Country>>(viewModelScope, emptyList())
     @NativeCoroutinesState

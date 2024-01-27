@@ -54,8 +54,9 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
-            @OptIn(ExperimentalComposeLibrary::class)
-            //implementation(compose.components.resources)
+
+            implementation(libs.koin.core)
+            //implementation(libs.koin.compose)
 
             implementation(libs.kotlinx.coroutines)
             implementation(libs.bundles.ktor.common)

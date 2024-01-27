@@ -1,5 +1,5 @@
 [versions]
-agp = "8.2.0"
+agp = "8.2.2"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
@@ -17,11 +17,13 @@ composeWindowSize = "0.5.0-alpha03"
 imageLoader = "1.7.1"
 junit = "4.13.2"
 koalaplot = "0.5.1"
-kotlin = "2.0.0-Beta1"
+koin = "3.6.0-wasm-alpha1"
+koinCompose = "3.6.0-wasm-alpha1"
+kotlin = "2.0.0-Beta2"
 kotlinx-coroutines = "1.8.0-RC2"
 kmpNativeCoroutines = "1.0.0-ALPHA-24-kotlin-2.0.0-Beta2"
 kmmViewModel = "1.0.0-ALPHA-17-kotlin-2.0.0-Beta2"
-ksp = "2.0.0-Beta1-1.0.15"
+ksp = "2.0.0-Beta2-1.0.16"
 ktor = "3.0.0-wasm2"
 multiplatformSettings = "1.1.1"
 voyager= "1.0.0"
@@ -45,6 +47,9 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-window-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "composeWindowSize" }
+
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 
 
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }

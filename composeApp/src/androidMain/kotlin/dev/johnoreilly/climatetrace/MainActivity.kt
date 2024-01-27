@@ -26,6 +26,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.johnoreilly.climatetrace.di.initKoin
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
 import dev.johnoreilly.climatetrace.ui.CountryListView
@@ -35,6 +36,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        initKoin()
 
         setContent {
             MaterialTheme {
