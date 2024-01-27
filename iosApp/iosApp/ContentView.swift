@@ -63,7 +63,14 @@ struct CountryListView: View {
                 }
             }
             .searchable(text: $query)
-            .navigationTitle("ClimateTrace")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    VStack {
+                        Text("ClimateTrace").font(.headline)
+                    }
+                }
+            }
         }
     }
 }

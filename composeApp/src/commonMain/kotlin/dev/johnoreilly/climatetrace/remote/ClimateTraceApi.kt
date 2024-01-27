@@ -2,13 +2,9 @@ package dev.johnoreilly.climatetrace.remote
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 @Serializable
 data class AssetsResult(val assets: List<Asset>)
@@ -65,15 +61,9 @@ data class EmissionInfo(
 
 
 class ClimateTraceApi(
+    private val client: HttpClient,
     private val baseUrl: String = "https://api.climatetrace.org/v4",
 )  {
-    @OptIn(ExperimentalSerializationApi::class)
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json { isLenient = true; ignoreUnknownKeys = true; explicitNulls = false})
-        }
-    }
-
     suspend fun fetchContinents() = client.get("$baseUrl/definitions/continents").body<List<String>>()
     suspend fun fetchCountries() = client.get("$baseUrl/definitions/countries").body<List<Country>>()
     suspend fun fetchSectors() = client.get("$baseUrl/definitions/sectors").body<List<String>>()
