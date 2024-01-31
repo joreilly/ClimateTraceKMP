@@ -44,15 +44,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
+import org.koin.compose.koinInject
+import org.koin.core.component.inject
 
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ClimateTraceScreen() {
     val windowSizeClass = calculateWindowSizeClass()
-    val viewModel = remember { ClimateTraceViewModel() }
+    val viewModel = koinInject<ClimateTraceViewModel>()
 
     val countryList by viewModel.countryList.collectAsState()
     val selectedCountry by viewModel.selectedCountry.collectAsState()

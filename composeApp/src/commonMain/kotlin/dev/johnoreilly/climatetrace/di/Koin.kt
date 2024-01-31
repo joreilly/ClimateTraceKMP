@@ -1,6 +1,7 @@
 package dev.johnoreilly.climatetrace.di
 
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
+import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.DEFAULT
@@ -22,10 +23,11 @@ fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclarat
 // called by iOS etc
 fun initKoin() = initKoin(enableNetworkLogs = false) {}
 
-fun commonModule(enableNetworkLogs: Boolean) = module {
+fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { createJson() }
     single { createHttpClient(get(), enableNetworkLogs = enableNetworkLogs) }
     single { ClimateTraceApi(get()) }
+    single { ClimateTraceViewModel() }
 }
 
 fun createJson() = Json { isLenient = true; ignoreUnknownKeys = true }
