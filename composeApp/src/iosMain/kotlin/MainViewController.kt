@@ -8,9 +8,10 @@ import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
 import dev.johnoreilly.climatetrace.ui.CountryListView
 import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
+import org.koin.compose.koinInject
 
 fun CountryListViewController(onCountryClicked: (country: Country) -> Unit) = ComposeUIViewController {
-    val viewModel = remember { ClimateTraceViewModel() }
+    val viewModel = koinInject<ClimateTraceViewModel>()
     val countryList by viewModel.countryList.collectAsState()
     val selectedCountry by viewModel.selectedCountry.collectAsState()
     val isLoadingCountries by viewModel.isLoadingCountries.collectAsState()
@@ -23,7 +24,7 @@ fun CountryListViewController(onCountryClicked: (country: Country) -> Unit) = Co
 
 
 fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewController {
-    val viewModel = remember { ClimateTraceViewModel() }
+    val viewModel = koinInject<ClimateTraceViewModel>()
     val countryEmissionInfo by viewModel.countryEmissionInfo.collectAsState()
     val countryAssetEmissions by viewModel.countryAssetEmissions.collectAsState()
     val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()

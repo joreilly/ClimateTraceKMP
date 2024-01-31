@@ -56,7 +56,7 @@ kotlin {
             implementation(compose.ui)
 
             implementation(libs.koin.core)
-            //implementation(libs.koin.compose)
+            implementation(libs.koin.compose)
 
             implementation(libs.kotlinx.coroutines)
             implementation(libs.bundles.ktor.common)
@@ -68,6 +68,8 @@ kotlin {
         }
 
         androidMain.dependencies {
+            // workaround for https://github.com/JetBrains/compose-multiplatform/issues/4157
+            implementation("androidx.compose.material3:material3:1.2.0-rc01")
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
 
@@ -77,7 +79,6 @@ kotlin {
 
         desktopMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${libs.versions.kotlinx.coroutines}")
-
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.java)
         }
