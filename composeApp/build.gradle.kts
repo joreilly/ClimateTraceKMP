@@ -77,6 +77,9 @@ kotlin {
 
             implementation(libs.ktor.client.android)
             implementation(libs.voyager)
+
+            implementation("io.github.overpas:treemap-chart:0.1.0")
+            implementation("io.github.overpas:treemap-chart-compose:0.1.0")
         }
 
         desktopMain.dependencies {
@@ -90,6 +93,9 @@ kotlin {
 
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)
+
+            implementation("io.github.overpas:treemap-chart:0.1.0")
+            implementation("io.github.overpas:treemap-chart-compose:0.1.0")
         }
     }
 }
