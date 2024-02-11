@@ -65,6 +65,8 @@ kotlin {
 
             implementation(libs.koalaplot)
             api(libs.compose.window.size)
+
+
         }
 
         androidMain.dependencies {
@@ -81,6 +83,9 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${libs.versions.kotlinx.coroutines}")
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.java)
+
+            implementation("io.github.overpas:treemap-chart:0.1.0")
+            implementation("io.github.overpas:treemap-chart-compose:0.1.0")
         }
 
         appleMain.dependencies {
