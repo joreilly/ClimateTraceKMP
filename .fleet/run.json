@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "kmp-app",
+            "name": "ClimateTraceKMP iOS App",
+            "module": "ClimateTraceKMP.ios-app.iosAppMain",
+            "destination": "iPad Pro (11-inch) (4th generation) | iOS 17.2",
+        }
+    ]
+}

@@ -1,5 +1,0 @@
-import androidx.compose.runtime.Composable
-import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
-
-@Composable
-expect fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAssetEmissionsInfo>)

@@ -19,13 +19,14 @@ junit = "4.13.2"
 koalaplot = "0.5.1"
 koin = "3.6.0-wasm-alpha2"
 koinCompose = "3.6.0-wasm-alpha2"
-kotlin = "2.0.0-Beta2"
+kotlin = "1.9.20"
 kotlinx-coroutines = "1.8.0-RC2"
-kmpNativeCoroutines = "1.0.0-ALPHA-24-kotlin-2.0.0-Beta2"
-kmmViewModel = "1.0.0-ALPHA-17-kotlin-2.0.0-Beta2"
-ksp = "2.0.0-Beta2-1.0.16"
-ktor = "3.0.0-wasm2"
+kmpNativeCoroutines = "1.0.0-ALPHA-21"
+kmmViewModel = "1.0.0-ALPHA-15"
+ksp = "1.9.20-1.0.14"
+ktor = "2.3.8"
 multiplatformSettings = "1.1.1"
+treemap = "0.1.0"
 voyager= "1.0.0"
 
 
@@ -53,6 +54,9 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 
 
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+
+
 kmmViewModel = { group = "com.rickclephas.kmm", name = "kmm-viewmodel-core", version.ref = "kmmViewModel" }
 
 ktor = { group = "io.ktor", name = "ktor", version.ref = "ktor" }
@@ -67,8 +71,12 @@ ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.r
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
 
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
+
 imageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 koalaplot = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
+treemap = { module = "io.github.overpas:treemap-chart", version.ref = "treemap" }
+treemap-compose = { module = "io.github.overpas:treemap-chart-compose", version.ref = "treemap" }
 
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatformSettings" }
