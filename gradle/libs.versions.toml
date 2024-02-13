@@ -1,61 +1,52 @@
 [versions]
-agp = "8.2.2"
+kotlin = "2.0.0"
+ksp = "2.0.0-1.0.22"
+kotlinx-coroutines = "1.8.1"
+
+
+agp = "8.5.0"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
-androidx-activityCompose = "1.8.2"
-androidx-appcompat = "1.6.1"
-androidx-constraintlayout = "2.1.4"
-androidx-core-ktx = "1.12.0"
-androidx-espresso-core = "3.5.1"
-androidx-material = "1.11.0"
-androidx-test-junit = "1.1.5"
-compose = "1.6.0-beta01"
-compose-compiler = "1.5.6-dev1-kt2.0.0-Beta2"
-compose-plugin = "1.6.0-beta01"
-composeWindowSize = "0.5.0-alpha03"
-imageLoader = "1.7.1"
-junit = "4.13.2"
-koalaplot = "0.5.1"
-koin = "3.6.0-wasm-alpha2"
-koinCompose = "3.6.0-wasm-alpha2"
-kotlin = "2.0.0-Beta2"
-kotlinx-coroutines = "1.8.0-RC2"
-kmpNativeCoroutines = "1.0.0-ALPHA-24-kotlin-2.0.0-Beta2"
-kmmViewModel = "1.0.0-ALPHA-17-kotlin-2.0.0-Beta2"
-ksp = "2.0.0-Beta2-1.0.16"
-ktor = "3.0.0-wasm2"
-multiplatformSettings = "1.1.1"
-voyager= "1.0.0"
+androidx-activityCompose = "1.9.0"
+compose = "1.6.8"
+compose-plugin = "1.6.11"
+composeWindowSize = "0.5.0"
+harawata-appdirs = "1.2.2"
+koalaplot = "0.5.3"
+koin = "3.6.0-Beta4"
+koin-android-compose = "3.6.0-Beta4"
+koin-compose-multiplatform = "1.2.0-Beta4"
+kmpNativeCoroutines = "1.0.0-ALPHA-31"
+kmmViewModel = "1.0.0-ALPHA-15"
+kstore = "0.8.0"
+ktor = "2.3.12"
+treemapChart = "0.1.0"
+voyager= "1.1.0-beta02"
+molecule =  "2.0.0"
+
 
 
 [libraries]
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
-androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
-androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 
-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-window-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "composeWindowSize" }
 
-koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose-multiplatform" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 
-
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kmmViewModel = { group = "com.rickclephas.kmm", name = "kmm-viewmodel-core", version.ref = "kmmViewModel" }
 
-ktor = { group = "io.ktor", name = "ktor", version.ref = "ktor" }
+
+kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
+kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
+kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "kstore" }
+
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
@@ -67,23 +58,23 @@ ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.r
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
 
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
-imageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
+harawata-appdirs = { module = "net.harawata:appdirs", version.ref = "harawata-appdirs" }
 koalaplot = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
+treemap-chart = { module = "io.github.overpas:treemap-chart", version.ref = "treemapChart" }
+treemap-chart-compose = { module = "io.github.overpas:treemap-chart-compose", version.ref = "treemapChart" }
 
-multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
-multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatformSettings" }
-
+molecule = { module = "app.cash.molecule:molecule-runtime", version.ref = "molecule" }
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
-multiplatform-settings = ["multiplatform-settings"] #, "multiplatform-settings-coroutines"]
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-

@@ -1,12 +1,13 @@
 Kotlin/Compose Multiplatform project to show climate related emission data from https://climatetrace.org/data. Development just started so very much work in progress right now!
 Have started with showing sector emission data per country but ton of other info available as well (ideas very welcome!).
 
+**Note tha tthis branch is using Amper build system**
+
 Running on
 * iOS 
 * Android
 * Desktop
-* Web (Wasm)
-* Kotlin Notebook
+* Web (Wasm) - (disabled in this branch until supported by Amper)
 
 
 Code is very minimal right now with Compose code using remote apis directly. Will choose/add persistence library once those libraries support Wasm along 
@@ -31,13 +32,4 @@ and need to evaulate whether this could/should be used for other clients (again 
 ### Compose for Desktop 
 
 <img width="1148" alt="Screenshot 2023-12-14 at 17 17 23" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/9e93cf4d-429f-4453-b30e-3a2c40cfdd5e">
-
-
-### Compose for Web (Wasm)
-
-<img width="1141" alt="Screenshot 2023-12-14 at 17 16 17" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/70e02dc8-f82b-4ed2-b940-495e513ce3b1">
-
-### Kotlin Notebook
-
-<img width="694" alt="Screenshot 2023-12-14 at 20 33 45" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/82ed364a-0284-4e5c-b81e-40fdfc58f312">
 

@@ -1,0 +1,12 @@
+product: android/app
+
+dependencies:
+  - ../shared
+  
+settings:
+  compose: enabled
+  android: 
+    minSdk: 26
+    namespace: dev.johnoreilly.climatetrace
+  
+  
