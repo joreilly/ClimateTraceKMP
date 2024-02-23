@@ -1,6 +1,9 @@
 package dev.johnoreilly.climatetrace.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -46,6 +49,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
+import dev.johnoreilly.climatetrace.ui.utils.PanelState
+import dev.johnoreilly.climatetrace.ui.utils.ResizablePanel
 import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
 import org.koin.compose.koinInject
 import org.koin.core.component.inject
@@ -64,6 +69,18 @@ fun ClimateTraceScreen() {
 
     val isLoadingCountries by viewModel.isLoadingCountries.collectAsState()
     val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()
+
+
+    val panelState = remember { PanelState() }
+
+    val animatedSize = if (panelState.splitter.isResizing) {
+        if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
+    } else {
+        animateDpAsState(
+            if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
+            SpringSpec(stiffness = Spring.StiffnessLow)
+        ).value
+    }
 
 
     Row(Modifier.fillMaxSize()) {
@@ -90,14 +107,22 @@ fun ClimateTraceScreen() {
                 )
             }
         } else {
-            Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
-                CountryListView(
-                    countryList = countryList,
-                    selectedCountry = selectedCountry,
-                    isLoading = isLoadingCountries
-                ) { country ->
-                    viewModel.fetchCountryDetails(country)
-                }
+
+            ResizablePanel(
+                Modifier.width(animatedSize).fillMaxHeight(),
+                title = "Countries",
+                state = panelState
+            ) {
+
+                //Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
+                    CountryListView(
+                        countryList = countryList,
+                        selectedCountry = selectedCountry,
+                        isLoading = isLoadingCountries
+                    ) { country ->
+                        viewModel.fetchCountryDetails(country)
+                    }
+                //}
             }
 
             Spacer(modifier = Modifier.width(1.dp).fillMaxHeight())

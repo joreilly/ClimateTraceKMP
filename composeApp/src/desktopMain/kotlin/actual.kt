@@ -2,6 +2,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -39,17 +42,19 @@ actual fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<Cou
         tree = buildAssetTree(countryAssetEmissions ?: emptyList())
     }
 
-    tree?.let {
-        TreemapChart(
-            data = it,
-            evaluateItem = ChartNode::value
-        ) { node, groupContent ->
-            val export = node.data
-            if (node.children.isEmpty() && export is ChartNode.Leaf) {
-                LeafItem(item = export, onClick = { })
-            } else if (export is ChartNode.Section) {
-                SectionItem(export.color) {
-                    groupContent(node)
+    Column(Modifier.height(500.dp).fillMaxWidth(0.8f)) {
+        tree?.let {
+            TreemapChart(
+                data = it,
+                evaluateItem = ChartNode::value
+            ) { node, groupContent ->
+                val export = node.data
+                if (node.children.isEmpty() && export is ChartNode.Leaf) {
+                    LeafItem(item = export, onClick = { })
+                } else if (export is ChartNode.Section) {
+                    SectionItem(export.color) {
+                        groupContent(node)
+                    }
                 }
             }
         }
