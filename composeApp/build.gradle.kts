@@ -71,7 +71,7 @@ kotlin {
 
         androidMain.dependencies {
             // workaround for https://github.com/JetBrains/compose-multiplatform/issues/4157
-            implementation("androidx.compose.material3:material3:1.2.0-rc01")
+            implementation("androidx.compose.material3:material3:1.2.0")
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
 
