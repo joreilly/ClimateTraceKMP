@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -47,6 +49,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.utils.PanelState
@@ -57,38 +62,66 @@ import org.koin.core.component.inject
 
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-@Composable
-fun ClimateTraceScreen() {
-    val windowSizeClass = calculateWindowSizeClass()
-    val viewModel = koinInject<ClimateTraceViewModel>()
+class ClimateTraceScreen: Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val windowSizeClass = calculateWindowSizeClass()
+        val viewModel = koinInject<ClimateTraceViewModel>()
 
-    val countryList by viewModel.countryList.collectAsState()
-    val selectedCountry by viewModel.selectedCountry.collectAsState()
-    val countryEmissionInfo by viewModel.countryEmissionInfo.collectAsState()
-    val countryAssetEmissions by viewModel.countryAssetEmissions.collectAsState()
+        val countryList by viewModel.countryList.collectAsState()
+        val selectedCountry by viewModel.selectedCountry.collectAsState()
+        val countryEmissionInfo by viewModel.countryEmissionInfo.collectAsState()
+        val countryAssetEmissions by viewModel.countryAssetEmissions.collectAsState()
 
-    val isLoadingCountries by viewModel.isLoadingCountries.collectAsState()
-    val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()
-
-
-    val panelState = remember { PanelState() }
-
-    val animatedSize = if (panelState.splitter.isResizing) {
-        if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
-    } else {
-        animateDpAsState(
-            if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
-            SpringSpec(stiffness = Spring.StiffnessLow)
-        ).value
-    }
+        val isLoadingCountries by viewModel.isLoadingCountries.collectAsState()
+        val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()
 
 
-    Row(Modifier.fillMaxSize()) {
+        val panelState = remember { PanelState() }
 
-        if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
-            Column(Modifier.fillMaxWidth()) {
+        val animatedSize = if (panelState.splitter.isResizing) {
+            if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
+        } else {
+            animateDpAsState(
+                if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
+                SpringSpec(stiffness = Spring.StiffnessLow)
+            ).value
+        }
 
-                Box(Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)) {
+
+        Row(Modifier.fillMaxSize()) {
+
+            if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
+                Column(Modifier.fillMaxWidth()) {
+
+                    Box(
+                        Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)
+                    ) {
+                        CountryListView(
+                            countryList = countryList,
+                            selectedCountry = selectedCountry,
+                            isLoading = isLoadingCountries
+                        ) { country ->
+                            viewModel.fetchCountryDetails(country)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
+                    CountryInfoDetailedView(
+                        country = selectedCountry,
+                        countryEmissionInfo = countryEmissionInfo,
+                        countryAssetEmissionsList = countryAssetEmissions,
+                        isLoading = isLoadingCountryDetails
+                    )
+                }
+            } else {
+
+                ResizablePanel(
+                    Modifier.width(animatedSize).fillMaxHeight(),
+                    title = "Countries",
+                    state = panelState
+                ) {
                     CountryListView(
                         countryList = countryList,
                         selectedCountry = selectedCountry,
@@ -98,41 +131,15 @@ fun ClimateTraceScreen() {
                     }
                 }
 
-                Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
-                CountryInfoDetailedView(
-                    country = selectedCountry,
-                    countryEmissionInfo = countryEmissionInfo,
-                    countryAssetEmissionsList = countryAssetEmissions,
-                    isLoading = isLoadingCountryDetails
-                )
-            }
-        } else {
-
-            ResizablePanel(
-                Modifier.width(animatedSize).fillMaxHeight(),
-                title = "Countries",
-                state = panelState
-            ) {
-
-                //Box(Modifier.width(250.dp).fillMaxHeight().background(color = Color.LightGray)) {
-                    CountryListView(
-                        countryList = countryList,
-                        selectedCountry = selectedCountry,
-                        isLoading = isLoadingCountries
-                    ) { country ->
-                        viewModel.fetchCountryDetails(country)
-                    }
-                //}
-            }
-
-            Spacer(modifier = Modifier.width(1.dp).fillMaxHeight())
-            Box(Modifier.fillMaxHeight()) {
-                CountryInfoDetailedView(
-                    country = viewModel.selectedCountry.value,
-                    countryEmissionInfo = countryEmissionInfo,
-                    countryAssetEmissionsList = countryAssetEmissions,
-                    isLoading = isLoadingCountryDetails
-                )
+                VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
+                Box(Modifier.fillMaxHeight()) {
+                    CountryInfoDetailedView(
+                        country = viewModel.selectedCountry.value,
+                        countryEmissionInfo = countryEmissionInfo,
+                        countryAssetEmissionsList = countryAssetEmissions,
+                        isLoading = isLoadingCountryDetails
+                    )
+                }
             }
         }
     }

@@ -1,3 +1,5 @@
+package dev.johnoreilly.climatetrace.ui
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,13 +31,14 @@ import by.overpass.treemapchart.compose.TreemapChart
 import by.overpass.treemapchart.core.tree.Tree
 import by.overpass.treemapchart.core.tree.tree
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
+import dev.johnoreilly.climatetrace.ui.ChartNode
 import io.github.koalaplot.core.util.generateHueColorPalette
 import io.github.koalaplot.core.util.toString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-actual fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAssetEmissionsInfo>) {
+fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAssetEmissionsInfo>) {
     var tree by remember { mutableStateOf<Tree<ChartNode>?>(null) }
 
     LaunchedEffect(countryAssetEmissions) {
