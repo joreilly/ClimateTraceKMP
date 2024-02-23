@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -86,9 +85,7 @@ fun CountryInfoDetailedView(
 
                         Spacer(modifier = Modifier.size(16.dp))
 
-                        Column(Modifier.height(500.dp).fillMaxWidth(0.8f)) {
-                            CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
-                        }
+                        CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
                         Spacer(modifier = Modifier.size(16.dp))
 
                         SectorEmissionsPieChart(countryAssetEmissionsList)
