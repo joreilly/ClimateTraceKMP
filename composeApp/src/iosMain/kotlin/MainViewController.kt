@@ -23,7 +23,7 @@ fun CountryListViewController(onCountryClicked: (country: Country) -> Unit) = Co
 }
 
 
-fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewController {
+fun CountryInfoDetailedViewController(country: Country, year: String) = ComposeUIViewController {
     val viewModel = koinInject<ClimateTraceViewModel>()
     val countryEmissionInfo by viewModel.countryEmissionInfo.collectAsState()
     val countryAssetEmissions by viewModel.countryAssetEmissions.collectAsState()
@@ -33,5 +33,5 @@ fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewControlle
         viewModel.fetchCountryDetails(country)
     }
 
-    CountryInfoDetailedView(country, countryEmissionInfo, countryAssetEmissions, isLoadingCountryDetails)
+    CountryInfoDetailedView(country, year, countryEmissionInfo, countryAssetEmissions, isLoadingCountryDetails)
 }

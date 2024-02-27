@@ -50,6 +50,7 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
             Column(Modifier.padding(it)) {
                 CountryInfoDetailedView(
                         country,
+                        viewModel.year,
                         countryEmissionInfo,
                         countryAssetEmissions,
                         isLoadingCountryDetails
