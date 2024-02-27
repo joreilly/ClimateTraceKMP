@@ -1,6 +1,5 @@
 package dev.johnoreilly.climatetrace.ui
 
-import CountryAssetEmissionsInfoTreeMapChart
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight

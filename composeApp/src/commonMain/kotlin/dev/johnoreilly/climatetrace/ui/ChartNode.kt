@@ -1,3 +1,5 @@
+package dev.johnoreilly.climatetrace.ui
+
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 

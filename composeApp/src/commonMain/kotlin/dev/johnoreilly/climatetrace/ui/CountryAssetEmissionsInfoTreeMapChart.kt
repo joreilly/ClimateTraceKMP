@@ -1,3 +1,5 @@
+package dev.johnoreilly.climatetrace.ui
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,7 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-actual fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAssetEmissionsInfo>) {
+fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAssetEmissionsInfo>) {
     var tree by remember { mutableStateOf<Tree<ChartNode>?>(null) }
 
     LaunchedEffect(countryAssetEmissions) {

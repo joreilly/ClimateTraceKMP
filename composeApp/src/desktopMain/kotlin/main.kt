@@ -8,6 +8,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import dev.johnoreilly.climatetrace.di.commonModule
 import dev.johnoreilly.climatetrace.remote.Country
+import dev.johnoreilly.climatetrace.ui.CountryAssetEmissionsInfoTreeMapChart
 import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
