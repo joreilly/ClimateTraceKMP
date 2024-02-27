@@ -45,7 +45,7 @@ open class ClimateTraceViewModel : KMMViewModel(), KoinComponent {
         isLoadingCountryDetails.value = true
         viewModelScope.coroutineScope.launch {
             countryEmissionInfo.value = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3).firstOrNull()
-            countryAssetEmissions.value = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)[country.alpha3]
+            countryAssetEmissions.value = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)
             isLoadingCountryDetails.value = false
         }
     }
