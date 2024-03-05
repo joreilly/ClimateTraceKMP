@@ -64,6 +64,7 @@ struct CountryListView: View {
                         }
                     }
                     .searchable(text: $query)
+                    .disableAutocorrection(true)
 
                     // Conditional display of the ProgressView
                     if let isLoading = viewModel.isLoadingCountries.value_ as? Bool, isLoading {
