@@ -11,22 +11,22 @@ androidx-espresso-core = "3.5.1"
 androidx-material = "1.11.0"
 androidx-test-junit = "1.1.5"
 compose = "1.6.2"
-compose-compiler = "1.5.6-dev1-kt2.0.0-Beta2"
-compose-plugin = "1.6.0-beta01"
-composeWindowSize = "0.5.0-alpha03"
-imageLoader = "1.7.6"
+compose-compiler = "1.5.6-dev2-kt2.0.0-Beta3"
+compose-plugin = "1.6.0"
+composeWindowSize = "0.5.0"
+imageLoader = "1.7.7"
 junit = "4.13.2"
 koalaplot = "0.5.1"
-koin = "3.6.0-wasm-alpha2"
-koinCompose = "3.6.0-wasm-alpha2"
-kotlin = "2.0.0-Beta2"
-kotlinx-coroutines = "1.8.0-RC2"
-kmpNativeCoroutines = "1.0.0-ALPHA-24-kotlin-2.0.0-Beta2"
-kmmViewModel = "1.0.0-ALPHA-17-kotlin-2.0.0-Beta2"
-ksp = "2.0.0-Beta2-1.0.16"
+koin = "3.6.0-alpha3"
+koinCompose = "1.2.0-alpha3"
+kotlin = "2.0.0-Beta3"
+kotlinx-coroutines = "1.8.0"
+kmpNativeCoroutines = "1.0.0-ALPHA-24-kotlin-2.0.0-Beta3"
+kmmViewModel = "1.0.0-ALPHA-18-kotlin-2.0.0-Beta3"
+ksp = "2.0.0-Beta3-1.0.17"
 ktor = "3.0.0-wasm2"
-multiplatformSettings = "1.1.1"
-voyager= "1.0.0"
+treemapChart = "0.1.1"
+voyager= "1.1.0-alpha03"
 
 
 [libraries]
@@ -69,14 +69,13 @@ ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref =
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 imageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 koalaplot = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
-
-multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
-multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatformSettings" }
+treemap-chart = { module = "io.github.overpas:treemap-chart", version.ref = "treemapChart" }
+treemap-chart-compose = { module = "io.github.overpas:treemap-chart-compose", version.ref = "treemapChart" }
 
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
-multiplatform-settings = ["multiplatform-settings"] #, "multiplatform-settings-coroutines"]
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

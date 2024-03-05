@@ -61,41 +61,31 @@ kotlin {
             implementation(libs.kotlinx.coroutines)
             implementation(libs.bundles.ktor.common)
 
+            implementation(libs.voyager)
+
             implementation(libs.kmmViewModel)
 
             implementation(libs.koalaplot)
+            implementation(libs.treemap.chart)
+            implementation(libs.treemap.chart.compose)
             api(libs.compose.window.size)
-
-
         }
 
         androidMain.dependencies {
-            // workaround for https://github.com/JetBrains/compose-multiplatform/issues/4157
-            implementation("androidx.compose.material3:material3:1.2.0")
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.ktor.client.android)
-            implementation(libs.voyager)
-
-            implementation("io.github.overpas:treemap-chart:0.1.0")
-            implementation("io.github.overpas:treemap-chart-compose:0.1.0")
         }
 
         desktopMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${libs.versions.kotlinx.coroutines}")
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.java)
-
-            implementation("io.github.overpas:treemap-chart:0.1.0")
-            implementation("io.github.overpas:treemap-chart-compose:0.1.0")
         }
 
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)
-
-            implementation("io.github.overpas:treemap-chart:0.1.0")
-            implementation("io.github.overpas:treemap-chart-compose:0.1.0")
         }
     }
 }

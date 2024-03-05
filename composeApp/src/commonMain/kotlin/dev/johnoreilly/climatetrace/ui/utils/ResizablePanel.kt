@@ -14,13 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,17 +53,10 @@ fun ResizablePanel(
 
     Box(modifier) {
         Column {
-            Row(Modifier
-                .height(32.dp)
-                .padding(6.dp)
-                .semantics(mergeDescendants = false) {
-                    val text = if (state.isExpanded) "Collapse" else "Expand"
-                    set(SemanticsProperties.Text, listOf(
-                        AnnotatedString("$text $title panel")
-                    ))
-                    set(SemanticsProperties.Role, Role.Button)
-                }
-                .clickable { state.isExpanded = !state.isExpanded }
+            Row(
+                modifier = Modifier.height(32.dp).padding(6.dp)
+                    .clickable { state.isExpanded = !state.isExpanded },
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
@@ -72,11 +65,6 @@ fun ResizablePanel(
                     modifier = Modifier
                         .size(24.dp)
                         .padding(start = 2.dp, end = 2.dp, bottom = 2.dp)
-                )
-                Text(
-                    text = if (state.isExpanded) title else "",
-                    modifier = Modifier.fillMaxWidth().clipToBounds(),
-                    fontSize = 14.sp
                 )
             }
 
