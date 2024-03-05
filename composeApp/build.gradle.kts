@@ -54,7 +54,10 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
 
+            
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
 
@@ -86,6 +89,14 @@ kotlin {
 
         appleMain.dependencies {
             implementation(libs.ktor.client.darwin)
+        }
+
+
+        val desktopTest by getting
+
+        // Adds the desktop test dependency
+        desktopTest.dependencies {
+            implementation(compose.desktop.currentOs)
         }
     }
 }

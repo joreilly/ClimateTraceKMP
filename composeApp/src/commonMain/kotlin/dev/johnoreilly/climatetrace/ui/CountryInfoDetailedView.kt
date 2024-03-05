@@ -24,6 +24,7 @@ import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
 @Composable
 fun CountryInfoDetailedView(
     country: Country?,
+    year: String,
     countryEmissionInfo: CountryEmissionsInfo?,
     countryAssetEmissionsList: List<CountryAssetEmissionsInfo>?,
     isLoading: Boolean
@@ -77,7 +78,7 @@ fun CountryInfoDetailedView(
                         val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
                         val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
 
-                        Text(text = "co2 = $co2 Million Tonnes (2022)")
+                        Text(text = "co2 = $co2 Million Tonnes ($year)")
                         Text(text = "rank = ${countryEmissionInfo.rank} ($percentage)")
 
                         Spacer(modifier = Modifier.size(16.dp))

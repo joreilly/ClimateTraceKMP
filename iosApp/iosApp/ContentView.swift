@@ -93,7 +93,7 @@ struct CountryInfoDetailedViewShared: UIViewControllerRepresentable {
     let country: Country
     
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.CountryInfoDetailedViewController(country: country)
+        MainViewControllerKt.CountryInfoDetailedViewController(country: country, year: "2022")
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

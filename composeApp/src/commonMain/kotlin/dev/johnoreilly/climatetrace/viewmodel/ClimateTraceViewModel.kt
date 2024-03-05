@@ -16,6 +16,8 @@ import org.koin.core.component.inject
 open class ClimateTraceViewModel : KMMViewModel(), KoinComponent {
     private val climateTraceApi: ClimateTraceApi by inject()
 
+    var year: String = "2022"
+
     private val _countryList = MutableStateFlow<List<Country>>(viewModelScope, emptyList())
     @NativeCoroutinesState
     val countryList = _countryList.asStateFlow()
@@ -44,7 +46,7 @@ open class ClimateTraceViewModel : KMMViewModel(), KoinComponent {
         selectedCountry.value = country
         isLoadingCountryDetails.value = true
         viewModelScope.coroutineScope.launch {
-            countryEmissionInfo.value = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3).firstOrNull()
+            countryEmissionInfo.value = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3, year).firstOrNull()
             countryAssetEmissions.value = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)
             isLoadingCountryDetails.value = false
         }

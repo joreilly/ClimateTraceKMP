@@ -110,6 +110,7 @@ class ClimateTraceScreen: Screen {
                     Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
                     CountryInfoDetailedView(
                         country = selectedCountry,
+                        year = viewModel.year,
                         countryEmissionInfo = countryEmissionInfo,
                         countryAssetEmissionsList = countryAssetEmissions,
                         isLoading = isLoadingCountryDetails
@@ -135,6 +136,7 @@ class ClimateTraceScreen: Screen {
                 Box(Modifier.fillMaxHeight()) {
                     CountryInfoDetailedView(
                         country = viewModel.selectedCountry.value,
+                        year = viewModel.year,
                         countryEmissionInfo = countryEmissionInfo,
                         countryAssetEmissionsList = countryAssetEmissions,
                         isLoading = isLoadingCountryDetails
@@ -285,6 +287,5 @@ fun CountryRow(
         }
     }
 }
-
 
 
