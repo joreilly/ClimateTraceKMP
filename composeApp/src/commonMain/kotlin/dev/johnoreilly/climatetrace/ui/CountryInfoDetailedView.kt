@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.johnoreilly.climatetrace.remote.Country
@@ -83,10 +84,22 @@ fun CountryInfoDetailedView(
 
                         Spacer(modifier = Modifier.size(16.dp))
 
-                        CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
-                        Spacer(modifier = Modifier.size(16.dp))
+                        val filteredCountryAssetEmissionsList = countryAssetEmissionsList.filter { it.sector != null }
+                        if (filteredCountryAssetEmissionsList.isNotEmpty()) {
+                            CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
+                            Spacer(modifier = Modifier.size(16.dp))
 
-                        SectorEmissionsPieChart(countryAssetEmissionsList)
+                            SectorEmissionsPieChart(countryAssetEmissionsList)
+                        } else {
+                            Spacer(modifier = Modifier.size(16.dp))
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    "Corrupted data! \n Try again sometime",
+                                    style = MaterialTheme.typography.titleMedium.copy(color = Color.Red),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
                     }
                 }
             }

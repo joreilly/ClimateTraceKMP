@@ -31,7 +31,6 @@ import by.overpass.treemapchart.compose.TreemapChart
 import by.overpass.treemapchart.core.tree.Tree
 import by.overpass.treemapchart.core.tree.tree
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
-import dev.johnoreilly.climatetrace.ui.ChartNode
 import io.github.koalaplot.core.util.generateHueColorPalette
 import io.github.koalaplot.core.util.toString
 import kotlinx.coroutines.Dispatchers
@@ -132,15 +131,17 @@ suspend fun buildAssetTree(assetEmissionInfoList: List<CountryAssetEmissionsInfo
             .sortedByDescending(CountryAssetEmissionsInfo::emissions)
             .take(10)
             .forEachIndexed { index, assetEmissionInfo ->
-                val productPercentage = assetEmissionInfo.emissions / total
-                node(
-                    ChartNode.Leaf(
-                        name = assetEmissionInfo.sector,
-                        value = assetEmissionInfo.emissions.toDouble(),
-                        percentage = productPercentage,
-                        color = colors[index]
-                    ),
-                )
+                assetEmissionInfo.sector?.let {
+                    val productPercentage = assetEmissionInfo.emissions / total
+                    node(
+                        ChartNode.Leaf(
+                            name = assetEmissionInfo.sector,
+                            value = assetEmissionInfo.emissions.toDouble(),
+                            percentage = productPercentage,
+                            color = colors[index]
+                        ),
+                    )
+                }
             }
 
     }
