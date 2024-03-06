@@ -38,7 +38,7 @@ fun SectorEmissionsPieChart(
         .sortedByDescending { it.emissions }
         .take(10)
     val values = filteredEmissionsList.map { it.emissions / 1_000_000 }
-    val labels = filteredEmissionsList.map { it.sector }
+    val labels = filteredEmissionsList.mapNotNull { it.sector }
     val total = values.sum()
     val colors = generateHueColorPalette(values.size)
 

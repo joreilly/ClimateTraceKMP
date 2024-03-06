@@ -43,11 +43,11 @@ data class CountryEmissionsInfo(
 @Serializable
 data class CountryAssetEmissionsInfo(
     @SerialName("Country")
-    val country: String,
+    val country: String? = null,
     @SerialName("Emissions")
-    val emissions: Float,
+    val emissions: Float = 0f,
     @SerialName("Sector")
-    val sector: String
+    val sector: String? = null
 )
 
 
