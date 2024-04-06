@@ -23,7 +23,14 @@ kotlin {
         }
         binaries.executable()
     }
-    
+
+
+    js(){
+        browser()
+        binaries.executable()
+    }
+
+
     androidTarget()
     jvm("desktop")
     
@@ -72,6 +79,10 @@ kotlin {
             implementation(libs.treemap.chart)
             implementation(libs.treemap.chart.compose)
             api(libs.compose.window.size)
+        }
+
+        jsMain.dependencies {
+            implementation(compose.html.core)
         }
 
         androidMain.dependencies {
