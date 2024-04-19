@@ -6,13 +6,13 @@ import androidx.compose.ui.window.application
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "ClimateTraceKMP") {
-        App()
+        AppJetpackBav()
     }
 }
 
 @Preview
 @Composable
 fun AppDesktopPreview() {
-    App()
+    AppJetpackBav()
 }
 

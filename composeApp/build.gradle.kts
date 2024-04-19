@@ -72,6 +72,9 @@ kotlin {
 
             implementation(libs.voyager)
 
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.androidx.navigation.compose)
+
             implementation(libs.kmmViewModel)
 
             implementation(libs.koalaplot)
