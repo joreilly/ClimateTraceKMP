@@ -2,12 +2,16 @@ Kotlin/Compose Multiplatform project to show climate related emission data from 
 Have started with showing sector emission data per country but ton of other info available as well (ideas very welcome!).
 
 Running on
-* iOS 
+* iOS (SwiftUI + shared Compose Multiplatform UI)
 * Android
 * Desktop
 * Web (Wasm)
 * Web (Kotlin/JS) - contributed by https://github.com/yogeshVU
 * Kotlin Notebook
+
+
+<img width="669" alt="Screenshot 2024-04-29 at 21 13 54" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/d5d2a147-20f4-430b-9a14-17bc5526957e">
+
 
 
 ### Android (Compose)
