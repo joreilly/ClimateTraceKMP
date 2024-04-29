@@ -41,7 +41,7 @@ fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAss
     var tree by remember { mutableStateOf<Tree<ChartNode>?>(null) }
 
     LaunchedEffect(countryAssetEmissions) {
-        tree = buildAssetTree(countryAssetEmissions ?: emptyList())
+        tree = buildAssetTree(countryAssetEmissions)
     }
 
     Column(Modifier.height(500.dp).fillMaxWidth(0.8f)) {

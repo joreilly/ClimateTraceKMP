@@ -3,7 +3,7 @@ package dev.johnoreilly.climatetrace.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,7 +41,7 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
                             },
                             navigationIcon = {
                                 IconButton(onClick = { navigator.pop() }) {
-                                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                                 }
                             }
                     )

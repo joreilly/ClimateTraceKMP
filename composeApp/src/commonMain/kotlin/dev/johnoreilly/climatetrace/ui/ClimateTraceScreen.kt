@@ -7,7 +7,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,28 +43,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.utils.PanelState
 import dev.johnoreilly.climatetrace.ui.utils.ResizablePanel
 import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
 import org.koin.compose.koinInject
-import org.koin.core.component.inject
 
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 class ClimateTraceScreen: Screen {
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
         val windowSizeClass = calculateWindowSizeClass()
         val viewModel = koinInject<ClimateTraceViewModel>()
 
@@ -179,7 +172,7 @@ fun CountryListView(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchableList(
     isLoading: Boolean,
