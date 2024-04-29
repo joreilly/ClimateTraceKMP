@@ -3,16 +3,15 @@ agp = "8.2.2"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
-androidx-activityCompose = "1.8.2"
+androidx-activityCompose = "1.9.0"
 androidx-appcompat = "1.6.1"
 androidx-constraintlayout = "2.1.4"
-androidx-core-ktx = "1.12.0"
+androidx-core-ktx = "1.13.0"
 androidx-espresso-core = "3.5.1"
 androidx-material = "1.11.0"
 androidx-test-junit = "1.1.5"
-compose = "1.6.5"
-compose-compiler = "1.5.11-kt-2.0.0-RC1"
-compose-plugin = "1.6.2"
+compose = "1.6.6"
+compose-plugin = "1.6.10-beta03"
 composeWindowSize = "0.5.0"
 harawata-appdirs = "1.2.1"
 imageLoader = "1.7.8"
@@ -20,7 +19,7 @@ junit = "4.13.2"
 koalaplot = "0.5.3"
 koin = "3.6.0-alpha3"
 koinCompose = "1.2.0-alpha3"
-kotlin = "2.0.0-RC1"
+kotlin = "2.0.0-RC2"
 kotlinx-coroutines = "1.8.0"
 kmpNativeCoroutines = "1.0.0-ALPHA-28-kotlin-2.0.0-RC1"
 kmmViewModel = "1.0.0-ALPHA-20-kotlin-2.0.0-RC1"
@@ -32,22 +31,10 @@ voyager= "1.1.0-alpha03"
 
 
 [libraries]
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
-androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
-androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 
-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-window-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "composeWindowSize" }
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
@@ -62,7 +49,6 @@ kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
 kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "kstore" }
 
-ktor = { group = "io.ktor", name = "ktor", version.ref = "ktor" }
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
@@ -75,7 +61,6 @@ ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref =
 
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 harawata-appdirs = { module = "net.harawata:appdirs", version.ref = "harawata-appdirs" }
-imageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 koalaplot = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
 treemap-chart = { module = "io.github.overpas:treemap-chart", version.ref = "treemapChart" }
 treemap-chart-compose = { module = "io.github.overpas:treemap-chart-compose", version.ref = "treemapChart" }
@@ -89,6 +74,7 @@ ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "k
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }

@@ -10,12 +10,6 @@ Running on
 * Kotlin Notebook
 
 
-
-Code is very minimal right now with Compose code using remote apis directly. Will choose/add persistence library once those libraries support Wasm along 
-with associated Repository. Also need to add some sort of shared view model/state holder. Have started using Voyager for navigation in the Android client
-and need to evaulate whether this could/should be used for other clients (again needs Wasm support first).
-
-
 ### Android (Compose)
 
 
