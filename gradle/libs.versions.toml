@@ -14,6 +14,7 @@ compose = "1.6.5"
 compose-compiler = "1.5.11-kt-2.0.0-RC1"
 compose-plugin = "1.6.2"
 composeWindowSize = "0.5.0"
+harawata-appdirs = "1.2.1"
 imageLoader = "1.7.8"
 junit = "4.13.2"
 koalaplot = "0.5.3"
@@ -24,6 +25,7 @@ kotlinx-coroutines = "1.8.0"
 kmpNativeCoroutines = "1.0.0-ALPHA-28-kotlin-2.0.0-RC1"
 kmmViewModel = "1.0.0-ALPHA-20-kotlin-2.0.0-RC1"
 ksp = "2.0.0-RC1-1.0.20"
+kstore = "0.8.0-SNAPSHOT"
 ktor = "3.0.0-wasm2"
 treemapChart = "0.1.1"
 voyager= "1.1.0-alpha03"
@@ -48,12 +50,17 @@ compose-foundation = { module = "androidx.compose.foundation:foundation", versio
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-window-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "composeWindowSize" }
 
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 
 
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kmmViewModel = { group = "com.rickclephas.kmm", name = "kmm-viewmodel-core", version.ref = "kmmViewModel" }
+
+kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
+kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
+kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "kstore" }
 
 ktor = { group = "io.ktor", name = "ktor", version.ref = "ktor" }
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
@@ -67,6 +74,7 @@ ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.r
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
 
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+harawata-appdirs = { module = "net.harawata:appdirs", version.ref = "harawata-appdirs" }
 imageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 koalaplot = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
 treemap-chart = { module = "io.github.overpas:treemap-chart", version.ref = "treemapChart" }

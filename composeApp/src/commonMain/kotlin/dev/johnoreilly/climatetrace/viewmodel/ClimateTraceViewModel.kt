@@ -4,6 +4,7 @@ import com.rickclephas.kmm.viewmodel.KMMViewModel
 import com.rickclephas.kmm.viewmodel.MutableStateFlow
 import com.rickclephas.kmm.viewmodel.coroutineScope
 import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
+import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
@@ -15,6 +16,7 @@ import org.koin.core.component.inject
 
 open class ClimateTraceViewModel : KMMViewModel(), KoinComponent {
     private val climateTraceApi: ClimateTraceApi by inject()
+    private val climateTraceRepository: ClimateTraceRepository by inject()
 
     var year: String = "2022"
 
@@ -37,7 +39,7 @@ open class ClimateTraceViewModel : KMMViewModel(), KoinComponent {
     init {
         isLoadingCountries.value = true
         viewModelScope.coroutineScope.launch {
-            _countryList.value = climateTraceApi.fetchCountries().sortedBy { it.name }
+            _countryList.value = climateTraceRepository.fetchCountries().sortedBy { it.name }
             isLoadingCountries.value = false
         }
     }
