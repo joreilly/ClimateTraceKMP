@@ -63,9 +63,11 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
-            
+
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+
+            implementation(libs.kstore)
 
             implementation(libs.kotlinx.coroutines)
             implementation(libs.bundles.ktor.common)
@@ -82,22 +84,27 @@ kotlin {
 
         jsMain.dependencies {
             implementation(compose.html.core)
+            implementation(libs.kstore.storage)
         }
 
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
-
+            implementation(libs.koin.android)
+            implementation(libs.kstore.file)
             implementation(libs.ktor.client.android)
         }
 
         desktopMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${libs.versions.kotlinx.coroutines}")
             implementation(compose.desktop.currentOs)
+            implementation(libs.harawata.appdirs)
+            implementation(libs.kstore.file)
             implementation(libs.ktor.client.java)
         }
 
         appleMain.dependencies {
+            implementation(libs.kstore.file)
             implementation(libs.ktor.client.darwin)
         }
 
@@ -107,6 +114,12 @@ kotlin {
         // Adds the desktop test dependency
         desktopTest.dependencies {
             implementation(compose.desktop.currentOs)
+        }
+
+        val wasmJsMain by getting
+
+        wasmJsMain.dependencies {
+            implementation(libs.kstore.storage)
         }
     }
 }

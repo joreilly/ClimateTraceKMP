@@ -1,5 +1,6 @@
 package dev.johnoreilly.climatetrace.di
 
+import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
 import io.ktor.client.HttpClient
@@ -10,7 +11,9 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
+import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
@@ -20,15 +23,16 @@ fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclarat
         modules(commonModule(enableNetworkLogs = enableNetworkLogs))
     }
 
-// called by iOS etc
-fun initKoin() = initKoin(enableNetworkLogs = false) {}
-
 fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { createJson() }
     single { createHttpClient(get(), enableNetworkLogs = enableNetworkLogs) }
     single { ClimateTraceApi(get()) }
     single { ClimateTraceViewModel() }
+    single { ClimateTraceRepository(get(), get()) }
+    loadKoinModules(dataModule())
 }
+
+expect fun dataModule(): Module
 
 fun createJson() = Json { isLenient = true; ignoreUnknownKeys = true }
 
