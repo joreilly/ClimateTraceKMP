@@ -9,6 +9,8 @@ Running on
 * Web (Kotlin/JS) - contributed by https://github.com/yogeshVU
 * Kotlin Notebook
 
+The iOS client as mentioned includes shared Compose Multiplatform UI code.  It also includes option to use either SwiftUI or Compose code for the Country List screen (in both cases selecting a country will navigate to shared Compose emissions details screen).
+
 
 <img width="669" alt="Screenshot 2024-04-29 at 21 13 54" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/d5d2a147-20f4-430b-9a14-17bc5526957e">
 
