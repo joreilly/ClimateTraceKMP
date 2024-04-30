@@ -1,4 +1,4 @@
-package dev.johnoreilly.climatetrace.di
+    package dev.johnoreilly.climatetrace.di
 
 import dev.johnoreilly.climatetrace.remote.Country
 import io.github.xxfast.kstore.KStore

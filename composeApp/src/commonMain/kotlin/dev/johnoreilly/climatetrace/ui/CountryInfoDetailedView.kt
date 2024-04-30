@@ -94,7 +94,7 @@ fun CountryInfoDetailedView(
                             Spacer(modifier = Modifier.size(16.dp))
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    "Corrupted data! \n Try again sometime",
+                                    "Invalid data",
                                     style = MaterialTheme.typography.titleMedium.copy(color = Color.Red),
                                     textAlign = TextAlign.Center
                                 )

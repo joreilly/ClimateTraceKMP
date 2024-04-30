@@ -7,9 +7,7 @@ import androidx.compose.ui.graphics.Color
 sealed class ChartNode {
 
     abstract val name: String
-
     abstract val value: Double
-
     abstract val percentage: Double
 
     @Stable
