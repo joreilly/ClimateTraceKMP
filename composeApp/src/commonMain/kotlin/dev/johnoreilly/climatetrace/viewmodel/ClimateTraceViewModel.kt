@@ -18,7 +18,7 @@ open class ClimateTraceViewModel : KMMViewModel(), KoinComponent {
     private val climateTraceApi: ClimateTraceApi by inject()
     private val climateTraceRepository: ClimateTraceRepository by inject()
 
-    var year: String = "2022"
+    var year: String = "2022" // TODO make this configurable
 
     private val _countryList = MutableStateFlow<List<Country>>(viewModelScope, emptyList())
     @NativeCoroutinesState
