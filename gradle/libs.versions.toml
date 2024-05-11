@@ -17,7 +17,7 @@ kmpNativeCoroutines = "1.0.0-ALPHA-28-kotlin-2.0.0-RC2"
 kmpObservableViewModel = "1.0.0-BETA-1-kotlin-2.0.0-RC2"
 ksp = "2.0.0-RC2-1.0.20"
 kstore = "0.8.0"
-ktor = "3.0.0-wasm2"
+ktor = "3.2.0"
 treemapChart = "0.1.1"
 voyager= "1.1.0-alpha03"
 
