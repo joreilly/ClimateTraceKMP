@@ -1,9 +1,9 @@
 package dev.johnoreilly.climatetrace.viewmodel
 
-import com.rickclephas.kmm.viewmodel.KMMViewModel
-import com.rickclephas.kmm.viewmodel.MutableStateFlow
-import com.rickclephas.kmm.viewmodel.coroutineScope
 import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
+import com.rickclephas.kmp.observableviewmodel.MutableStateFlow
+import com.rickclephas.kmp.observableviewmodel.ViewModel
+import com.rickclephas.kmp.observableviewmodel.coroutineScope
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-open class ClimateTraceViewModel : KMMViewModel(), KoinComponent {
+open class ClimateTraceViewModel : ViewModel(), KoinComponent {
     private val climateTraceApi: ClimateTraceApi by inject()
     private val climateTraceRepository: ClimateTraceRepository by inject()
 

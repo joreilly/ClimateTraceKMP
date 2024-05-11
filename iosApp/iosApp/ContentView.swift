@@ -1,8 +1,8 @@
 import UIKit
 import SwiftUI
 import ComposeApp
-import KMMViewModelCore
-import KMMViewModelSwiftUI
+import KMPObservableViewModelCore
+import KMPObservableViewModelSwiftUI
 
 
 struct ContentView: View {
