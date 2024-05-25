@@ -1,21 +1,24 @@
 [versions]
+kotlin = "2.0.0"
+ksp = "2.0.0-1.0.21"
+kotlinx-coroutines = "1.8.1"
+
+
 agp = "8.2.2"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
 androidx-activityCompose = "1.9.0"
-compose = "1.6.6"
-compose-plugin = "1.6.10-beta03"
+compose = "1.6.7"
+compose-plugin = "1.6.10"
 composeWindowSize = "0.5.0"
 harawata-appdirs = "1.2.1"
 koalaplot = "0.5.3"
-koin = "3.6.0-alpha3"
-koinCompose = "1.2.0-alpha3"
-kotlin = "2.0.0-RC2"
-kotlinx-coroutines = "1.8.0"
-kmpNativeCoroutines = "1.0.0-ALPHA-28-kotlin-2.0.0-RC2"
-kmpObservableViewModel = "1.0.0-BETA-1-kotlin-2.0.0-RC2"
-ksp = "2.0.0-RC2-1.0.20"
+koin = "3.6.0-Beta4"
+koin-android-compose = "3.6.0-Beta4"
+koin-compose-multiplatform = "1.2.0-Beta4"
+kmpNativeCoroutines = "1.0.0-ALPHA-31"
+kmpObservableViewModel = "1.0.0-BETA-3"
 kstore = "0.8.0"
 ktor = "3.0.0-wasm2"
 treemapChart = "0.1.1"
@@ -30,7 +33,7 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-window-size = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "composeWindowSize" }
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose-multiplatform" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 
 
