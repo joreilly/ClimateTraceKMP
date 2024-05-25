@@ -1,3 +1,5 @@
+![kotlin-version](https://img.shields.io/badge/kotlin-2.0.0-blue?logo=kotlin)
+
 Kotlin/Compose Multiplatform project to show climate related emission data from https://climatetrace.org/data. Development just started so very much work in progress right now!
 Have started with showing sector emission data per country but ton of other info available as well (ideas very welcome!).
 
@@ -47,3 +49,16 @@ The iOS client as mentioned includes shared Compose Multiplatform UI code.  It a
 
 <img width="694" alt="Screenshot 2023-12-14 at 20 33 45" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/82ed364a-0284-4e5c-b81e-40fdfc58f312">
 
+## Full set of Kotlin Multiplatform/Compose/SwiftUI samples
+
+*  PeopleInSpace (https://github.com/joreilly/PeopleInSpace)
+*  GalwayBus (https://github.com/joreilly/GalwayBus)
+*  Confetti (https://github.com/joreilly/Confetti)
+*  BikeShare (https://github.com/joreilly/BikeShare)
+*  FantasyPremierLeague (https://github.com/joreilly/FantasyPremierLeague)
+*  ClimateTrace (https://github.com/joreilly/ClimateTraceKMP)
+*  GeminiKMP (https://github.com/joreilly/GeminiKMP)
+*  MortyComposeKMM (https://github.com/joreilly/MortyComposeKMM)
+*  StarWars (https://github.com/joreilly/StarWars)
+*  WordMasterKMP (https://github.com/joreilly/WordMasterKMP)
+*  Chip-8 (https://github.com/joreilly/chip-8)
