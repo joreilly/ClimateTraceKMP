@@ -23,7 +23,7 @@ jobs:
 
       # Build application
       - name: Build
-        run: ./gradlew :compose-web:wasmJsBrowserDistribution
+        run: ./gradlew :composeApp:wasmJsBrowserDistribution
 
 #      - name: Copy "uninstantiated" file over (workaround for now)
 #        run: cp compose-web/build/compileSync/wasmJs/main/productionExecutable/kotlin/chip8.uninstantiated.mjs compose-web/build/dist/wasmJs/productionExecutable
