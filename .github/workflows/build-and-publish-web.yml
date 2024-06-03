@@ -25,9 +25,6 @@ jobs:
       - name: Build
         run: ./gradlew :composeApp:wasmJsBrowserDistribution
 
-#      - name: Copy "uninstantiated" file over (workaround for now)
-#        run: cp compose-web/build/compileSync/wasmJs/main/productionExecutable/kotlin/chip8.uninstantiated.mjs compose-web/build/dist/wasmJs/productionExecutable
-
       # If main branch update, deploy to gh-pages
       - name: Deploy
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'

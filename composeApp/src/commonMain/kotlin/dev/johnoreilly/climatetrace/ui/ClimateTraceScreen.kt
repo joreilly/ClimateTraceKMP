@@ -96,14 +96,15 @@ class ClimateTraceScreen: Screen {
                             selectedCountry = selectedCountry,
                             isLoading = isLoadingCountries
                         ) { country ->
-                            viewModel.fetchCountryDetails(country)
+                            viewModel.setCountry(country)
                         }
                     }
 
                     Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
                     CountryInfoDetailedView(
                         country = selectedCountry,
-                        year = viewModel.year,
+                        year = viewModel.selectedYear.value,
+                        onYearSelected = { viewModel.setYear(it) },
                         countryEmissionInfo = countryEmissionInfo,
                         countryAssetEmissionsList = countryAssetEmissions,
                         isLoading = isLoadingCountryDetails
@@ -121,7 +122,7 @@ class ClimateTraceScreen: Screen {
                         selectedCountry = selectedCountry,
                         isLoading = isLoadingCountries
                     ) { country ->
-                        viewModel.fetchCountryDetails(country)
+                        viewModel.setCountry(country)
                     }
                 }
 
@@ -129,7 +130,8 @@ class ClimateTraceScreen: Screen {
                 Box(Modifier.fillMaxHeight()) {
                     CountryInfoDetailedView(
                         country = viewModel.selectedCountry.value,
-                        year = viewModel.year,
+                        year = viewModel.selectedYear.value,
+                        onYearSelected = { viewModel.setYear(it) },
                         countryEmissionInfo = countryEmissionInfo,
                         countryAssetEmissionsList = countryAssetEmissions,
                         isLoading = isLoadingCountryDetails

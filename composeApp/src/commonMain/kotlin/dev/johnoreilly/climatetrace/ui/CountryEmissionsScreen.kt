@@ -30,7 +30,7 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
         val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()
 
         LaunchedEffect(country) {
-            viewModel.fetchCountryDetails(country)
+            viewModel.setCountry(country)
         }
 
         Scaffold(
@@ -50,7 +50,8 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
             Column(Modifier.padding(it)) {
                 CountryInfoDetailedView(
                         country,
-                        viewModel.year,
+                        viewModel.selectedYear.value,
+                        onYearSelected = { viewModel.setYear(it) },
                         countryEmissionInfo,
                         countryAssetEmissions,
                         isLoadingCountryDetails

@@ -18,11 +18,12 @@ open class ClimateTraceViewModel : ViewModel(), KoinComponent {
     private val climateTraceApi: ClimateTraceApi by inject()
     private val climateTraceRepository: ClimateTraceRepository by inject()
 
-    var year: String = "2022" // TODO make this configurable
-
     private val _countryList = MutableStateFlow<List<Country>>(viewModelScope, emptyList())
     @NativeCoroutinesState
     val countryList = _countryList.asStateFlow()
+
+    @NativeCoroutinesState
+    val selectedYear = MutableStateFlow<String>(viewModelScope, "2022")
 
     @NativeCoroutinesState
     val selectedCountry = MutableStateFlow<Country?>(viewModelScope, null)
@@ -44,13 +45,24 @@ open class ClimateTraceViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun fetchCountryDetails(country: Country) {
+    fun setYear(year: String) {
+        selectedYear.value = year
+        fetchCountryDetails()
+    }
+
+    fun setCountry(country: Country) {
         selectedCountry.value = country
-        isLoadingCountryDetails.value = true
-        viewModelScope.coroutineScope.launch {
-            countryEmissionInfo.value = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3, year).firstOrNull()
-            countryAssetEmissions.value = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)
-            isLoadingCountryDetails.value = false
+        fetchCountryDetails()
+    }
+
+    fun fetchCountryDetails() {
+        selectedCountry.value?.let { country ->
+            isLoadingCountryDetails.value = true
+            viewModelScope.coroutineScope.launch {
+                countryEmissionInfo.value = climateTraceApi.fetchCountryEmissionsInfo(country.alpha3, selectedYear.value).firstOrNull()
+                countryAssetEmissions.value = climateTraceApi.fetchCountryAssetEmissionsInfo(country.alpha3)
+                isLoadingCountryDetails.value = false
+            }
         }
     }
 }
