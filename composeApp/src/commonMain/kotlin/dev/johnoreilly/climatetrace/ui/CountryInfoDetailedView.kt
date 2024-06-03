@@ -1,8 +1,9 @@
 package dev.johnoreilly.climatetrace.ui
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -10,9 +11,15 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +33,7 @@ import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
 fun CountryInfoDetailedView(
     country: Country?,
     year: String,
+    onYearSelected: (String) -> Unit,
     countryEmissionInfo: CountryEmissionsInfo?,
     countryAssetEmissionsList: List<CountryAssetEmissionsInfo>?,
     isLoading: Boolean
@@ -33,28 +41,16 @@ fun CountryInfoDetailedView(
     when {
         country == null -> {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .fillMaxHeight()
+                modifier = Modifier.fillMaxSize()
                     .wrapContentSize(Alignment.Center)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .fillMaxHeight()
-                        .wrapContentSize(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "No Country Selected.", style = MaterialTheme.typography.titleMedium)
-                }
+                Text(text = "No Country Selected.", style = MaterialTheme.typography.titleMedium)
             }
         }
         else -> {
             if (isLoading) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .fillMaxHeight()
+                    modifier = Modifier.fillMaxSize()
                         .wrapContentSize(Alignment.Center)
                 ) {
                     CircularProgressIndicator()
@@ -76,6 +72,8 @@ fun CountryInfoDetailedView(
 
                         Spacer(modifier = Modifier.size(16.dp))
 
+                        YearSelector(year, onYearSelected)
+
                         val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
                         val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
 
@@ -86,10 +84,9 @@ fun CountryInfoDetailedView(
 
                         val filteredCountryAssetEmissionsList = countryAssetEmissionsList.filter { it.sector != null }
                         if (filteredCountryAssetEmissionsList.isNotEmpty()) {
-                            CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
-                            Spacer(modifier = Modifier.size(16.dp))
-
                             SectorEmissionsPieChart(countryAssetEmissionsList)
+                            Spacer(modifier = Modifier.size(16.dp))
+                            CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
                         } else {
                             Spacer(modifier = Modifier.size(16.dp))
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -102,6 +99,29 @@ fun CountryInfoDetailedView(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun YearSelector(selectedYear: String, onYearSelected: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val items = listOf("2021", "2022")
+
+    Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+        Text(selectedYear, modifier = Modifier.clickable(onClick = { expanded = true }))
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            items.forEach { year ->
+                DropdownMenuItem(onClick = {
+                    onYearSelected(year)
+                    expanded = false
+                }, text = {
+                    Text(year)
+                })
             }
         }
     }
