@@ -22,7 +22,7 @@ kmpObservableViewModel = "1.0.0-BETA-3"
 kstore = "0.8.0"
 ktor = "3.0.0-wasm2"
 treemapChart = "0.1.1"
-voyager= "1.1.0-alpha03"
+voyager= "1.1.0-beta02"
 
 
 [libraries]
