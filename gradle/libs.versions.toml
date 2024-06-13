@@ -4,7 +4,7 @@ ksp = "2.0.0-1.0.21"
 kotlinx-coroutines = "1.8.1"
 
 
-agp = "8.2.2"
+agp = "8.5.0"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
