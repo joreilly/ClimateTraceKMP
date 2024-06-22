@@ -85,7 +85,7 @@ fun CountryInfoDetailedView(
                         val filteredCountryAssetEmissionsList = countryAssetEmissionsList.filter { it.sector != null }
                         if (filteredCountryAssetEmissionsList.isNotEmpty()) {
                             SectorEmissionsPieChart(countryAssetEmissionsList)
-                            Spacer(modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.size(32.dp))
                             CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
                         } else {
                             Spacer(modifier = Modifier.size(16.dp))
