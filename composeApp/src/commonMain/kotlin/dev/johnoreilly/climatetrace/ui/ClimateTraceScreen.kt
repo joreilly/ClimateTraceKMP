@@ -42,6 +42,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,9 +67,7 @@ class ClimateTraceScreen: Screen {
         Column(Modifier) {
             when (val state = countryListViewState) {
                 is CountryListUIState.Loading -> {
-                    Column(modifier = Modifier.fillMaxSize().fillMaxHeight()
-                        .wrapContentSize(Alignment.Center)
-                    ) {
+                    Column(modifier = Modifier.fillMaxSize().fillMaxHeight().wrapContentSize(Alignment.Center)) {
                         CircularProgressIndicator()
                     }
                 }
@@ -88,10 +87,8 @@ class ClimateTraceScreen: Screen {
 fun CountryScreenSuccess(countryList: List<Country>) {
     val windowSizeClass = calculateWindowSizeClass()
     val countryDetailsViewModel = koinInject<CountryDetailsViewModel>()
-
-
-    val selectedCountry by countryDetailsViewModel.selectedCountry.collectAsState()
     val countryDetailsViewState by countryDetailsViewModel.viewState.collectAsState()
+    var selectedCountry by remember {  mutableStateOf<Country?>(null) }
 
     val panelState = remember { PanelState() }
 
@@ -108,7 +105,6 @@ fun CountryScreenSuccess(countryList: List<Country>) {
     Row(Modifier.fillMaxSize()) {
         if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
             Column(Modifier.fillMaxWidth()) {
-
                 Box(
                     Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)
                 ) {
@@ -116,6 +112,7 @@ fun CountryScreenSuccess(countryList: List<Country>) {
                         countryList = countryList,
                         selectedCountry = selectedCountry,
                     ) { country ->
+                        selectedCountry = country
                         countryDetailsViewModel.setCountry(country)
                     }
                 }
@@ -136,6 +133,7 @@ fun CountryScreenSuccess(countryList: List<Country>) {
                     countryList = countryList,
                     selectedCountry = selectedCountry,
                 ) { country ->
+                    selectedCountry = country
                     countryDetailsViewModel.setCountry(country)
                 }
             }
