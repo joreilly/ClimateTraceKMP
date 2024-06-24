@@ -25,21 +25,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import dev.johnoreilly.climatetrace.remote.Country
-import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
-import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
+import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsUIState
 
 @Composable
 fun CountryInfoDetailedView(
-    country: Country?,
-    year: String,
-    onYearSelected: (String) -> Unit,
-    countryEmissionInfo: CountryEmissionsInfo?,
-    countryAssetEmissionsList: List<CountryAssetEmissionsInfo>?,
-    isLoading: Boolean
+    viewState: CountryDetailsUIState,
+    onYearSelected: (String) -> Unit
 ) {
-    when {
-        country == null -> {
+    when (viewState) {
+        CountryDetailsUIState.NoCountrySelected -> {
             Column(
                 modifier = Modifier.fillMaxSize()
                     .wrapContentSize(Alignment.Center)
@@ -47,62 +41,75 @@ fun CountryInfoDetailedView(
                 Text(text = "No Country Selected.", style = MaterialTheme.typography.titleMedium)
             }
         }
-        else -> {
-            if (isLoading) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                        .wrapContentSize(Alignment.Center)
-                ) {
-                    CircularProgressIndicator()
-                }
+        is CountryDetailsUIState.Loading -> {
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is CountryDetailsUIState.Error -> { Text("Error") }
+        is CountryDetailsUIState.Success -> {
+            CountryInfoDetailedViewSuccess(viewState, onYearSelected)
+        }
+    }
+}
+
+
+@Composable
+fun CountryInfoDetailedViewSuccess(viewState: CountryDetailsUIState.Success, onYearSelected: (String) -> Unit) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Text(
+            text = viewState.country.name,
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.size(16.dp))
+
+        val year = viewState.year
+        val countryAssetEmissionsList = viewState.countryAssetEmissionsList
+        val countryEmissionInfo = viewState.countryEmissionInfo
+
+        YearSelector(year, onYearSelected)
+        countryEmissionInfo?.let {
+            val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
+            val percentage =
+                (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
+
+            Text(text = "co2 = $co2 Million Tonnes ($year)")
+            Text(text = "rank = ${countryEmissionInfo.rank} ($percentage)")
+
+            Spacer(modifier = Modifier.size(16.dp))
+
+            val filteredCountryAssetEmissionsList =
+                countryAssetEmissionsList.filter { it.sector != null }
+            if (filteredCountryAssetEmissionsList.isNotEmpty()) {
+                SectorEmissionsPieChart(countryAssetEmissionsList)
+                Spacer(modifier = Modifier.size(32.dp))
+                CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
             } else {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (countryEmissionInfo != null && countryAssetEmissionsList != null) {
-                        Text(
-                            text = country.name,
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        YearSelector(year, onYearSelected)
-
-                        val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
-                        val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
-
-                        Text(text = "co2 = $co2 Million Tonnes ($year)")
-                        Text(text = "rank = ${countryEmissionInfo.rank} ($percentage)")
-
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        val filteredCountryAssetEmissionsList = countryAssetEmissionsList.filter { it.sector != null }
-                        if (filteredCountryAssetEmissionsList.isNotEmpty()) {
-                            SectorEmissionsPieChart(countryAssetEmissionsList)
-                            Spacer(modifier = Modifier.size(32.dp))
-                            CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
-                        } else {
-                            Spacer(modifier = Modifier.size(16.dp))
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    "Invalid data",
-                                    style = MaterialTheme.typography.titleMedium.copy(color = Color.Red),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-                    }
+                Spacer(modifier = Modifier.size(16.dp))
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        "Invalid data",
+                        style = MaterialTheme.typography.titleMedium.copy(color = Color.Red),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun YearSelector(selectedYear: String, onYearSelected: (String) -> Unit) {

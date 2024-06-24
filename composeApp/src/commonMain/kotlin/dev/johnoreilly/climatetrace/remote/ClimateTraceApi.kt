@@ -76,5 +76,5 @@ class ClimateTraceApi(
     suspend fun fetchCountryAssets(countryCode: String) = client.get("$baseUrl/assets?countries=$countryCode").body<AssetsResult>()
     suspend fun fetchCountryEmissionsInfo(countryCode: String, year: String) = client.get("$baseUrl/country/emissions?since=$year&to=$year&countries=$countryCode").body<List<CountryEmissionsInfo>>()
 
-    suspend fun fetchCountryAssetEmissionsInfo(countryCode: String) = client.get("$baseUrl/assets/emissions?countries=$countryCode").body<Map<String, List<CountryAssetEmissionsInfo>>>()[countryCode]
+    suspend fun fetchCountryAssetEmissionsInfo(countryCode: String) = client.get("$baseUrl/assets/emissions?countries=$countryCode").body<Map<String, List<CountryAssetEmissionsInfo>>>()[countryCode] ?: emptyList()
 }

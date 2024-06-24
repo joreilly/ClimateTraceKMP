@@ -51,133 +51,129 @@ import cafe.adriel.voyager.core.screen.Screen
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.utils.PanelState
 import dev.johnoreilly.climatetrace.ui.utils.ResizablePanel
-import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
+import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
+import dev.johnoreilly.climatetrace.viewmodel.CountryListUIState
+import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
 import org.koin.compose.koinInject
 
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 class ClimateTraceScreen: Screen {
     @Composable
     override fun Content() {
-        val windowSizeClass = calculateWindowSizeClass()
-        val viewModel = koinInject<ClimateTraceViewModel>()
+        val countryListViewModel = koinInject<CountryListViewModel>()
+        val countryListViewState by countryListViewModel.viewState.collectAsState()
 
-        val countryList by viewModel.countryList.collectAsState()
-        val selectedCountry by viewModel.selectedCountry.collectAsState()
-        val countryEmissionInfo by viewModel.countryEmissionInfo.collectAsState()
-        val countryAssetEmissions by viewModel.countryAssetEmissions.collectAsState()
-
-        val isLoadingCountries by viewModel.isLoadingCountries.collectAsState()
-        val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()
-
-
-        val panelState = remember { PanelState() }
-
-        val animatedSize = if (panelState.splitter.isResizing) {
-            if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
-        } else {
-            animateDpAsState(
-                if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
-                SpringSpec(stiffness = Spring.StiffnessLow)
-            ).value
-        }
-
-
-        Row(Modifier.fillMaxSize()) {
-
-            if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
-                Column(Modifier.fillMaxWidth()) {
-
-                    Box(
-                        Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)
+        Column(Modifier) {
+            when (val state = countryListViewState) {
+                is CountryListUIState.Loading -> {
+                    Column(modifier = Modifier.fillMaxSize().fillMaxHeight()
+                        .wrapContentSize(Alignment.Center)
                     ) {
-                        CountryListView(
-                            countryList = countryList,
-                            selectedCountry = selectedCountry,
-                            isLoading = isLoadingCountries
-                        ) { country ->
-                            viewModel.setCountry(country)
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
-                    CountryInfoDetailedView(
-                        country = selectedCountry,
-                        year = viewModel.selectedYear.value,
-                        onYearSelected = { viewModel.setYear(it) },
-                        countryEmissionInfo = countryEmissionInfo,
-                        countryAssetEmissionsList = countryAssetEmissions,
-                        isLoading = isLoadingCountryDetails
-                    )
-                }
-            } else {
-
-                ResizablePanel(
-                    Modifier.width(animatedSize).fillMaxHeight(),
-                    title = "Countries",
-                    state = panelState
-                ) {
-                    CountryListView(
-                        countryList = countryList,
-                        selectedCountry = selectedCountry,
-                        isLoading = isLoadingCountries
-                    ) { country ->
-                        viewModel.setCountry(country)
+                        CircularProgressIndicator()
                     }
                 }
-
-                VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
-                Box(Modifier.fillMaxHeight()) {
-                    CountryInfoDetailedView(
-                        country = viewModel.selectedCountry.value,
-                        year = viewModel.selectedYear.value,
-                        onYearSelected = { viewModel.setYear(it) },
-                        countryEmissionInfo = countryEmissionInfo,
-                        countryAssetEmissionsList = countryAssetEmissions,
-                        isLoading = isLoadingCountryDetails
-                    )
+                is CountryListUIState.Error -> {
+                    Text("Error")
+                }
+                is CountryListUIState.Success -> {
+                    CountryScreenSuccess(state.countryList)
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@Composable
+fun CountryScreenSuccess(countryList: List<Country>) {
+    val windowSizeClass = calculateWindowSizeClass()
+    val countryDetailsViewModel = koinInject<CountryDetailsViewModel>()
+
+
+    val selectedCountry by countryDetailsViewModel.selectedCountry.collectAsState()
+    val countryDetailsViewState by countryDetailsViewModel.viewState.collectAsState()
+
+    val panelState = remember { PanelState() }
+
+    val animatedSize = if (panelState.splitter.isResizing) {
+        if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
+    } else {
+        animateDpAsState(
+            if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
+            SpringSpec(stiffness = Spring.StiffnessLow)
+        ).value
+    }
+
+
+    Row(Modifier.fillMaxSize()) {
+        if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
+            Column(Modifier.fillMaxWidth()) {
+
+                Box(
+                    Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)
+                ) {
+                    CountryListView(
+                        countryList = countryList,
+                        selectedCountry = selectedCountry,
+                    ) { country ->
+                        countryDetailsViewModel.setCountry(country)
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
+                CountryInfoDetailedView(countryDetailsViewState) {
+                    countryDetailsViewModel.setYear(it)
+                }
+            }
+        } else {
+
+            ResizablePanel(
+                Modifier.width(animatedSize).fillMaxHeight(),
+                title = "Countries",
+                state = panelState
+            ) {
+                CountryListView(
+                    countryList = countryList,
+                    selectedCountry = selectedCountry,
+                ) { country ->
+                    countryDetailsViewModel.setCountry(country)
+                }
+            }
+
+            VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
+            Box(Modifier.fillMaxHeight()) {
+                CountryInfoDetailedView(countryDetailsViewState) {
+                    countryDetailsViewModel.setYear(it)
+                }
+            }
+        }
+    }
+
+}
+
+
 @Composable
 fun CountryListView(
     countryList: List<Country>,
     selectedCountry: Country?,
-    isLoading: Boolean,
     countrySelected: (country: Country) -> Unit
 ) {
     val searchQuery = remember { mutableStateOf("") }
 
-    if (isLoading) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .fillMaxHeight()
-                .wrapContentSize(Alignment.Center)
-        ) {
-            CircularProgressIndicator()
-        }
-    } else {
-        Column {
-            SearchableList(
-                isLoading = isLoading,
-                searchQuery = searchQuery,
-                onSearchQueryChange = { query -> searchQuery.value = query },
-                countryList = countryList,
-                selectedCountry = selectedCountry,
-                countrySelected = countrySelected
-            )
-        }
+    Column {
+        SearchableList(
+            searchQuery = searchQuery,
+            onSearchQueryChange = { query -> searchQuery.value = query },
+            countryList = countryList,
+            selectedCountry = selectedCountry,
+            countrySelected = countrySelected
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchableList(
-    isLoading: Boolean,
     searchQuery: MutableState<String>,
     onSearchQueryChange: (String) -> Unit,
     countryList: List<Country>,
@@ -223,7 +219,7 @@ fun SearchableList(
             }
         },
         content = {
-            if (filteredCountryList.isEmpty() && isLoading.not()) {
+            if (filteredCountryList.isEmpty()) {
                 EmptyState(message = "")
             } else {
                 LazyColumn {

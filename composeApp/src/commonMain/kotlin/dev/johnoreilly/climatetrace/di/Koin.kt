@@ -2,7 +2,8 @@ package dev.johnoreilly.climatetrace.di
 
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
-import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
+import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
+import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.DEFAULT
@@ -27,7 +28,8 @@ fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { createJson() }
     single { createHttpClient(get(), enableNetworkLogs = enableNetworkLogs) }
     single { ClimateTraceApi(get()) }
-    single { ClimateTraceViewModel() }
+    single { CountryListViewModel() }
+    single { CountryDetailsViewModel() }
     single { ClimateTraceRepository(get(), get()) }
     loadKoinModules(dataModule())
 }
