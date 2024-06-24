@@ -32,18 +32,18 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
         }
 
         Scaffold(
-                topBar = {
-                    CenterAlignedTopAppBar(
-                            title = {
-                                Text("ClimateTraceKMP")
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = { navigator.pop() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                                }
-                            }
-                    )
-                }
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text("ClimateTraceKMP")
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navigator.pop() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
+            }
         ) {
             Column(Modifier.padding(it)) {
                 CountryInfoDetailedView(viewState) { year ->

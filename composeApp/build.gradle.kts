@@ -64,6 +64,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
+            implementation(libs.molecule)
 
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
