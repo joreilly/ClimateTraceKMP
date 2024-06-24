@@ -48,14 +48,25 @@ struct ContentView: View {
 
 
 struct CountryListView: View {
-    @StateViewModel var viewModel = ClimateTraceViewModel()
+    @StateViewModel var viewModel = CountryListViewModel()
     @State var query: String = ""
     
     var body: some View {
+        
+        switch(viewModel.viewState) {
+         
+        case is CountryListUIState.Loading:
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+                .scaleEffect(1.5)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        case is CountryListUIState.Error:  Text("Error")
+        case let state as CountryListUIState.Success:
+            
             NavigationView {
                 ZStack {
                     List {
-                        ForEach(viewModel.countryList.filter { query.isEmpty || $0.name.contains(query) }, id: \.self) { country in
+                        ForEach(state.countryList.filter { query.isEmpty || $0.name.contains(query) }, id: \.self) { country in
                             NavigationLink(destination: CountryInfoDetailedViewShared(country: country)) {
                                 HStack {
                                     Text(country.name).font(.headline)
@@ -66,14 +77,7 @@ struct CountryListView: View {
                     .searchable(text: $query)
                     .disableAutocorrection(true)
 
-                    // Conditional display of the ProgressView
-                    if let isLoading = viewModel.isLoadingCountries.value_ as? Bool, isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                            .scaleEffect(1.5)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else if viewModel.countryList.filter({ query.isEmpty || $0.name.contains(query) }).isEmpty {
-                        // Conditional display of text when query result is empty from search bar
+                    if state.countryList.filter({ query.isEmpty || $0.name.contains(query) }).isEmpty {
                         Text("No Countries Found!")
                             .font(.headline)
                             .foregroundColor(.gray)
@@ -89,7 +93,9 @@ struct CountryListView: View {
                     }
                 }
             }
+        default: EmptyView()
         }
+    }
 }
 
 

@@ -1,38 +1,56 @@
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeUIViewController
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
 import dev.johnoreilly.climatetrace.ui.CountryListView
-import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
+import dev.johnoreilly.climatetrace.ui.CountryScreenSuccess
+import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
+import dev.johnoreilly.climatetrace.viewmodel.CountryListUIState
+import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
 import org.koin.compose.koinInject
 
 fun CountryListViewController(onCountryClicked: (country: Country) -> Unit) = ComposeUIViewController {
-    val viewModel = koinInject<ClimateTraceViewModel>()
-    val countryList by viewModel.countryList.collectAsState()
-    val selectedCountry by viewModel.selectedCountry.collectAsState()
-    val isLoadingCountries by viewModel.isLoadingCountries.collectAsState()
+    val viewModel = koinInject<CountryListViewModel>()
+    val viewState by viewModel.viewState.collectAsState()
 
-    CountryListView(countryList, selectedCountry, isLoadingCountries) {
-        //selectedCountry.value = it
-        onCountryClicked(it)
+    when (val state = viewState) {
+        is CountryListUIState.Loading -> {
+            Column(modifier = Modifier.fillMaxSize().fillMaxHeight()
+                .wrapContentSize(Alignment.Center)
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is CountryListUIState.Error -> {
+            Text("Error")
+        }
+        is CountryListUIState.Success -> {
+            CountryScreenSuccess(state.countryList)
+        }
     }
 }
 
 
 fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewController {
-    val viewModel = koinInject<ClimateTraceViewModel>()
-    val countryEmissionInfo by viewModel.countryEmissionInfo.collectAsState()
-    val countryAssetEmissions by viewModel.countryAssetEmissions.collectAsState()
-    val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()
+    val viewModel = koinInject<CountryDetailsViewModel>()
+    val viewState by viewModel.viewState.collectAsState()
 
     LaunchedEffect(country) {
         viewModel.setCountry(country)
     }
 
-    CountryInfoDetailedView(country, viewModel.selectedYear.value, { viewModel.setYear(it) },
-        countryEmissionInfo, countryAssetEmissions, isLoadingCountryDetails)
+    CountryInfoDetailedView(viewState) {
+        viewModel.setYear(it)
+    }
 }

@@ -14,7 +14,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.johnoreilly.climatetrace.remote.Country
-import dev.johnoreilly.climatetrace.viewmodel.ClimateTraceViewModel
+import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,10 +24,8 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        val viewModel = koinInject<ClimateTraceViewModel>()
-        val countryEmissionInfo by viewModel.countryEmissionInfo.collectAsState()
-        val countryAssetEmissions by viewModel.countryAssetEmissions.collectAsState()
-        val isLoadingCountryDetails by viewModel.isLoadingCountryDetails.collectAsState()
+        val viewModel = koinInject<CountryDetailsViewModel>()
+        val viewState by viewModel.viewState.collectAsState()
 
         LaunchedEffect(country) {
             viewModel.setCountry(country)
@@ -48,14 +46,9 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
                 }
         ) {
             Column(Modifier.padding(it)) {
-                CountryInfoDetailedView(
-                        country,
-                        viewModel.selectedYear.value,
-                        onYearSelected = { viewModel.setYear(it) },
-                        countryEmissionInfo,
-                        countryAssetEmissions,
-                        isLoadingCountryDetails
-                )
+                CountryInfoDetailedView(viewState) { year ->
+                    viewModel.setYear(year)
+                }
             }
         }
     }
