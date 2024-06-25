@@ -23,8 +23,8 @@ import org.koin.core.component.inject
 
 
 sealed class CountryDetailsUIState {
-    object NoCountrySelected : CountryDetailsUIState()
-    object Loading : CountryDetailsUIState()
+    data object NoCountrySelected : CountryDetailsUIState()
+    data object Loading : CountryDetailsUIState()
     data class Error(val message: String) : CountryDetailsUIState()
     data class Success(
         val country: Country,
@@ -64,7 +64,7 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
     fun CountryDetailsPresenter(events: Flow<CountryDetailsEvents>): CountryDetailsUIState {
         var uiState by remember { mutableStateOf<CountryDetailsUIState>(CountryDetailsUIState.NoCountrySelected) }
         var selectedCountry by remember { mutableStateOf<Country?>(null) }
-        var selectedYear by remember { mutableStateOf<String>("2022") }
+        var selectedYear by remember { mutableStateOf("2022") }
 
         var countryEmissionInfo by remember { mutableStateOf<CountryEmissionsInfo?>(null) }
         var countryAssetEmissionsList by remember { mutableStateOf<List<CountryAssetEmissionsInfo>>(emptyList()) }
@@ -72,24 +72,18 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
         LaunchedEffect(Unit) {
             events.collect { event ->
                 when (event) {
-                    is CountryDetailsEvents.SetCountry -> {
-                        selectedCountry = event.country
-                        selectedCountry?.let { country ->
-                            uiState = CountryDetailsUIState.Loading
-                            countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.alpha3, selectedYear).firstOrNull()
-                            countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.alpha3)
-                            uiState = CountryDetailsUIState.Success(country, selectedYear, countryEmissionInfo, countryAssetEmissionsList)
-                        }
-                    }
-
-                    is CountryDetailsEvents.SetYear -> {
-                        selectedCountry?.let { country ->
-                            selectedYear = event.year
-                            countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.alpha3, selectedYear).firstOrNull()
-                            uiState = CountryDetailsUIState.Success(country, selectedYear, countryEmissionInfo, countryAssetEmissionsList)
-                        }
-                    }
+                    is CountryDetailsEvents.SetCountry -> selectedCountry = event.country
+                    is CountryDetailsEvents.SetYear -> selectedYear = event.year
                 }
+            }
+        }
+
+        LaunchedEffect(selectedCountry, selectedYear) {
+            selectedCountry?.let { country ->
+                uiState = CountryDetailsUIState.Loading
+                countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.alpha3, selectedYear).firstOrNull()
+                countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.alpha3)
+                uiState = CountryDetailsUIState.Success(country, selectedYear, countryEmissionInfo, countryAssetEmissionsList)
             }
         }
 
