@@ -66,9 +66,6 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
         var selectedCountry by remember { mutableStateOf<Country?>(null) }
         var selectedYear by remember { mutableStateOf("2022") }
 
-        var countryEmissionInfo by remember { mutableStateOf<CountryEmissionsInfo?>(null) }
-        var countryAssetEmissionsList by remember { mutableStateOf<List<CountryAssetEmissionsInfo>>(emptyList()) }
-
         LaunchedEffect(Unit) {
             events.collect { event ->
                 when (event) {
@@ -81,9 +78,13 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
         LaunchedEffect(selectedCountry, selectedYear) {
             selectedCountry?.let { country ->
                 uiState = CountryDetailsUIState.Loading
-                countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.alpha3, selectedYear).firstOrNull()
-                countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.alpha3)
-                uiState = CountryDetailsUIState.Success(country, selectedYear, countryEmissionInfo, countryAssetEmissionsList)
+                try {
+                    val countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.alpha3, selectedYear).firstOrNull()
+                    val countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.alpha3)
+                    uiState = CountryDetailsUIState.Success(country, selectedYear, countryEmissionInfo, countryAssetEmissionsList)
+                } catch (e: Exception) {
+                    uiState = CountryDetailsUIState.Error("Error retrieving data from backend")
+                }
             }
         }
 
