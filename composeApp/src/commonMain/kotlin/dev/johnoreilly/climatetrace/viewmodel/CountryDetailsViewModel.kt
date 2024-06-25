@@ -10,7 +10,6 @@ import app.cash.molecule.RecompositionMode
 import app.cash.molecule.launchMolecule
 import com.rickclephas.kmp.observableviewmodel.ViewModel
 import com.rickclephas.kmp.observableviewmodel.coroutineScope
-import com.rickclephas.kmp.observableviewmodel.launch
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
@@ -42,22 +41,18 @@ sealed interface CountryDetailsEvents {
 open class CountryDetailsViewModel : ViewModel(), KoinComponent {
     private val climateTraceRepository: ClimateTraceRepository by inject()
 
-    private val events = MutableSharedFlow<CountryDetailsEvents>()
+    private val events = MutableSharedFlow<CountryDetailsEvents>(extraBufferCapacity = 20)
 
     val viewState: StateFlow<CountryDetailsUIState> = viewModelScope.coroutineScope.launchMolecule(mode = RecompositionMode.Immediate) {
         CountryDetailsPresenter(events)
     }
 
     fun setYear(year: String) {
-        viewModelScope.launch {
-            events.emit(CountryDetailsEvents.SetYear(year))
-        }
+        events.tryEmit(CountryDetailsEvents.SetYear(year))
     }
 
     fun setCountry(country: Country) {
-        viewModelScope.launch {
-            events.emit(CountryDetailsEvents.SetCountry(country))
-        }
+        events.tryEmit(CountryDetailsEvents.SetCountry(country))
     }
 
     @Composable
