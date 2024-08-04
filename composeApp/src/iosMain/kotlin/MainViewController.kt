@@ -42,11 +42,16 @@ fun CountryListViewController(onCountryClicked: (country: Country) -> Unit) = Co
 }
 
 
-fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewController {
+interface SomeKotlinInterface {
+    suspend fun doSomething()
+}
+
+fun CountryInfoDetailedViewController(country: Country, someClass: SomeKotlinInterface) = ComposeUIViewController {
     val viewModel = koinInject<CountryDetailsViewModel>()
     val viewState by viewModel.viewState.collectAsState()
 
     LaunchedEffect(country) {
+        someClass.doSomething()
         viewModel.setCountry(country)
     }
 

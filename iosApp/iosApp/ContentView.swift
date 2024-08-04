@@ -112,11 +112,22 @@ struct CountryListViewShared: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
 
+
+class SomeSwiftClass: SomeKotlinInterface {
+//    func doSomething(completionHandler: @escaping ((any Error)?) -> Void) {
+//        print("hi")
+//    }
+    
+    func doSomething() async throws {
+        print("hi there")
+    }
+}
+
 struct CountryInfoDetailedViewShared: UIViewControllerRepresentable {
     let country: Country
     
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.CountryInfoDetailedViewController(country: country)
+        MainViewControllerKt.CountryInfoDetailedViewController(country: country, someClass: SomeSwiftClass())
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
