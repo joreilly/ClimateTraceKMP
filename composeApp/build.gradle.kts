@@ -81,7 +81,8 @@ kotlin {
             implementation(libs.koalaplot)
             implementation(libs.treemap.chart)
             implementation(libs.treemap.chart.compose)
-            api(libs.compose.window.size)
+            api(libs.compose.adaptive)
+            api(libs.compose.adaptive.layout)
         }
 
         jsMain.dependencies {
@@ -95,6 +96,8 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.kstore.file)
             implementation(libs.ktor.client.android)
+            // workaround for https://youtrack.jetbrains.com/issue/CMP-5959/Invalid-redirect-in-window-core#focus=Comments-27-10365630.0-0
+            implementation("androidx.window:window-core:1.3.0")
         }
 
         desktopMain.dependencies {
@@ -179,4 +182,8 @@ compose.experimental {
 
 kotlin.sourceSets.all {
     languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
+}
+
+configurations.configureEach {
+    exclude("androidx.window.core", "window-core")
 }
