@@ -33,9 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -48,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowWidthSizeClass
 import cafe.adriel.voyager.core.screen.Screen
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.utils.PanelState
@@ -82,10 +81,9 @@ class ClimateTraceScreen: Screen {
     }
 }
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun CountryScreenSuccess(countryList: List<Country>) {
-    val windowSizeClass = calculateWindowSizeClass()
+    val windowAdaptiveInfo = currentWindowAdaptiveInfo() //  calculateWindowSizeClass()
     val countryDetailsViewModel = koinInject<CountryDetailsViewModel>()
     val countryDetailsViewState by countryDetailsViewModel.viewState.collectAsState()
     var selectedCountry by remember {  mutableStateOf<Country?>(null) }
@@ -103,7 +101,8 @@ fun CountryScreenSuccess(countryList: List<Country>) {
 
 
     Row(Modifier.fillMaxSize()) {
-        if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
+        val windowSizeClass = windowAdaptiveInfo.windowSizeClass
+        if (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT) {
             Column(Modifier.fillMaxWidth()) {
                 Box(
                     Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)
