@@ -1,9 +1,6 @@
 package dev.johnoreilly.climatetrace.ui
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.SpringSpec
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -83,7 +80,7 @@ class ClimateTraceScreen: Screen {
 
 @Composable
 fun CountryScreenSuccess(countryList: List<Country>) {
-    val windowAdaptiveInfo = currentWindowAdaptiveInfo() //  calculateWindowSizeClass()
+    val windowAdaptiveInfo = currentWindowAdaptiveInfo() 
     val countryDetailsViewModel = koinInject<CountryDetailsViewModel>()
     val countryDetailsViewState by countryDetailsViewModel.viewState.collectAsState()
     var selectedCountry by remember {  mutableStateOf<Country?>(null) }
@@ -93,12 +90,8 @@ fun CountryScreenSuccess(countryList: List<Country>) {
     val animatedSize = if (panelState.splitter.isResizing) {
         if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
     } else {
-        animateDpAsState(
-            if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize,
-            SpringSpec(stiffness = Spring.StiffnessLow)
-        ).value
+        if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
     }
-
 
     Row(Modifier.fillMaxSize()) {
         val windowSizeClass = windowAdaptiveInfo.windowSizeClass
