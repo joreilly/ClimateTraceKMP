@@ -31,7 +31,7 @@ fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { CountryListViewModel() }
     single { CountryDetailsViewModel() }
     single { ClimateTraceRepository(get(), get()) }
-    loadKoinModules(dataModule())
+    includes(dataModule())
 }
 
 expect fun dataModule(): Module
