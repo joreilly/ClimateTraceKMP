@@ -27,12 +27,6 @@ kotlin {
     }
 
 
-    js(){
-        browser()
-        binaries.executable()
-    }
-
-
     androidTarget()
     jvm("desktop")
     
