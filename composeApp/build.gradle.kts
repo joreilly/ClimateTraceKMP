@@ -81,6 +81,13 @@ kotlin {
             api(libs.compose.adaptive.layout)
         }
 
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+
+            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+            implementation(compose.uiTest)
+        }
+
         jsMain.dependencies {
             implementation(compose.html.core)
             implementation(libs.kstore.storage)
