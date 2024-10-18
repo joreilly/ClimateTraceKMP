@@ -1,6 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -15,7 +16,6 @@ plugins {
 kotlin {
     jvmToolchain(17)
 
-    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
         browser {
@@ -27,7 +27,13 @@ kotlin {
     }
 
 
-    androidTarget()
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
+
+    }
+
+
     jvm("desktop")
     
     listOf(
@@ -79,6 +85,13 @@ kotlin {
             implementation(libs.treemap.chart.compose)
             api(libs.compose.adaptive)
             api(libs.compose.adaptive.layout)
+        }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+
+            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+            implementation(compose.uiTest)
         }
 
         jsMain.dependencies {
@@ -139,7 +152,10 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -156,6 +172,14 @@ android {
     }
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
+    }
+
+    testOptions {
+        unitTests {
+            all {
+                it.exclude("**/screen/**")
+            }
+        }
     }
 }
 
