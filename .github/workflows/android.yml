@@ -17,7 +17,5 @@ jobs:
     - name: Build android app
       run: ./gradlew assembleDebug
     - name: Run Unit Tests
-      run: ./gradlew test
-    - name: Build iOS shared code
-      run: ./gradlew :composeApp:compileKotlinIosSimulatorArm64
+      run: ./gradlew allTests
 
