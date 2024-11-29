@@ -1,6 +1,6 @@
 [versions]
-kotlin = "2.0.21"
-ksp = "2.0.21-1.0.25"
+kotlin = "2.1.0"
+ksp = "2.1.0-1.0.28"
 kotlinx-coroutines = "1.9.0"
 
 
@@ -16,7 +16,7 @@ harawata-appdirs = "1.2.2"
 koalaplot = "0.5.3"
 koin = "4.0.1-Beta1"
 koin-compose-multiplatform = "4.0.1-Beta1"
-kmpNativeCoroutines = "1.0.0-ALPHA-35"
+kmpNativeCoroutines = "1.0.0-ALPHA-37-kotlin-2.1.0-RC2"
 kmpObservableViewModel = "1.0.0-BETA-7"
 kstore = "0.8.0"
 ktor = "3.0.1"
