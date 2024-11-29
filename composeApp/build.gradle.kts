@@ -94,11 +94,6 @@ kotlin {
             implementation(compose.uiTest)
         }
 
-        jsMain.dependencies {
-            implementation(compose.html.core)
-            implementation(libs.kstore.storage)
-        }
-
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
