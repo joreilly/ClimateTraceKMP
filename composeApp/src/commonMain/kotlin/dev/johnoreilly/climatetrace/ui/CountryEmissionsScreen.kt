@@ -28,7 +28,7 @@ fun CountryEmissionsScreen(country: Country, onBack: () -> Unit ) {
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text("ClimateTraceKMP")
+                    Text(country.name)
                 },
                 navigationIcon = {
                     IconButton(onClick = {

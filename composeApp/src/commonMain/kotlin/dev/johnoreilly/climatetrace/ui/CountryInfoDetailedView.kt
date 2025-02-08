@@ -67,13 +67,13 @@ fun CountryInfoDetailedViewSuccess(viewState: CountryDetailsUIState.Success, onY
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(
-            text = viewState.country.name,
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.size(16.dp))
+//        Text(
+//            text = viewState.country.name,
+//            style = MaterialTheme.typography.titleLarge,
+//            textAlign = TextAlign.Center
+//        )
+//
+//        Spacer(modifier = Modifier.size(16.dp))
 
         val year = viewState.year
         val countryAssetEmissionsList = viewState.countryAssetEmissionsList
