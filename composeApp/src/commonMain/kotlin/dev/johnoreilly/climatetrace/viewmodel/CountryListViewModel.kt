@@ -1,6 +1,5 @@
 package dev.johnoreilly.climatetrace.viewmodel
 
-import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import com.rickclephas.kmp.observableviewmodel.MutableStateFlow
 import com.rickclephas.kmp.observableviewmodel.ViewModel
 import com.rickclephas.kmp.observableviewmodel.coroutineScope
@@ -22,7 +21,6 @@ open class CountryListViewModel : ViewModel(), KoinComponent {
     private val climateTraceRepository: ClimateTraceRepository by inject()
 
     private val _viewState = MutableStateFlow<CountryListUIState>(viewModelScope, CountryListUIState.Loading)
-    @NativeCoroutinesState
     val viewState = _viewState.asStateFlow()
 
 

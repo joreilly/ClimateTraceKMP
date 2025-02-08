@@ -44,7 +44,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
-import cafe.adriel.voyager.core.screen.Screen
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.utils.PanelState
 import dev.johnoreilly.climatetrace.ui.utils.ResizablePanel
@@ -53,26 +52,27 @@ import dev.johnoreilly.climatetrace.viewmodel.CountryListUIState
 import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
 import org.koin.compose.koinInject
 
+//
+// NOTE THIS IS NOT BEING USED IN THIS BRANCH SO FAR
+//
 
-class ClimateTraceScreen: Screen {
-    @Composable
-    override fun Content() {
-        val countryListViewModel = koinInject<CountryListViewModel>()
-        val countryListViewState by countryListViewModel.viewState.collectAsState()
+@Composable
+fun ClimateTraceScreen() {
+    val countryListViewModel = koinInject<CountryListViewModel>()
+    val countryListViewState by countryListViewModel.viewState.collectAsState()
 
-        Column(Modifier) {
-            when (val state = countryListViewState) {
-                is CountryListUIState.Loading -> {
-                    Column(modifier = Modifier.fillMaxSize().fillMaxHeight().wrapContentSize(Alignment.Center)) {
-                        CircularProgressIndicator()
-                    }
+    Column(Modifier) {
+        when (val state = countryListViewState) {
+            is CountryListUIState.Loading -> {
+                Column(modifier = Modifier.fillMaxSize().fillMaxHeight().wrapContentSize(Alignment.Center)) {
+                    CircularProgressIndicator()
                 }
-                is CountryListUIState.Error -> {
-                    Text("Error")
-                }
-                is CountryListUIState.Success -> {
-                    CountryScreenSuccess(state.countryList)
-                }
+            }
+            is CountryListUIState.Error -> {
+                Text("Error")
+            }
+            is CountryListUIState.Success -> {
+                CountryScreenSuccess(state.countryList)
             }
         }
     }
@@ -80,7 +80,7 @@ class ClimateTraceScreen: Screen {
 
 @Composable
 fun CountryScreenSuccess(countryList: List<Country>) {
-    val windowAdaptiveInfo = currentWindowAdaptiveInfo() 
+    val windowAdaptiveInfo = currentWindowAdaptiveInfo()
     val countryDetailsViewModel = koinInject<CountryDetailsViewModel>()
     val countryDetailsViewState by countryDetailsViewModel.viewState.collectAsState()
     var selectedCountry by remember {  mutableStateOf<Country?>(null) }

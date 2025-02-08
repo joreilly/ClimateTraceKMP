@@ -1,33 +1,38 @@
 [versions]
 kotlin = "2.1.0"
 ksp = "2.1.0-1.0.29"
-kotlinx-coroutines = "1.9.0"
+kotlinx-coroutines = "1.10.1"
 
 
-agp = "8.7.3"
-android-compileSdk = "34"
+agp = "8.8.0"
+android-compileSdk = "35"
 android-minSdk = "24"
-android-targetSdk = "34"
-androidx-activityCompose = "1.9.3"
-compose = "1.7.6"
+android-targetSdk = "35"
+androidx-activityCompose = "1.10.0"
+compose = "1.7.7"
 compose-plugin = "1.7.3"
 composeAdaptiveLayout = "1.0.0"
 harawata-appdirs = "1.2.2"
 koalaplot = "0.5.3"
 koin = "4.0.1-Beta1"
 koin-compose-multiplatform = "4.0.1-Beta1"
-kmpNativeCoroutines = "1.0.0-ALPHA-38"
 kmpObservableViewModel = "1.0.0-BETA-7"
 kstore = "0.8.0"
 ktor = "3.0.1"
 treemapChart = "0.1.1"
-voyager= "1.1.0-beta03"
 molecule =  "2.0.0"
 
+lifecycleViewmodel = "2.9.0-alpha09"
+navigation3 = "0.1.0-SNAPSHOT"
 
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodel" }
+androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycleViewmodel" }
+androidx-navigation3 = { module = "androidx.navigation3:navigation3", version.ref = "navigation3" }
+
 
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
@@ -56,7 +61,6 @@ ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
 
-voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 harawata-appdirs = { module = "net.harawata:appdirs", version.ref = "harawata-appdirs" }
 koalaplot = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
 treemap-chart = { module = "io.github.overpas:treemap-chart", version.ref = "treemapChart" }
@@ -75,6 +79,5 @@ jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

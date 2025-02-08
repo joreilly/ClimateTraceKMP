@@ -10,21 +10,21 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.kmpNativeCoroutines)
+    id("kotlin-parcelize")
 }
 
 kotlin {
     jvmToolchain(17)
 
-    wasmJs {
-        moduleName = "composeApp"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "composeApp.js"
-            }
-        }
-        binaries.executable()
-    }
+//    wasmJs {
+//        moduleName = "composeApp"
+//        browser {
+//            commonWebpackConfig {
+//                outputFileName = "composeApp.js"
+//            }
+//        }
+//        binaries.executable()
+//    }
 
 
     androidTarget {
@@ -56,15 +56,23 @@ kotlin {
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
         }
 
-        val desktopMain by getting
-        
+
         commonMain.dependencies {
+
+//            implementation(libs.androidx.navigation3)
+//            implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+            implementation(libs.androidx.lifecycle.viewmodel)
+
+            implementation("androidx.savedstate:savedstate:1.3.0-alpha07")
+            implementation("androidx.collection:collection:1.4.5")
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            api(libs.compose.adaptive)
+            api(libs.compose.adaptive.layout)
 
             implementation(libs.molecule)
 
@@ -72,19 +80,13 @@ kotlin {
             implementation(libs.koin.compose)
 
             implementation(libs.kstore)
-
             implementation(libs.kotlinx.coroutines)
             implementation(libs.bundles.ktor.common)
-
-            implementation(libs.voyager)
-
             implementation(libs.kmpObservableViewModel)
 
             implementation(libs.koalaplot)
             implementation(libs.treemap.chart)
             implementation(libs.treemap.chart.compose)
-            api(libs.compose.adaptive)
-            api(libs.compose.adaptive.layout)
         }
 
         commonTest.dependencies {
@@ -103,6 +105,8 @@ kotlin {
             // workaround for https://youtrack.jetbrains.com/issue/CMP-5959/Invalid-redirect-in-window-core#focus=Comments-27-10365630.0-0
             implementation("androidx.window:window-core:1.3.0")
         }
+
+        val desktopMain by getting
 
         desktopMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${libs.versions.kotlinx.coroutines}")
@@ -125,11 +129,11 @@ kotlin {
             implementation(compose.desktop.currentOs)
         }
 
-        val wasmJsMain by getting
-
-        wasmJsMain.dependencies {
-            implementation(libs.kstore.storage)
-        }
+//        val wasmJsMain by getting
+//
+//        wasmJsMain.dependencies {
+//            implementation(libs.kstore.storage)
+//        }
     }
 }
 
