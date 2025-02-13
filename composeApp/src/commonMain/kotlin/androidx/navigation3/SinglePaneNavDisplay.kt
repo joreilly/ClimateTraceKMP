@@ -15,8 +15,8 @@
  */
 package androidx.navigation3
 
-//import androidx.activity.compose.BackHandler
-//import androidx.activity.compose.PredictiveBackHandler
+import androidx.compose.ui.backhandler.BackHandler
+import androidx.compose.ui.backhandler.PredictiveBackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
@@ -37,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.navigation3.SinglePaneNavDisplay.DEFAULT_TRANSITION_DURATION_MILLISECOND
 import androidx.navigation3.SinglePaneNavDisplay.ENTER_TRANSITION_KEY
@@ -98,6 +99,7 @@ public object SinglePaneNavDisplay {
  * @sample androidx.navigation3.samples.BaseNav
  * @sample androidx.navigation3.samples.CustomBasicDisplay
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 public fun <T : Any> SinglePaneNavDisplay(
     backStack: List<T>,
@@ -138,7 +140,7 @@ public fun <T : Any> SinglePaneNavDisplay(
 ) {
     require(backStack.isNotEmpty()) { "NavDisplay backstack cannot be empty" }
 
-    //BackHandler(backStack.size > 1, onBack)
+    BackHandler(backStack.size > 1, onBack)
     NavBackStackProvider(backStack, entryProvider, localProviders) { entries ->
         // Make a copy shallow copy so that transition.currentState and transition.targetState are
         // different backstack instances. This ensures currentState reflects the old backstack when
@@ -148,19 +150,19 @@ public fun <T : Any> SinglePaneNavDisplay(
 
         var progress by remember { mutableFloatStateOf(0f) }
         var inPredictiveBack by remember { mutableStateOf(false) }
-//        PredictiveBackHandler(backStack.size > 1) { backEvent ->
-//            progress = 0f
-//            try {
-//                backEvent.collect { value ->
-//                    inPredictiveBack = true
-//                    progress = value.progress
-//                }
-//                inPredictiveBack = false
-//                onBack()
-//            } catch (e: CancellationException) {
-//                inPredictiveBack = false
-//            }
-//        }
+        PredictiveBackHandler(backStack.size > 1) { backEvent ->
+            progress = 0f
+            try {
+                backEvent.collect { value ->
+                    inPredictiveBack = true
+                    progress = value.progress
+                }
+                inPredictiveBack = false
+                onBack()
+            } catch (e: CancellationException) {
+                inPredictiveBack = false
+            }
+        }
 
         val transitionState = remember {
             // The state returned here cannot be nullable cause it produces the input of the

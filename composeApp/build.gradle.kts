@@ -69,6 +69,7 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
+            implementation("org.jetbrains.compose.ui:ui-backhandler:1.8.0-alpha03")
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             api(libs.compose.adaptive)

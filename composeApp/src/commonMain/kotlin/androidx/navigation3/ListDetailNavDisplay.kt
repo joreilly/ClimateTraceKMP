@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.navigation3.ListDetailNavDisplay.IS_SUPPORTING_PANE
 import androidx.window.core.layout.WindowWidthSizeClass
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun <T : Any> ListDetailNavDisplay(
     backStack: List<T>,
@@ -21,7 +24,7 @@ fun <T : Any> ListDetailNavDisplay(
 ) {
 
     val isSinglePaneLayout = (windowWidthSizeClass == WindowWidthSizeClass.COMPACT)
-    //BackHandler(isSinglePaneLayout && backStack.size > 1, onBack)
+    BackHandler(isSinglePaneLayout && backStack.size > 1, onBack)
 
     NavBackStackProvider(backStack, entryProvider, localProviders) { entries ->
         val lastEntry = entries.last()
