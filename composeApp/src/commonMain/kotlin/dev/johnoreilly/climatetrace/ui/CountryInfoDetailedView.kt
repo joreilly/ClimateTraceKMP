@@ -79,7 +79,7 @@ fun CountryInfoDetailedViewSuccess(viewState: CountryDetailsUIState.Success, onY
         val countryAssetEmissionsList = viewState.countryAssetEmissionsList
         val countryEmissionInfo = viewState.countryEmissionInfo
 
-        YearSelector(year, onYearSelected)
+        YearSelector(year, viewState.availableYears, onYearSelected)
         countryEmissionInfo?.let {
             val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
             val percentage =
@@ -112,9 +112,8 @@ fun CountryInfoDetailedViewSuccess(viewState: CountryDetailsUIState.Success, onY
 
 
 @Composable
-fun YearSelector(selectedYear: String, onYearSelected: (String) -> Unit) {
+fun YearSelector(selectedYear: String, availableYears: List<String>, onYearSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    val items = listOf("2021", "2022")
 
     Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
         Text(selectedYear, modifier = Modifier.clickable(onClick = { expanded = true }))
@@ -122,7 +121,7 @@ fun YearSelector(selectedYear: String, onYearSelected: (String) -> Unit) {
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            items.forEach { year ->
+            availableYears.forEach { year ->
                 DropdownMenuItem(onClick = {
                     onYearSelected(year)
                     expanded = false
