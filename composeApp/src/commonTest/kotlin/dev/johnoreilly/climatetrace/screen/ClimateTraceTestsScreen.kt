@@ -35,7 +35,7 @@ class ClimateTraceScreenTest {
     @Test
     fun testCountryInfoDetailsView() = runComposeUiTest {
         val state = CountryDetailsUIState.Success(country,
-            year, countryEmissionsInfo, emptyList()
+            year, listOf("2022", "2023"), countryEmissionsInfo, emptyList()
         )
         setContent {
             CountryInfoDetailedView(state, {})
