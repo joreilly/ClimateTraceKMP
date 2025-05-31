@@ -28,13 +28,11 @@ fun configureServer(): Server {
 
     val server = Server(
         Implementation(
-            name = "mcp-kotlin PeopleInSpace server",
+            name = "ClimateTrace MCP Server",
             version = "1.0.0"
         ),
         ServerOptions(
             capabilities = ServerCapabilities(
-                prompts = ServerCapabilities.Prompts(listChanged = true),
-                resources = ServerCapabilities.Resources(subscribe = true, listChanged = true),
                 tools = ServerCapabilities.Tools(listChanged = true)
             )
         )
@@ -60,10 +58,9 @@ fun configureServer(): Server {
                 mapOf(
                     "countryCode" to JsonPrimitive("string"),
                     "year" to JsonPrimitive("date"),
-
                 )
             ),
-            required = listOf("countryCode")
+            required = listOf("countryCode", "year")
         )
 
     ) { request ->
@@ -76,12 +73,11 @@ fun configureServer(): Server {
         }
 
         val countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(
-            countryCode.jsonPrimitive.content,
-            year.jsonPrimitive.content
+            countryCode = countryCode.jsonPrimitive.content,
+            year = year.jsonPrimitive.content
         )
         CallToolResult(
-            content =
-                countryEmissionInfo.map { TextContent(it.emissions.co2.toString()) }
+            content = countryEmissionInfo.map { TextContent(it.emissions.co2.toString()) }
         )
     }
 
