@@ -10,6 +10,7 @@ Running on
 * Web (Wasm)
 * Web (Kotlin/JS) - contributed by https://github.com/yogeshVU
 * Kotlin Notebook
+* MCP Server
 
 The iOS client as mentioned includes shared Compose Multiplatform UI code.  It also includes option to use either SwiftUI or Compose code for the Country List screen (in both cases selecting a country will navigate to shared Compose emissions details screen).
 
