@@ -34,7 +34,7 @@ kotlin {
     }
 
 
-    jvm("desktop")
+    jvm()
     
     listOf(
         iosX64(),
@@ -56,8 +56,6 @@ kotlin {
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
         }
 
-        val desktopMain by getting
-        
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -100,11 +98,9 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.kstore.file)
             implementation(libs.ktor.client.android)
-            // workaround for https://youtrack.jetbrains.com/issue/CMP-5959/Invalid-redirect-in-window-core#focus=Comments-27-10365630.0-0
-            implementation("androidx.window:window-core:1.3.0")
         }
 
-        desktopMain.dependencies {
+        jvmMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${libs.versions.kotlinx.coroutines}")
             implementation(compose.desktop.currentOs)
             implementation(libs.harawata.appdirs)
@@ -118,10 +114,7 @@ kotlin {
         }
 
 
-        val desktopTest by getting
-
-        // Adds the desktop test dependency
-        desktopTest.dependencies {
+        jvmTest.dependencies {
             implementation(compose.desktop.currentOs)
         }
 

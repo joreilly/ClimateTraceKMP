@@ -1,15 +1,15 @@
 [versions]
-kotlin = "2.1.20"
-ksp = "2.1.20-2.0.0"
-kotlinx-coroutines = "1.10.1"
+kotlin = "2.1.21"
+ksp = "2.1.21-2.0.1"
+kotlinx-coroutines = "1.10.2"
 
 
-agp = "8.9.2"
+agp = "8.9.3"
 android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "35"
 androidx-activityCompose = "1.10.1"
-compose = "1.8.0"
+compose = "1.8.2"
 compose-plugin = "1.7.3"
 composeAdaptiveLayout = "1.0.0"
 harawata-appdirs = "1.2.2"
@@ -23,7 +23,8 @@ ktor = "3.1.1"
 treemapChart = "0.1.1"
 voyager= "1.1.0-beta03"
 molecule =  "2.0.0"
-
+mcp = "0.5.0"
+shadowPlugin = "8.1.1"
 
 
 [libraries]
@@ -63,6 +64,7 @@ treemap-chart = { module = "io.github.overpas:treemap-chart", version.ref = "tre
 treemap-chart-compose = { module = "io.github.overpas:treemap-chart-compose", version.ref = "treemapChart" }
 
 molecule = { module = "app.cash.molecule:molecule-runtime", version.ref = "molecule" }
+mcp-kotlin = { group = "io.modelcontextprotocol", name = "kotlin-sdk", version.ref = "mcp" }
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
@@ -77,4 +79,5 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm" }
+shadowPlugin = { id = "com.github.johnrengelman.shadow", version.ref = "shadowPlugin" }
