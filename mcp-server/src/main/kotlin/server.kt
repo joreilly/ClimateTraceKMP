@@ -11,7 +11,9 @@ import kotlinx.io.asSink
 import kotlinx.io.buffered
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.putJsonObject
 
 
 private val koin = initKoin(enableNetworkLogs = true).koin
@@ -47,12 +49,10 @@ fun configureServer(): Server {
         name = "get-emissions",
         description = "List emission info for a particular country",
         inputSchema = Tool.Input(
-            properties = JsonObject(
-                mapOf(
-                    "countryCode" to JsonPrimitive("string"),
-                    "year" to JsonPrimitive("date"),
-                )
-            ),
+            properties = buildJsonObject {
+                putJsonObject("countryCode") { put("type", JsonPrimitive("string")) }
+                putJsonObject("year") { put("type", JsonPrimitive("string")) }
+            },
             required = listOf("countryCode", "year")
         )
 
