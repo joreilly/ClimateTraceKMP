@@ -23,3 +23,4 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "ClimateTraceKMP"
 include(":composeApp")
 include(":mcp-server")
+include(":agents")
