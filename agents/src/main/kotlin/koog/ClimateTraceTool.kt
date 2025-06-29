@@ -1,8 +1,10 @@
+package koog
+
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.ToolSet
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
-
+import koin
 
 
 @LLMDescription("Tools for getting climate emission information")

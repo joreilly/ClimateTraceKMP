@@ -1,4 +1,7 @@
+package koog
+
 import ai.koog.agents.core.agent.AIAgent
+import ai.koog.agents.core.tools.Tool
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.core.tools.reflect.asTools
 import ai.koog.agents.features.eventHandler.feature.handleEvents
@@ -16,16 +19,16 @@ val apiKeyGoogle = ""
 
 
 @OptIn(ExperimentalUuidApi::class)
-suspend fun runKoogAgent() {
+suspend fun main() {
     val agent = AIAgent(
-        executor = simpleOpenAIExecutor(openAIApiKey),
-        //executor = simpleGoogleAIExecutor(apiKeyGoogle),
-        llmModel = OpenAIModels.Chat.GPT4o,
-        //llmModel = GoogleModels.Gemini1_5Pro,
+        //executor = simpleOpenAIExecutor(openAIApiKey),
+        executor = simpleGoogleAIExecutor(apiKeyGoogle),
+        //llmModel = OpenAIModels.Chat.GPT4o,
+        llmModel = GoogleModels.Gemini1_5Pro,
         toolRegistry = createToolSetRegistry()
     ) {
         handleEvents {
-            onToolCall { tool: ai.koog.agents.core.tools.Tool<*, *>, toolArgs: ai.koog.agents.core.tools.Tool.Args ->
+            onToolCall { tool: Tool<*, *>, toolArgs: Tool.Args ->
                 println("Tool called: tool ${tool.name}, args $toolArgs")
             }
 
@@ -41,9 +44,8 @@ suspend fun runKoogAgent() {
 
     agent.run(
         """
-        Get emission data for France, Germany for 2023 and 2024.
+        Get emission data for France and Germany for 2023 and 2024.
         Use units of millions for the emissions data.
-        Also get best estimate of population for each country and show per-capita emissions.
         """.trimIndent()
     )
 }
