@@ -10,6 +10,7 @@ import ai.koog.prompt.executor.clients.google.GoogleModels
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import ai.koog.prompt.executor.llms.all.simpleGoogleAIExecutor
 import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
+import kotlinx.coroutines.runBlocking
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -17,9 +18,8 @@ val openAIApiKey = ""
 val apiKeyGoogle = ""
 
 
-
 @OptIn(ExperimentalUuidApi::class)
-suspend fun main() {
+fun main() = runBlocking {
     val agent = AIAgent(
         //executor = simpleOpenAIExecutor(openAIApiKey),
         executor = simpleGoogleAIExecutor(apiKeyGoogle),

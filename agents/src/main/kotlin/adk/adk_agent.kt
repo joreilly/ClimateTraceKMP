@@ -61,8 +61,9 @@ fun main() {
 
     val prompt =
         """
-            Get emission data for France and Germany for 2023 and 2024.
+            Get emission data for EU countries in 2024.
             Use units of millions for the emissions data.
+            Show result in a grid or decreasing order of emissions.
             """.trimIndent()
 
     val userMsg = Content.fromParts(Part.fromText(prompt))

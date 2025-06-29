@@ -12,6 +12,7 @@ import kotlinx.io.buffered
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.putJsonObject
 
@@ -50,23 +51,30 @@ fun configureServer(): Server {
         description = "List emission info for a particular country",
         inputSchema = Tool.Input(
             properties = buildJsonObject {
-                putJsonObject("countryCode") { put("type", JsonPrimitive("string")) }
+                putJsonObject("countryCodeList") {
+                    put("type", JsonPrimitive("array"))
+                    putJsonObject("items") {
+                        put("type", JsonPrimitive("string"))
+                    }
+                }
                 putJsonObject("year") { put("type", JsonPrimitive("string")) }
             },
-            required = listOf("countryCode", "year")
+            required = listOf("countryCodeList", "year")
         )
 
     ) { request ->
-        val countryCode = request.arguments["countryCode"]
+        val countryCodeList = request.arguments["countryCodeList"]
         val year = request.arguments["year"]
-        if (countryCode == null || year == null) {
+        if (countryCodeList == null || year == null) {
             return@addTool CallToolResult(
-                content = listOf(TextContent("The 'countryCode' and `year` parameters are required."))
+                content = listOf(TextContent("The 'countryCodeList' and `year` parameters are required."))
             )
         }
 
         val countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(
-            countryCode = countryCode.jsonPrimitive.content,
+            countryCodeList = countryCodeList
+                .jsonArray
+                .map { it.jsonPrimitive.content },
             year = year.jsonPrimitive.content
         )
         CallToolResult(
