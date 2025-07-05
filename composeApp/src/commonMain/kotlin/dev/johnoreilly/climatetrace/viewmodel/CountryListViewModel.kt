@@ -6,6 +6,7 @@ import com.rickclephas.kmp.observableviewmodel.ViewModel
 import com.rickclephas.kmp.observableviewmodel.coroutineScope
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.Country
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -23,7 +24,7 @@ open class CountryListViewModel : ViewModel(), KoinComponent {
 
     private val _viewState = MutableStateFlow<CountryListUIState>(viewModelScope, CountryListUIState.Loading)
     @NativeCoroutinesState
-    val viewState = _viewState.asStateFlow()
+    val viewState: StateFlow<CountryListUIState> = _viewState.asStateFlow()
 
 
     init {
