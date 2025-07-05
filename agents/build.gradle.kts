@@ -8,7 +8,7 @@ dependencies {
     implementation("ai.koog:koog-agents:0.2.1")
     //implementation("org.slf4j:slf4j-simple:2.0.17")
     implementation("com.google.adk:google-adk:0.1.0")
-    implementation("com.google.adk:google-adk-dev:0.1.0")
+    implementation("com.google.adk:google-adk-dev:0.2.0")
 
     // following needed for AdkWebServer (dev UI)
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.3")
