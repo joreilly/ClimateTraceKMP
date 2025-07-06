@@ -11,7 +11,7 @@ dependencies {
     implementation("com.google.adk:google-adk-dev:0.1.0")
 
     // following needed for AdkWebServer (dev UI)
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.3")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
 
     implementation(projects.composeApp)
 }
