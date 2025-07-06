@@ -46,9 +46,44 @@ fun configureServer(): Server {
         )
     }
 
+
+    server.addTool(
+        name = "get-country-asset-emissions",
+        description = "Get sector emission information for the given countries",
+        inputSchema = Tool.Input(
+            properties = buildJsonObject {
+                putJsonObject("countryCodeList") {
+                    put("type", JsonPrimitive("array"))
+                    putJsonObject("items") {
+                        put("type", JsonPrimitive("string"))
+                    }
+                }
+            },
+            required = listOf("countryCodeList")
+        )
+    ) { request ->
+        val countryCodeList = request.arguments["countryCodeList"]
+        if (countryCodeList == null) {
+            return@addTool CallToolResult(
+                content = listOf(TextContent("The 'countryCodeList' parameters are required."))
+            )
+        }
+
+        val countryAssetEmissionInfo = climateTraceRepository.fetchCountryAssetEmissionsInfo(
+            countryCodeList = countryCodeList
+                .jsonArray
+                .map { it.jsonPrimitive.content }
+        )
+        CallToolResult(
+            content = countryAssetEmissionInfo.map { TextContent("${it.key}, ${it.value}") }
+        )
+    }
+
+
+
     server.addTool(
         name = "get-emissions",
-        description = "List emission info for a particular country",
+        description = "Get total emission information for the given countries",
         inputSchema = Tool.Input(
             properties = buildJsonObject {
                 putJsonObject("countryCodeList") {

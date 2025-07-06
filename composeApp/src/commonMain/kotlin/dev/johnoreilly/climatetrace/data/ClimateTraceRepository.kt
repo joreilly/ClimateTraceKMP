@@ -15,7 +15,9 @@ class ClimateTraceRepository(
         return countries
     }
 
-    suspend fun fetchCountryEmissionsInfo(countryCodeList: List<String>, year: String) = api.fetchCountryEmissionsInfo(countryCodeList, year)
     suspend fun fetchCountryEmissionsInfo(countryCode: String, year: String) = api.fetchCountryEmissionsInfo(listOf(countryCode), year)
+    suspend fun fetchCountryEmissionsInfo(countryCodeList: List<String>, year: String) = api.fetchCountryEmissionsInfo(countryCodeList, year)
+
     suspend fun fetchCountryAssetEmissionsInfo(countryCode: String) = api.fetchCountryAssetEmissionsInfo(countryCode)
+    suspend fun fetchCountryAssetEmissionsInfo(countryCodeList: List<String>) = api.fetchCountryAssetEmissionsInfo(countryCodeList)
 }
