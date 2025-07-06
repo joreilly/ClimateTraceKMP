@@ -6,6 +6,7 @@ import com.google.adk.agents.LlmAgent
 import com.google.adk.events.Event
 import com.google.adk.models.Gemini
 import com.google.adk.runner.InMemoryRunner
+import com.google.adk.tools.LongRunningFunctionTool
 import com.google.adk.tools.mcp.McpToolset
 import com.google.genai.Client
 import com.google.genai.types.Content
@@ -25,12 +26,16 @@ class ClimateTraceAgent {
         fun initAgent(): BaseAgent {
             val apiKeyGoogle = ""
 
-            val mcpTools = McpToolset(
-                ServerParameters
-                    .builder("java")
-                    .args("-jar", "/Users/joreilly/dev/github/ClimateTraceKMP/mcp-server/build/libs/serverAll.jar", "--stdio")
-                    .build()
-            ).loadTools().join()
+//            val mcpTools = McpToolset(
+//                ServerParameters
+//                    .builder("java")
+//                    .args("-jar", "/Users/joreilly/dev/github/ClimateTraceKMP/mcp-server/build/libs/serverAll.jar", "--stdio")
+//                    .build()
+//            ).loadTools().join()
+
+            val getCountriesTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getCountries")
+            val getEmissionsTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getEmissions")
+            val mcpTools = listOf(getCountriesTool, getEmissionsTool)
 
             val model = Gemini(
                 "gemini-1.5-pro",
@@ -47,7 +52,6 @@ class ClimateTraceAgent {
                 .tools(mcpTools)
                 .build()
         }
-
     }
 }
 
