@@ -73,8 +73,6 @@ class ClimateTraceApi(
     // TODO need to implement paging on top of this
     suspend fun fetchAssets() = client.get("$baseUrl/assets").body<AssetsResult>()
 
-    suspend fun fetchCountryAssets(countryCode: String) = client.get("$baseUrl/assets?countries=$countryCode").body<AssetsResult>()
-    //suspend fun fetchCountryEmissionsInfo(countryCode: String, year: String) = client.get("$baseUrl/country/emissions?since=$year&to=$year&countries=$countryCode").body<List<CountryEmissionsInfo>>()
 
     suspend fun fetchCountryEmissionsInfo(countryCodeList: List<String>, year: String): List<CountryEmissionsInfo> {
         return client.get("$baseUrl/country/emissions") {
@@ -86,6 +84,13 @@ class ClimateTraceApi(
         }.body<List<CountryEmissionsInfo>>()
     }
 
+    suspend fun fetchCountryAssetEmissionsInfo(countryCodeList: List<String>): Map<String, List<CountryAssetEmissionsInfo>> {
+        return client.get("$baseUrl/assets/emissions") {
+            url {
+                parameters.append("countries", countryCodeList.joinToString(","))
+            }
+        }.body<Map<String, List<CountryAssetEmissionsInfo>>>()
+    }
 
     suspend fun fetchCountryAssetEmissionsInfo(countryCode: String) = client.get("$baseUrl/assets/emissions?countries=$countryCode").body<Map<String, List<CountryAssetEmissionsInfo>>>()[countryCode] ?: emptyList()
 }
