@@ -50,9 +50,9 @@ The iOS client as mentioned includes shared Compose Multiplatform UI code.  It a
 
 <img width="694" alt="Screenshot 2023-12-14 at 20 33 45" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/82ed364a-0284-4e5c-b81e-40fdfc58f312">
 
-**MCP**
+**MCP Server**
 
-The `mcp-server` module uses the [Kotlin MCP SDK](https://github.com/modelcontextprotocol/kotlin-sdk) to expose an MCP tools endpoint (returning list of people in space) that
+The `mcp-server` module uses the [Kotlin MCP SDK](https://github.com/modelcontextprotocol/kotlin-sdk) to expose an MCP tools endpoint (returning per country emission data) that
 can for example be plugged in to Claude Desktop as shown below.  That module uses same KMP shared code.
 
 <img width="1608" alt="Screenshot 2025-07-06 at 17 24 20" src="https://github.com/user-attachments/assets/7e4fd599-3ade-47b7-bbe3-a4f36148c170" />
