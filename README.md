@@ -19,6 +19,12 @@ The iOS client as mentioned includes shared Compose Multiplatform UI code.  It a
 
 
 
+Related posts:
+* [Kotlin MCP 💜 Kotlin Multiplatform](https://johnoreilly.dev/posts/kotlin-mcp-kmp/)
+* [Initial exploration of using Koog for developing Kotlin based AI agents](https://johnoreilly.dev/posts/kotlin-koog/)
+* [Using Google's Agent Development Kit for Java from Kotlin code](https://johnoreilly.dev/posts/kotlin-adk/)
+  
+
 ### Android (Compose)
 
 
