@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import dev.johnoreilly.climatetrace.di.initKoin
 import dev.johnoreilly.climatetrace.ui.CountryListScreen
+import dev.johnoreilly.wordmaster.androidApp.theme.ClimateTraceTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -22,7 +23,7 @@ class MainActivity : ComponentActivity() {
         initKoin(this)
 
         setContent {
-            MaterialTheme {
+            ClimateTraceTheme {
                 AndroidApp()
             }
         }
