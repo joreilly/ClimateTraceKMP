@@ -3,7 +3,6 @@ package dev.johnoreilly.climatetrace.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -98,7 +98,7 @@ fun CountryScreenSuccess(countryList: List<Country>) {
         if (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT) {
             Column(Modifier.fillMaxWidth()) {
                 Box(
-                    Modifier.height(250.dp).fillMaxWidth().background(color = Color.LightGray)
+                    Modifier.height(250.dp).fillMaxWidth()
                 ) {
                     CountryListView(
                         countryList = countryList,
@@ -225,7 +225,7 @@ fun SearchableList(
         },
         active = true,
         onActiveChange = {},
-        tonalElevation = 0.dp
+        colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
     )
 }
 
