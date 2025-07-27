@@ -9,7 +9,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.asSink
 import kotlinx.io.buffered
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
@@ -19,7 +18,8 @@ import kotlinx.serialization.json.putJsonObject
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 
-fun configureServer(): Server {
+
+fun configureMcpServer(): Server {
     val climateTraceRepository = koin.get<ClimateTraceRepository>()
 
     val server = Server(
@@ -33,7 +33,6 @@ fun configureServer(): Server {
             )
         )
     )
-
 
     server.addTool(
         name = "get-countries",
@@ -130,7 +129,7 @@ fun configureServer(): Server {
  * a close event.
  */
 fun `run mcp server using stdio`() {
-    val server = configureServer()
+    val server = configureMcpServer()
     val transport = StdioServerTransport(
         System.`in`.asInput(),
         System.out.asSink().buffered()
@@ -154,7 +153,7 @@ fun `run mcp server using stdio`() {
  * @param port The port number on which the SSE server should be started.
  */
 fun `run sse mcp server`(port: Int): Unit = runBlocking {
-    val server = configureServer()
+    val server = configureMcpServer()
     embeddedServer(CIO, host = "0.0.0.0", port = port) {
         mcp {
             server
