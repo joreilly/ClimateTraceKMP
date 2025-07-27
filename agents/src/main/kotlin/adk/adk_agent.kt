@@ -6,6 +6,9 @@ import com.google.adk.agents.LlmAgent
 import com.google.adk.events.Event
 import com.google.adk.models.Gemini
 import com.google.adk.runner.InMemoryRunner
+import com.google.adk.tools.AgentTool
+import com.google.adk.tools.BaseTool
+import com.google.adk.tools.GoogleSearchTool
 import com.google.adk.tools.LongRunningFunctionTool
 import com.google.adk.tools.mcp.McpToolset
 import com.google.genai.Client
@@ -26,30 +29,56 @@ class ClimateTraceAgent {
         fun initAgent(): BaseAgent {
             val apiKeyGoogle = ""
 
-//            val mcpTools = McpToolset(
-//                ServerParameters
-//                    .builder("java")
-//                    .args("-jar", "/Users/joreilly/dev/github/ClimateTraceKMP/mcp-server/build/libs/serverAll.jar", "--stdio")
-//                    .build()
-//            ).loadTools().join()
+            val climateTools = McpToolset(
+                ServerParameters
+                    .builder("java")
+                    .args("-jar", "/Users/joreilly/dev/github/ClimateTraceKMP/mcp-server/build/libs/serverAll.jar", "--stdio")
+                    .build()
+            ).loadTools().join()
 
-            val getCountriesTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getCountries")
-            val getEmissionsTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getEmissions")
-            val mcpTools = listOf(getCountriesTool, getEmissionsTool)
+//            val getCountriesTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getCountries")
+//            val getEmissionsTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getEmissions")
+//            val climateTools = listOf(getCountriesTool, getEmissionsTool, GoogleSearchTool())
+
 
             val model = Gemini(
-                "gemini-1.5-pro",
+                "gemini-2.0-flash",
                 Client.builder()
                     .apiKey(apiKeyGoogle)
                     .build()
             )
 
-            return LlmAgent.builder()
-                .name(NAME)
+
+            val searchAgent = LlmAgent.builder()
+                .name("SearchAgent")
+                .model(model)
+                .description("Google Search agent")
+                .instruction("You're a specialist in Google Search")
+                .tools(GoogleSearchTool())
+                .build()
+
+            val climateAgent = LlmAgent.builder()
+                .name("ClimateAgent")
                 .model(model)
                 .description("Agent to answer climate emissions related questions.")
                 .instruction("You are an agent that provides climate emissions related information. Use 3 letter country codes.")
-                .tools(mcpTools)
+                .tools(climateTools)
+                .build()
+
+            return LlmAgent.builder()
+                .name(NAME)
+                .description("Agent to answer climate emissions related questions.")
+                //.instruction("You are an agent that provides climate emissions related information. Use 3 letter country codes. Use SearchAgent for population data.")
+                .instruction("""
+                    You are an agent that provides climate emissions related information.
+            
+                    Use `ClimateAgent` for emission data.
+                    Use `SearchAgent` for population data.
+                    """)
+
+                .model(model)
+                //.subAgents(searchAgent, climateAgent)
+                .tools(AgentTool.create(searchAgent), AgentTool.create(climateAgent))
                 .build()
         }
     }

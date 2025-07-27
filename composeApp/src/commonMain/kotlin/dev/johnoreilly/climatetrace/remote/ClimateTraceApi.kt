@@ -6,9 +6,21 @@ import io.ktor.client.request.get
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the result of an API call to fetch assets.
+ * @property assets A list of [Asset] objects.
+ */
 @Serializable
 data class AssetsResult(val assets: List<Asset>)
 
+/**
+ * Represents a single asset.
+ * @property id The unique identifier of the asset.
+ * @property name The name of the asset.
+ * @property assetType The type of the asset.
+ * @property sector The sector to which the asset belongs.
+ * @property thumbnail A URL to a thumbnail image for the asset.
+ */
 @Serializable
 data class Asset(
     @SerialName("Id")
