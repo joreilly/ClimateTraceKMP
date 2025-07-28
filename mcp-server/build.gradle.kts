@@ -2,12 +2,14 @@ plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.shadowPlugin)
+    alias(libs.plugins.jib)
     application
 }
 
 dependencies {
     implementation(libs.mcp.kotlin)
     implementation(libs.koin.core)
+    implementation("ch.qos.logback:logback-classic:1.5.8")
     implementation(projects.composeApp)
 }
 
@@ -18,14 +20,25 @@ java {
 }
 
 application {
-    mainClass = "MainKt"
+    mainClass = "McpServerKt"
 }
 
 tasks.shadowJar {
     archiveFileName.set("serverAll.jar")
     archiveClassifier.set("")
     manifest {
-        attributes["Main-Class"] = "MainKt"
+        attributes["Main-Class"] = "McpServerKt"
     }
 }
 
+jib {
+    from.image = "docker.io/library/eclipse-temurin:21"
+
+    to {
+        image = "gcr.io/climatetrace-mcp/climatetrace-mcp-server"
+    }
+    container {
+        ports = listOf("8080")
+        mainClass = "McpServerKt"
+    }
+}
