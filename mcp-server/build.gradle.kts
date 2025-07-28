@@ -1,21 +1,26 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.shadowPlugin)
     alias(libs.plugins.jib)
     application
+    id("org.graalvm.buildtools.native") version "0.11.0"
 }
 
 dependencies {
     implementation(libs.mcp.kotlin)
     implementation(libs.koin.core)
-    implementation("ch.qos.logback:logback-classic:1.5.8")
     implementation(projects.composeApp)
+    implementation(libs.logback.classic)
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion.set(JavaLanguageVersion.of(24))
+        vendor.set(JvmVendorSpec.GRAAL_VM)
+        nativeImageCapable.set(true)
     }
 }
 
@@ -23,11 +28,23 @@ application {
     mainClass = "McpServerKt"
 }
 
-tasks.shadowJar {
-    archiveFileName.set("serverAll.jar")
-    archiveClassifier.set("")
-    manifest {
-        attributes["Main-Class"] = "McpServerKt"
+graalvmNative {
+    agent {
+        enabled.set(true)
+    }
+
+    binaries {
+        all {
+            javaLauncher.set(javaToolchains.launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(24))
+                vendor.set(JvmVendorSpec.GRAAL_VM)
+                nativeImageCapable.set(true)
+            })
+        }
+        named("main") {
+            imageName.set("climate-trace-mcp")
+            mainClass.set("MainKt")
+        }
     }
 }
 
