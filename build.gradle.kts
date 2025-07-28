@@ -6,4 +6,5 @@ plugins {
     alias(libs.plugins.jetbrainsCompose) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kmpNativeCoroutines) apply false
+    alias(libs.plugins.jib) apply false
 }
