@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.shadowPlugin)
     alias(libs.plugins.jib)
     application
-    id("org.graalvm.buildtools.native") version "0.11.0"
+    alias(libs.plugins.graalvm)
 }
 
 dependencies {
@@ -40,22 +40,37 @@ graalvmNative {
                 vendor.set(JvmVendorSpec.GRAAL_VM)
                 nativeImageCapable.set(true)
             })
+            buildArgs("--enable-url-protocols=http,https")
         }
         named("main") {
             imageName.set("climate-trace-mcp")
-            mainClass.set("MainKt")
+            mainClass.set("McpServerKt")
         }
     }
 }
 
 jib {
-    from.image = "docker.io/library/eclipse-temurin:21"
+    from.image = "docker.io/library/alpine:3.22"
 
     to {
         image = "gcr.io/climatetrace-mcp/climatetrace-mcp-server"
     }
     container {
         ports = listOf("8080")
-        mainClass = "McpServerKt"
+        entrypoint = listOf("/climate-trace-mcp")
     }
+    extraDirectories {
+        paths {
+            path {
+                // copies a single-file.xml
+                setFrom("build/native/nativeCompile")
+                into = "/"
+                includes = listOf("climate-trace-mcp")
+            }
+        }
+    }
+}
+
+tasks.named("jib").configure {
+    dependsOn(tasks.named("nativeCompile"))
 }

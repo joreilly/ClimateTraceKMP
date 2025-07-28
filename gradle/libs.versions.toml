@@ -83,6 +83,7 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm" }
+graalvm = { id = "org.graalvm.buildtools.native", version = "0.11.0" }
 shadowPlugin = { id = "com.gradleup.shadow", version.ref = "shadowPlugin" }
 jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
 
