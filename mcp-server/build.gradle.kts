@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+import com.google.cloud.tools.jib.gradle.JibTask
+
+
 plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.kotlinx.serialization)
@@ -58,15 +61,13 @@ jib {
     extraDirectories {
         paths {
             path {
-                // copies a single-file.xml
                 setFrom("build/native/nativeCompile")
                 into = "/"
-                includes = listOf("climate-trace-mcp")
             }
         }
     }
 }
 
-tasks.named("jib").configure {
+tasks.withType<JibTask> {
     dependsOn(tasks.named("nativeCompile"))
 }
