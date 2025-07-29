@@ -7,15 +7,6 @@
       "type": "[Ljava.lang.Object;"
     },
     {
-      "type": "apple.security.AppleProvider",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
       "type": "ch.qos.logback.classic.BasicConfigurator",
       "methods": [
         {
@@ -136,6 +127,23 @@
     },
     {
       "type": "dev.johnoreilly.climatetrace.remote.Country$Companion",
+      "methods": [
+        {
+          "name": "serializer",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo",
+      "fields": [
+        {
+          "name": "Companion"
+        }
+      ]
+    },
+    {
+      "type": "dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo$Companion",
       "methods": [
         {
           "name": "serializer",
@@ -463,23 +471,6 @@
       ]
     },
     {
-      "type": "io.modelcontextprotocol.kotlin.sdk.ListToolsResult",
-      "fields": [
-        {
-          "name": "Companion"
-        }
-      ]
-    },
-    {
-      "type": "io.modelcontextprotocol.kotlin.sdk.ListToolsResult$Companion",
-      "methods": [
-        {
-          "name": "serializer",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
       "type": "io.modelcontextprotocol.kotlin.sdk.PingRequest",
       "fields": [
         {
@@ -552,6 +543,14 @@
     },
     {
       "type": "java.lang.Object"
+    },
+    {
+      "type": "java.lang.String",
+      "fields": [
+        {
+          "name": "Companion"
+        }
+      ]
     },
     {
       "type": "java.net.StandardSocketOptions"
@@ -627,6 +626,9 @@
           "name": "_value"
         }
       ]
+    },
+    {
+      "type": "kotlin.String"
     },
     {
       "type": "kotlin.Unit"
@@ -1331,10 +1333,6 @@
     },
     {
       "module": "java.base",
-      "glob": "jdk/internal/icu/impl/data/icudt76b/nfc.nrm"
-    },
-    {
-      "module": "java.base",
       "glob": "jdk/internal/icu/impl/data/icudt76b/nfkc.nrm"
     },
     {
@@ -1348,6 +1346,17 @@
   ],
   "bundles": [],
   "jni": [
+    {
+      "type": "McpServerKt",
+      "methods": [
+        {
+          "name": "main",
+          "parameterTypes": [
+            "java.lang.String[]"
+          ]
+        }
+      ]
+    },
     {
       "type": "java.lang.Boolean",
       "methods": [

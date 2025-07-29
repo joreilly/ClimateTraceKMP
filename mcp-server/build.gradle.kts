@@ -3,7 +3,6 @@
 plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.shadowPlugin)
     alias(libs.plugins.jib)
     application
     alias(libs.plugins.graalvm)
@@ -19,8 +18,6 @@ dependencies {
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(24))
-        vendor.set(JvmVendorSpec.GRAAL_VM)
-        nativeImageCapable.set(true)
     }
 }
 
@@ -37,7 +34,6 @@ graalvmNative {
         all {
             javaLauncher.set(javaToolchains.launcherFor {
                 languageVersion.set(JavaLanguageVersion.of(24))
-                vendor.set(JvmVendorSpec.GRAAL_VM)
                 nativeImageCapable.set(true)
             })
             buildArgs("--enable-url-protocols=http,https")
