@@ -152,6 +152,23 @@
       ]
     },
     {
+      "type": "dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo",
+      "fields": [
+        {
+          "name": "Companion"
+        }
+      ]
+    },
+    {
+      "type": "dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo$Companion",
+      "methods": [
+        {
+          "name": "serializer",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "io.ktor.client.HttpClient",
       "fields": [
         {
