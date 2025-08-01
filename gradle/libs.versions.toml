@@ -20,6 +20,7 @@ kmpNativeCoroutines = "1.0.0-ALPHA-45"
 kmpObservableViewModel = "1.0.0-BETA-12"
 kstore = "1.0.0"
 ktor = "3.2.2"
+logbackClassic = "1.5.18"
 treemapChart = "0.1.3"
 voyager= "1.1.0-beta03"
 molecule =  "2.1.0"
@@ -58,6 +59,7 @@ ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
 
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 harawata-appdirs = { module = "net.harawata:appdirs", version.ref = "harawata-appdirs" }
 koalaplot = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
@@ -81,6 +83,7 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm" }
+graalvm = { id = "org.graalvm.buildtools.native", version = "0.11.0" }
 shadowPlugin = { id = "com.gradleup.shadow", version.ref = "shadowPlugin" }
 jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
 
