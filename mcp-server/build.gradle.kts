@@ -9,7 +9,7 @@ plugins {
 dependencies {
     implementation(libs.mcp.kotlin)
     implementation(libs.koin.core)
-    implementation("ch.qos.logback:logback-classic:1.5.8")
+    implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation(projects.composeApp)
 }
 
