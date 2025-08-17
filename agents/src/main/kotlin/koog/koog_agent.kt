@@ -40,6 +40,12 @@ fun main() = runBlocking {
         executor = simpleOllamaAIExecutor(),
         //llmModel = OpenAIModels.Chat.GPT4o,
         //llmModel = GoogleModels.Gemini1_5Pro,
+        systemPrompt  ="""
+            You an AI assistant specialising in providing information about global climate emissions.
+            Pass the list of countries and the year to the get-emissions MCP tool to get climate emission information.            
+            Use 3 letter country codes.
+            Use units of millions for the emissions data.                    
+            """,
         llmModel = model,
         toolRegistry = createToolSetRegistry()
     ) {
@@ -50,23 +56,17 @@ fun main() = runBlocking {
             onAgentRunError { eventContext ->
                 println("An error occurred: ${eventContext.throwable.message}\n${eventContext.throwable.stackTraceToString()}")
             }
-            onAgentFinished { eventContext ->
-                println("Agent finished with result: ${eventContext.result}")
-            }
         }
     }
 
 
     val output = agent.run(
         """
-        Get emission data for France and Germany for 2023 and 2024.
-        Also break down by sector.
-        Use 3 letter country codes.
-        Use units of millions for the emissions data.        
-        """.trimIndent()
+        Get per capita emission data for France, Germany and Spain for the year 2024.
+        Results should include full country name, country code, total emissions, population and per capita emissions.
+        """
     )
-
-    println(output)
+    println("Result = $output")
 }
 
 
