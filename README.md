@@ -27,8 +27,8 @@ Related posts:
 
 ### Android (Compose)
 
+<img width="405" height="900" alt="Screenshot_20250824_175635" src="https://github.com/user-attachments/assets/bcce6d6e-85b2-4c27-aa12-eed898173b30" />
 
-![Screenshot_20231210_180223](https://github.com/joreilly/ClimateTraceKMP/assets/6302/7ae517ec-ef48-4f85-a267-5b4bdef2e25f)
 
 
 
@@ -41,16 +41,15 @@ Related posts:
 
 ### Compose for Desktop 
 
-<img width="1148" alt="Screenshot 2023-12-14 at 17 17 23" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/9e93cf4d-429f-4453-b30e-3a2c40cfdd5e">
+<img width="1275" height="866" alt="Screenshot 2025-08-24 at 17 54 45" src="https://github.com/user-attachments/assets/534206cd-1a49-40ca-9a5f-3d7b54f4e4e5" />
+
 
 
 ### Compose for Web (Wasm)
 
-<img width="1141" alt="Screenshot 2023-12-14 at 17 16 17" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/70e02dc8-f82b-4ed2-b940-495e513ce3b1">
+<img width="1336" height="930" alt="Screenshot 2025-08-24 at 17 53 09" src="https://github.com/user-attachments/assets/9905a7bb-b10f-43a5-8428-7971a8ac4a9f" />
 
-### Compose for Web (Kotlin/JS)
 
-<img width="1141" alt="Screenshot 2023-12-14 at 17 16 17" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/70e02dc8-f82b-4ed2-b940-495e513ce3b1">
 
 ### Kotlin Notebook
 
