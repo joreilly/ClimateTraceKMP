@@ -81,6 +81,7 @@ kotlin {
             implementation(libs.koalaplot)
             implementation(libs.treemap.chart)
             implementation(libs.treemap.chart.compose)
+            implementation("dev.carlsen.flagkit:flagkit:1.1.0")
             api(libs.compose.adaptive)
             api(libs.compose.adaptive.layout)
         }

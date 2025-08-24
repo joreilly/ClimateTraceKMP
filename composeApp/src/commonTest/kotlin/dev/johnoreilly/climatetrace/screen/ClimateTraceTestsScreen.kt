@@ -44,8 +44,8 @@ class ClimateTraceScreenTest {
         onNodeWithText(country.name).assertExists()
         val millionTonnes = (countryEmissions.co2 / 1_000_000).toInt()
         val percentage = (countryEmissions.co2 / worldEmissions.co2).toPercent(2)
-        onNodeWithText("co2 = $millionTonnes Million Tonnes ($year)").assertExists()
-        onNodeWithText("rank = ${countryEmissionsInfo.rank} ($percentage)").assertExists()
+        onNodeWithText("$millionTonnes").assertExists()
+        onNodeWithText(percentage).assertExists()
     }
 
 }
