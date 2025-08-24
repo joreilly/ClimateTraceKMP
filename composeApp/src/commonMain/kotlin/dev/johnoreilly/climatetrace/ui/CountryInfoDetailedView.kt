@@ -3,6 +3,7 @@ package dev.johnoreilly.climatetrace.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -64,14 +66,10 @@ fun CountryInfoDetailedViewSuccess(viewState: CountryDetailsUIState.Success, onY
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
-
-        Text(
-            text = viewState.country.name,
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center
-        )
+        // Header card with flag + country label info
+        CountryHeader(viewState)
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -79,20 +77,27 @@ fun CountryInfoDetailedViewSuccess(viewState: CountryDetailsUIState.Success, onY
         val countryAssetEmissionsList = viewState.countryAssetEmissionsList
         val countryEmissionInfo = viewState.countryEmissionInfo
 
-        YearSelector(year, viewState.availableYears, onYearSelected)
+        // Year selector row
+        Column {
+            Text(text = "Year", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.size(6.dp))
+            YearSelector(year, viewState.availableYears, onYearSelected)
+        }
+
+        Spacer(modifier = Modifier.size(12.dp))
+
         countryEmissionInfo?.let {
             val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
-            val percentage =
-                (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
+            val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
 
-            Text(text = "co2 = $co2 Million Tonnes ($year)")
-            Text(text = "rank = ${countryEmissionInfo.rank} ($percentage)")
+            // Key figures chips
+            KeyFiguresRow(co2Mt = co2, rank = countryEmissionInfo.rank, share = percentage)
 
             Spacer(modifier = Modifier.size(16.dp))
 
-            val filteredCountryAssetEmissionsList =
-                countryAssetEmissionsList.filter { it.sector != null }
+            val filteredCountryAssetEmissionsList = countryAssetEmissionsList.filter { it.sector != null }
             if (filteredCountryAssetEmissionsList.isNotEmpty()) {
+                // Keep charts unchanged
                 SectorEmissionsPieChart(countryAssetEmissionsList)
                 Spacer(modifier = Modifier.size(32.dp))
                 CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
@@ -109,6 +114,54 @@ fun CountryInfoDetailedViewSuccess(viewState: CountryDetailsUIState.Success, onY
         }
     }
 }
+
+@Composable
+private fun CountryHeader(viewState: CountryDetailsUIState.Success) {
+    val c = viewState.country
+    androidx.compose.material3.Surface(
+        tonalElevation = 2.dp,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceVariant
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = c.name,
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Spacer(modifier = Modifier.size(4.dp))
+            Text(
+                text = "${c.continent} • ${c.alpha2} / ${c.alpha3}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun KeyFiguresRow(co2Mt: Int, rank: Int, share: String) {
+    Row {
+        KeyFigureChip(label = "CO₂ (Mt)", value = co2Mt.toString())
+        Spacer(modifier = Modifier.size(8.dp))
+        KeyFigureChip(label = "Rank", value = rank.toString())
+        Spacer(modifier = Modifier.size(8.dp))
+        KeyFigureChip(label = "World Share", value = share)
+    }
+}
+
+@Composable
+private fun KeyFigureChip(label: String, value: String) {
+    AssistChip(
+        onClick = {},
+        label = {
+            Column {
+                Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                Text(text = value, style = MaterialTheme.typography.titleMedium)
+            }
+        }
+    )
+}
+
 
 
 @Composable

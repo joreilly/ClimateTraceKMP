@@ -35,7 +35,7 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        Text("ClimateTraceKMP")
+                        Text(text = country.name)
                     },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
@@ -53,3 +53,4 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
         }
     }
 }
+

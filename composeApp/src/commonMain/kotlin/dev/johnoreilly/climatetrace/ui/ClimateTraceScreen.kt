@@ -3,6 +3,7 @@ package dev.johnoreilly.climatetrace.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -45,6 +47,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
 import cafe.adriel.voyager.core.screen.Screen
+import dev.carlsen.flagkit.FlagKit
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.utils.PanelState
 import dev.johnoreilly.climatetrace.ui.utils.ResizablePanel
@@ -170,9 +173,9 @@ fun SearchableList(
     selectedCountry: Country?,
     countrySelected: (country: Country) -> Unit
 ) {
-    val filteredCountryList = countryList.filter {
-        it.name.contains(searchQuery.value, ignoreCase = true)
-    }
+    val filteredCountryList = countryList
+        .filter { it.name.contains(searchQuery.value, ignoreCase = true) || it.alpha2.contains(searchQuery.value, true) || it.alpha3.contains(searchQuery.value, true) }
+        .sortedBy { it.name }
     val keyboardController = LocalSoftwareKeyboardController.current
     SearchBar(
         query = searchQuery.value,
@@ -253,20 +256,37 @@ fun CountryRow(
     selectedCountry: Country?,
     countrySelected: (country: Country) -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = { countrySelected(country) })
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column {
-            Text(
-                text = country.name,
-                style = if (country.name == selectedCountry?.name) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge
-            )
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = { countrySelected(country) })
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val imageVector = FlagKit.getFlag(countryCode = country.alpha2)
+            imageVector?.let {
+                Image(
+                    imageVector = imageVector,
+                    contentDescription = country.name,
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Title and subtitle
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = country.name,
+                    style = if (country.name == selectedCountry?.name) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${country.continent} • ${country.alpha2} / ${country.alpha3}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
         }
+        HorizontalDivider()
     }
 }
-
-
