@@ -28,9 +28,10 @@ fun main() = runBlocking {
         //id = "llama3.1:8b",
         capabilities = listOf(
             LLMCapability.Temperature,
-            LLMCapability.Schema.JSON.Simple,
+            LLMCapability.Schema.JSON.Standard,
             LLMCapability.Tools
         ),
+        contextLength = 128_000,
     )
 
 
@@ -59,13 +60,14 @@ fun main() = runBlocking {
         }
     }
 
-
+    println("Running agent")
     val output = agent.run(
         """
         Get per capita emission data for France, Germany and Spain for the year 2024.
         Results should include full country name, country code, total emissions, population and per capita emissions.
         """
     )
+
     println("Result = $output")
 }
 
