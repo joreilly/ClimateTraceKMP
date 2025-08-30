@@ -1,10 +1,12 @@
 [versions]
+googleAdk = "0.2.0"
+koogAgents = "0.4.1"
 kotlin = "2.2.10"
 ksp = "2.2.10-2.0.2"
 kotlinx-coroutines = "1.10.2"
 kotlinxSerialization = "1.9.0"
 
-agp = "8.12.1"
+agp = "8.12.2"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
@@ -35,12 +37,16 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "composeAdaptiveLayout" }
 compose-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "composeAdaptiveLayout" }
 
+google-adk = { module = "com.google.adk:google-adk", version.ref = "googleAdk" }
+google-adk-dev = { module = "com.google.adk:google-adk-dev", version.ref = "googleAdk" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose-multiplatform" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 
 
+koog-agents = { module = "ai.koog:koog-agents", version.ref = "koogAgents" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-rx3 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx3", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
 kmpObservableViewModel = { module = "com.rickclephas.kmp:kmp-observableviewmodel-core", version.ref = "kmpObservableViewModel" }
 

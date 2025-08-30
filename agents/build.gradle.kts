@@ -5,12 +5,12 @@ plugins {
 dependencies {
     implementation(libs.mcp.kotlin)
     implementation(libs.koin.core)
-    implementation("ai.koog:koog-agents:0.3.0")
+    implementation(libs.koog.agents)
     //implementation("org.slf4j:slf4j-simple:2.0.17")
-    implementation("com.google.adk:google-adk:0.2.0")
-    implementation("com.google.adk:google-adk-dev:0.2.0")
+    implementation(libs.google.adk)
+    implementation(libs.google.adk.dev)
 
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.10.2")
+    implementation (libs.kotlinx.coroutines.rx3)
 
     // following needed for AdkWebServer (dev UI)
     implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
