@@ -27,7 +27,7 @@ mcp = "0.6.0"
 shadowPlugin = "9.1.0"
 jib = "3.4.5"
 googleAdk = "0.3.0"
-koogAgents = "0.4.1"
+koogAgents = "0.4.2"
 
 
 [libraries]
