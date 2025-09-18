@@ -24,11 +24,11 @@ java {
     }
 }
 
-tasks.register<JavaExec>("devUi") {
+// Task to execute the startDevUI() Kotlin function via a small entrypoint
+tasks.register<JavaExec>("startDevUI") {
     group = "application"
-    description = "Start the ADK Dev UI server"
-    mainClass.set("com.google.adk.web.AdkWebServer")
+    description = "Starts the ADK Dev UI by invoking startDevUI()"
+    mainClass.set("adk.DevUiMainKt")
     classpath = sourceSets["main"].runtimeClasspath
-    args = listOf("--adk.agents.source-dir=src/main/java")
 }
 
