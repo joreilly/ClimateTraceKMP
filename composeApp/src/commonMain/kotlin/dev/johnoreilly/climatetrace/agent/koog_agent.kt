@@ -1,11 +1,11 @@
-package koog
+package dev.johnoreilly.climatetrace.agent
 
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.tools.ToolRegistry
-import ai.koog.agents.core.tools.reflect.asTools
+//import ai.koog.agents.core.tools.reflect.asTools
 import ai.koog.agents.features.eventHandler.feature.handleEvents
 import ai.koog.agents.mcp.McpToolRegistryProvider
-import ai.koog.agents.mcp.defaultStdioTransport
+//import ai.koog.agents.mcp.McpToolRegistryProvider
 import ai.koog.prompt.executor.clients.google.GoogleModels
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import ai.koog.prompt.executor.llms.all.simpleGoogleAIExecutor
@@ -14,46 +14,43 @@ import ai.koog.prompt.executor.llms.all.simpleOpenAIExecutor
 import ai.koog.prompt.llm.LLMCapability
 import ai.koog.prompt.llm.LLMProvider
 import ai.koog.prompt.llm.LLModel
-import dev.johnoreilly.climatetrace.agent.runAgent
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
-import koin
-import kotlinx.coroutines.runBlocking
 
 val openAIApiKey = ""
-val apiKeyGoogle = ""
+val apiKeyGoogle = "AIzaSyDO59eFtRe2WBL4puZcF3rtYyHE2urZ6Og"
 
 
 
-fun main() = runBlocking {
+suspend fun runAgent(climateTraceRepository: ClimateTraceRepository) {
 
-/*
-    val model = LLModel(
-        provider = LLMProvider.Ollama,
-        id = "gpt-oss",
-        //id = "llama3.1:8b",
-        capabilities = listOf(
-            LLMCapability.Temperature,
-            LLMCapability.Schema.JSON.Standard,
-            LLMCapability.Tools
-        ),
-        contextLength = 128_000,
-    )
+//    val model = LLModel(
+//        provider = LLMProvider.Ollama,
+//        id = "gpt-oss",
+//        //id = "llama3.1:8b",
+//        capabilities = listOf(
+//            LLMCapability.Temperature,
+//            LLMCapability.Schema.JSON.Standard,
+//            LLMCapability.Tools
+//        ),
+//        contextLength = 128_000,
+//    )
 
 
     val agent = AIAgent(
         //executor = simpleOpenAIExecutor(openAIApiKey),
-        //executor = simpleGoogleAIExecutor(apiKeyGoogle),
-        executor = simpleOllamaAIExecutor(),
+        executor = simpleGoogleAIExecutor(apiKeyGoogle),
+        //executor = simpleOllamaAIExecutor(),
         //llmModel = OpenAIModels.Chat.GPT4o,
-        //llmModel = GoogleModels.Gemini1_5Pro,
+        llmModel = GoogleModels.Gemini2_5Pro,
         systemPrompt  ="""
             You an AI assistant specialising in providing information about global climate emissions.
-            Pass the list of countries and the year to the get-emissions MCP tool to get climate emission information.            
+            Pass the list of countries and the year to the get_emissions tool to get climate emission information.
+            Use get_countries tool to look up country codes.
             Use 3 letter country codes.
-            Use units of millions for the emissions data.                    
+            Use units of millions for the emissions data.
             """,
-        llmModel = model,
-        toolRegistry = createToolSetRegistry()
+        //llmModel = model,
+        toolRegistry = createToolSetRegistry(climateTraceRepository)
     ) {
         handleEvents {
             onToolCall { eventContext ->
@@ -68,31 +65,31 @@ fun main() = runBlocking {
     println("Running agent")
     val output = agent.run(
         """
-        Get per capita emission data for France, Germany and Spain for the year 2024.
-        Results should include full country name, country code, total emissions, population and per capita emissions.
+        Get emission data for France, Germany and Spain for the year 2024.
+        Results should include full country name, country code, and total emissions.
         """
     )
 
     println("Result = $output")
-
- */
-
-    val climateTraceRepository = koin.get<ClimateTraceRepository>()
-    runAgent(climateTraceRepository)
 }
 
 
 
-//suspend fun createToolSetRegistry(): ToolRegistry {
+suspend fun createToolSetRegistry(climateTraceRepository: ClimateTraceRepository): ToolRegistry {
 //    val processClimateTrace = ProcessBuilder("java", "-jar",
 //        "./mcp-server/build/libs/serverAll.jar", "--stdio"
 //    ).start()
 //    val transportClimateTrace = McpToolRegistryProvider.defaultStdioTransport(processClimateTrace)
 //    val toolRegistryClimateTrace = McpToolRegistryProvider.fromTransport(transportClimateTrace)
 //
-//    val localToolSetRegistry = ToolRegistry { tools(ClimateTraceTool().asTools()) }
-//
-//    // Can use either local toolset or one based on MCP server
-//    return toolRegistryClimateTrace
-//    //return localToolSetRegistry
-//}
+//    //val localToolSetRegistry = ToolRegistry { tools(ClimateTraceTool().asTools()) }
+
+    val localToolSetRegistry = ToolRegistry {
+        tool(GetCountriesTool(climateTraceRepository))
+        tool(GetEmissionsTool(climateTraceRepository))
+    }
+
+    // Can use either local toolset or one based on MCP server
+    //return toolRegistryClimateTrace
+    return localToolSetRegistry
+}

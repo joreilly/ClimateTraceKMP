@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
@@ -84,6 +85,9 @@ kotlin {
             implementation("dev.carlsen.flagkit:flagkit:1.1.0")
             api(libs.compose.adaptive)
             api(libs.compose.adaptive.layout)
+
+            api(libs.koin.core)
+            api(libs.koog.agents)
         }
 
         commonTest.dependencies {
