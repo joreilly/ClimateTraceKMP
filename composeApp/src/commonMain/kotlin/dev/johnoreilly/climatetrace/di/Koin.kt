@@ -1,10 +1,14 @@
 package dev.johnoreilly.climatetrace.di
 
+import dev.johnoreilly.climatetrace.agent.ClimateTraceAgent
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
+import dev.johnoreilly.climatetrace.remote.PopulationApi
+import dev.johnoreilly.climatetrace.viewmodel.AgentViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
@@ -28,9 +32,12 @@ fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { createJson() }
     single { createHttpClient(get(), enableNetworkLogs = enableNetworkLogs) }
     single { ClimateTraceApi(get()) }
+    single { PopulationApi(get()) }
     single { CountryListViewModel() }
     single { CountryDetailsViewModel() }
-    single { ClimateTraceRepository(get(), get()) }
+    single { AgentViewModel() }
+    single { ClimateTraceRepository(get(), get(), get()) }
+    single { ClimateTraceAgent(get()) }
     includes(dataModule())
 }
 
@@ -38,7 +45,10 @@ expect fun dataModule(): Module
 
 fun createJson() = Json { isLenient = true; ignoreUnknownKeys = true }
 
-fun createHttpClient(json: Json, enableNetworkLogs: Boolean) = HttpClient {
+
+expect fun createHttpClientEngine(): HttpClientEngine
+
+fun createHttpClient(json: Json, enableNetworkLogs: Boolean) = HttpClient(createHttpClientEngine()) {
     install(ContentNegotiation) {
         json(json)
     }

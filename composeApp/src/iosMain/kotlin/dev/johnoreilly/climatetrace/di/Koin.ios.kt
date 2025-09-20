@@ -4,6 +4,8 @@ import dev.johnoreilly.climatetrace.remote.Country
 import io.github.xxfast.kstore.KStore
 import io.github.xxfast.kstore.file.storeOf
 import io.github.xxfast.kstore.utils.ExperimentalKStoreApi
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.darwin.Darwin
 import kotlinx.io.files.Path
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -27,4 +29,8 @@ actual fun dataModule(): Module = module {
         requireNotNull(filesDir) { "Document directory not found" }
         storeOf(file = Path(path = "$filesDir/countries.json"), default = emptyList())
     }
+}
+
+actual fun createHttpClientEngine(): HttpClientEngine {
+    return Darwin.create()
 }

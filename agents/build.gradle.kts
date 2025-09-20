@@ -5,7 +5,6 @@ plugins {
 dependencies {
     implementation(libs.mcp.kotlin)
     implementation(libs.koin.core)
-    implementation(libs.koog.agents)
     //implementation("org.slf4j:slf4j-simple:2.0.17")
     implementation(libs.google.adk)
     implementation(libs.google.adk.dev)

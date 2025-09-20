@@ -1,6 +1,6 @@
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.di.initKoin
-import io.ktor.server.cio.*
+//import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.utils.io.streams.*
 import io.modelcontextprotocol.kotlin.sdk.*
@@ -166,10 +166,10 @@ fun `run mcp server using stdio`() {
  * @param port The port number on which the SSE server should be started.
  */
 fun `run sse mcp server`(port: Int): Unit = runBlocking {
-    val server = configureMcpServer()
-    embeddedServer(CIO, host = "0.0.0.0", port = port) {
-        mcp {
-            server
-        }
-    }.start(wait = true)
+//    val server = configureMcpServer()
+//    embeddedServer(CIO, host = "0.0.0.0", port = port) {
+//        mcp {
+//            server
+//        }
+//    }.start(wait = true)
 }
