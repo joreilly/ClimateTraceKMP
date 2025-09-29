@@ -10,7 +10,22 @@ struct ContentView: View {
     @State private var selectedCountry: Country? = nil
     
     var body: some View {
-        CountryListView()
+        TabView {
+            CountryListView()
+                .tabItem {
+                    Label("Climate", systemImage: "globe")
+                }
+            AgentsView()
+                .tabItem {
+                    Label("Agents", systemImage: "tree")
+                }
+        }
+    }
+}
+
+struct AgentsView: View {
+    var body: some View {
+        AgentViewShared()
     }
 }
 
@@ -44,8 +59,8 @@ struct ContentView: View {
         }
     }
 }
-*/
 
+*/
 
 struct CountryListView: View {
     @StateViewModel var viewModel = CountryListViewModel()
@@ -117,6 +132,14 @@ struct CountryInfoDetailedViewShared: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UIViewController {
         MainViewControllerKt.CountryInfoDetailedViewController(country: country)
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
+
+struct AgentViewShared: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        MainViewControllerKt.AgentViewController()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

@@ -1,6 +1,8 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
@@ -29,7 +31,6 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
-
     }
 
 
@@ -46,10 +47,6 @@ kotlin {
         }
     }
 
-    compilerOptions {
-        languageVersion.set(KOTLIN_2_0)
-    }
-    
     sourceSets {
         all {
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
@@ -84,6 +81,10 @@ kotlin {
             implementation("dev.carlsen.flagkit:flagkit:1.1.0")
             api(libs.compose.adaptive)
             api(libs.compose.adaptive.layout)
+
+            implementation(libs.markdown.renderer)
+
+            implementation(libs.koog.agents)
         }
 
         commonTest.dependencies {
@@ -159,9 +160,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    dependencies {
-        debugImplementation(libs.compose.ui.tooling)
-    }
+//    dependencies {
+//        debugImplementation(libs.compose.ui.tooling)
+//    }
 
     testOptions {
         unitTests {
@@ -184,15 +185,26 @@ compose.desktop {
     }
 }
 
-compose.experimental {
-    web.application {}
-}
+//compose.experimental {
+//    web.application {}
+//}
 
 
 kotlin.sourceSets.all {
     languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
 }
 
-configurations.configureEach {
-    exclude("androidx.window.core", "window-core")
+//configurations.configureEach {
+//    exclude("androidx.window.core", "window-core")
+//}
+//
+configurations.all {
+    // FIXME exclude netty from Koog dependencies?
+    exclude(group = "io.netty", module = "*")
+}
+
+// Explicitly exclude Ktor CIO engine on iOS/apple targets to avoid bringing non-supported engine
+// can be removed once https://github.com/JetBrains/koog/pull/869 is merged
+configurations.matching { it.name.contains("ios", ignoreCase = true) || it.name.contains("apple", ignoreCase = true) }.all {
+    exclude(group = "io.ktor", module = "ktor-client-cio")
 }
