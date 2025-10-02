@@ -3,24 +3,21 @@ package dev.johnoreilly.climatetrace.agent
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.handleEvents
-import ai.koog.prompt.executor.clients.google.GoogleModels
-import ai.koog.prompt.executor.llms.all.simpleGoogleAIExecutor
+import ai.koog.prompt.executor.model.PromptExecutor
+import ai.koog.prompt.llm.LLModel
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 
 
 
+expect fun getLLModel(): LLModel
+expect fun getPromptExecutor(apiKey: String = ""): PromptExecutor
+
 class ClimateTraceAgent(private val climateTraceRepository: ClimateTraceRepository) {
     private val apiKeyGoogle = ""
-    private var agent: AIAgent<String, String>? = null
 
-    suspend fun createAgent() {
-        //val executor = simpleOpenAIExecutor(openAiApiKey)
-        val executor = simpleGoogleAIExecutor(apiKeyGoogle)
-
-        agent = AIAgent(
-            promptExecutor = executor,
-            llmModel = GoogleModels.Gemini2_5Flash,
-            //llmModel = OpenAIModels.Chat.GPT4o,
+    suspend fun createAgent() = AIAgent(
+            promptExecutor = getPromptExecutor(apiKeyGoogle),
+            llmModel = getLLModel(),
             toolRegistry = createToolSetRegistry(climateTraceRepository),
             systemPrompt  =
                 """                
@@ -46,7 +43,7 @@ class ClimateTraceAgent(private val climateTraceRepository: ClimateTraceReposito
                     ctx.responses.forEach { println("   $it") }
                 }
 
-                onToolExecutionStarting { eventContext ->
+                onToolCallStarting { eventContext ->
                     println("Tool called: ${eventContext.tool} with args ${eventContext.toolArgs}")
                 }
                 onAgentExecutionFailed { eventContext ->
@@ -62,18 +59,15 @@ class ClimateTraceAgent(private val climateTraceRepository: ClimateTraceReposito
                 }
             }
         }
-    }
+
 
 
     suspend fun runAgent(prompt: String): String {
-        agent?.let { agent ->
-            println("Running agent")
-            val output = agent.run(prompt)
-            println("Result = $output")
-            return output
-        }
-
-        return ""
+        val agent = createAgent()
+        println("Running agent")
+        val output = agent.run(prompt)
+        println("Result = $output")
+        return output
     }
 
     private suspend fun createToolSetRegistry(climateTraceRepository: ClimateTraceRepository): ToolRegistry {

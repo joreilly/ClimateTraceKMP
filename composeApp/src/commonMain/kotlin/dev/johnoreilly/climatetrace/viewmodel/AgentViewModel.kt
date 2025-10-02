@@ -10,7 +10,6 @@ import app.cash.molecule.RecompositionMode
 import app.cash.molecule.launchMolecule
 import com.rickclephas.kmp.observableviewmodel.ViewModel
 import com.rickclephas.kmp.observableviewmodel.coroutineScope
-import com.rickclephas.kmp.observableviewmodel.launch
 import dev.johnoreilly.climatetrace.agent.ClimateTraceAgent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,20 +18,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 
-sealed class Message {
-    data class UserMessage(val text: String) : Message()
-    data class AgentMessage(val text: String) : Message()
-    data class SystemMessage(val text: String) : Message()
-    data class ErrorMessage(val text: String) : Message()
-    data class ToolCallMessage(val text: String) : Message()
-    data class ResultMessage(val text: String) : Message()
-}
-
-
 data class AgentUIState(
     val prompt: String = "",
     val result: String = "",
-    val messages: List<Message> = emptyList(),
     val isInputEnabled: Boolean = true,
     val isLoading: Boolean = false,
 
@@ -55,11 +43,6 @@ open class AgentViewModel : ViewModel(), KoinComponent {
         agentPresenter(events)
     }
 
-    init {
-        viewModelScope.launch {
-            climateTraceAgent.createAgent()
-        }
-    }
 
     fun updatePrompt(prompt: String) = events.tryEmit(AgentEvents.SetPrompt(prompt))
     fun runAgent() = events.tryEmit(AgentEvents.RunAgent)

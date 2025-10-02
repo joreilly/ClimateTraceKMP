@@ -1,10 +1,10 @@
 package dev.johnoreilly.climatetrace.agent
 
 import ai.koog.agents.core.tools.SimpleTool
-import ai.koog.agents.core.tools.ToolArgs
 import ai.koog.agents.core.tools.ToolDescriptor
 import ai.koog.agents.core.tools.ToolParameterDescriptor
 import ai.koog.agents.core.tools.ToolParameterType
+import ai.koog.agents.core.tools.annotations.LLMDescription
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.Country
 import kotlinx.serialization.Serializable
@@ -12,23 +12,15 @@ import kotlinx.serialization.Serializable
 
 class GetCountryTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetCountryTool.Args>() {
     @Serializable
-    data class Args(val countryName: String) : ToolArgs
+    data class Args(
+        @property:LLMDescription("Country name")
+        val countryName: String
+    )
 
     override val argsSerializer = Args.serializer()
     override val description = "Look up country code using country name"
 
-
     private var countryList: List<Country>? = null
-
-    override val descriptor = ToolDescriptor(
-        name = "GetCountryTool",
-        description = "Look up country code using country name",
-        requiredParameters = listOf(
-            ToolParameterDescriptor(
-                name = "country", description = "country name", type = ToolParameterType.String
-            )
-        ),
-    )
 
     override suspend fun doExecute(args: Args): String {
         try {
@@ -46,23 +38,15 @@ class GetCountryTool(val climateTraceRepository: ClimateTraceRepository) : Simpl
 
 class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetEmissionsTool.Args>() {
     @Serializable
-    data class Args(val countryCodeList: List<String>, val year: String) : ToolArgs
+    data class Args(
+        @property:LLMDescription("ISO country code list (e.g., 'USA', 'GBR', 'FRA')")
+        val countryCodeList: List<String>,
+        @property:LLMDescription("Year for which emissions occurred")
+        val year: String
+    )
 
     override val argsSerializer = Args.serializer()
     override val description = "Get the emission data for a country for a particular year."
-
-    override val descriptor = ToolDescriptor(
-        name = "GetEmissionsTool",
-        description = "Get the emission data for a country for a particular year.",
-        requiredParameters = listOf(
-            ToolParameterDescriptor(
-                name = "countryCodeList", description = "country code list", type = ToolParameterType.List(ToolParameterType.String)
-            ),
-            ToolParameterDescriptor(
-                name = "year", description = "year", type = ToolParameterType.String
-            )
-        ),
-    )
 
     override suspend fun doExecute(args: Args): String {
         try {
@@ -79,7 +63,7 @@ class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : Sim
 
 class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPopulationTool.Args>() {
     @Serializable
-    data class Args(val countryCode: String) : ToolArgs
+    data class Args(val countryCode: String)
 
     override val argsSerializer = Args.serializer()
     override val description = "Get population data for a country by its country code"
