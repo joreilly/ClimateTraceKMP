@@ -17,7 +17,7 @@ struct ContentView: View {
                 }
             AgentsView()
                 .tabItem {
-                    Label("Agents", systemImage: "tree")
+                    Label("Agent", systemImage: "tree")
                 }
         }
     }
