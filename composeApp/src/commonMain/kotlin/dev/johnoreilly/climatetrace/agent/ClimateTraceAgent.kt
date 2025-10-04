@@ -1,12 +1,18 @@
 package dev.johnoreilly.climatetrace.agent
 
 import ai.koog.agents.core.agent.AIAgent
+import ai.koog.agents.core.agent.asAssistantMessage
+import ai.koog.agents.core.agent.containsToolCalls
+import ai.koog.agents.core.agent.executeMultipleTools
+import ai.koog.agents.core.agent.extractToolCalls
+import ai.koog.agents.core.agent.functionalStrategy
+import ai.koog.agents.core.agent.requestLLM
+import ai.koog.agents.core.agent.requestLLMMultiple
+import ai.koog.agents.core.agent.sendMultipleToolResults
 import ai.koog.agents.core.tools.ToolRegistry
-import ai.koog.agents.features.eventHandler.feature.handleEvents
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
-
 
 
 expect fun getLLModel(): LLModel
@@ -15,10 +21,25 @@ expect fun getPromptExecutor(apiKey: String = ""): PromptExecutor
 class ClimateTraceAgent(private val climateTraceRepository: ClimateTraceRepository) {
     private val apiKeyGoogle = ""
 
-    suspend fun createAgent() = AIAgent(
+    suspend fun createAgent() = AIAgent<String, String>(
             promptExecutor = getPromptExecutor(apiKeyGoogle),
             llmModel = getLLModel(),
             toolRegistry = createToolSetRegistry(climateTraceRepository),
+            strategy = functionalStrategy { input ->
+                println("Calling LLM with Input = $input")
+                var responses = requestLLMMultiple(input)
+
+                while (responses.containsToolCalls()) {
+                    val pendingCalls = extractToolCalls(responses)
+                    println("Pending Calls")
+                    println(pendingCalls.map { "${it.tool} ${it.content}" })
+                    val results = executeMultipleTools(pendingCalls, parallelTools = true)
+                    responses = sendMultipleToolResults(results)
+                }
+
+                val draft = responses.single().asAssistantMessage().content
+                requestLLM("Improve and clarify: $draft").asAssistantMessage().content
+            },
             systemPrompt  =
                 """                
                 You an AI assistant specialising in providing information about global climate emissions.
@@ -32,33 +53,7 @@ class ClimateTraceAgent(private val climateTraceRepository: ClimateTraceReposito
                 Pass the list of country codes and the year to the GetEmissionsTool tool to get climate emission information.
                 Use units of millions for the emissions data.
                 """,
-        ) {
-            handleEvents {
-                onLLMCallStarting { ctx ->
-                    println("Request to LLM")
-                }
-
-                onLLMCallCompleted { ctx ->
-                    println("Response from LLM")
-                    ctx.responses.forEach { println("   $it") }
-                }
-
-                onToolCallStarting { eventContext ->
-                    println("Tool called: ${eventContext.tool} with args ${eventContext.toolArgs}")
-                }
-                onAgentExecutionFailed { eventContext ->
-                    println("An error occurred: ${eventContext.throwable.message}\n${eventContext.throwable.stackTraceToString()}")
-                }
-
-                onNodeExecutionStarting {
-                    println(it.node.name)
-                }
-
-                onAgentCompleted {
-                    println("onAgentCompleted")
-                }
-            }
-        }
+        )
 
 
 
