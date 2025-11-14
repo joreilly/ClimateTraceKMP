@@ -69,6 +69,7 @@ kotlin {
             implementation(libs.kstore)
 
             implementation(libs.kotlinx.coroutines)
+            implementation(libs.kotlinx.datetime)
             implementation(libs.bundles.ktor.common)
 
             implementation(libs.voyager)
@@ -149,6 +150,7 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/DEPENDENCIES"
         }
     }
     buildTypes {
@@ -206,5 +208,7 @@ configurations.all {
 // Explicitly exclude Ktor CIO engine on iOS/apple targets to avoid bringing non-supported engine
 // can be removed once https://github.com/JetBrains/koog/pull/869 is merged
 configurations.matching { it.name.contains("ios", ignoreCase = true) || it.name.contains("apple", ignoreCase = true) }.all {
-    exclude(group = "io.ktor", module = "ktor-client-cio")
+    //exclude(group = "io.ktor", module = "ktor-client-cio")
+    // Exclude kotlinx-datetime to avoid Clock type alias conflict with kotlin.time.Clock in Kotlin 2.2.21
+    //exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-datetime")
 }
