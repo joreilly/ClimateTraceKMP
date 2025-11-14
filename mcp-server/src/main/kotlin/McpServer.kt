@@ -1,6 +1,6 @@
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.di.initKoin
-//import io.ktor.server.cio.*
+import io.ktor.server.cio.CIO
 import io.ktor.server.engine.*
 import io.ktor.utils.io.streams.*
 import io.modelcontextprotocol.kotlin.sdk.*
@@ -19,7 +19,7 @@ import kotlinx.serialization.json.putJsonObject
 
 
 fun main(args: Array<String>) {
-    val command = args.firstOrNull() ?: "--sse-server"
+    val command = args.firstOrNull() ?: "--stdio"
     val port = args.getOrNull(1)?.toIntOrNull() ?: 8080
     when (command) {
         "--sse-server" -> `run sse mcp server`(port)
@@ -142,7 +142,7 @@ fun configureMcpServer(): Server {
  * a close event.
  */
 fun `run mcp server using stdio`() {
-    val server = configureMcpServer()
+`    val server = configureMcpServer()
     val transport = StdioServerTransport(
         System.`in`.asInput(),
         System.out.asSink().buffered()
@@ -156,7 +156,7 @@ fun `run mcp server using stdio`() {
         }
         done.join()
     }
-}
+`}
 
 /**
  * Launches an SSE (Server-Sent Events) MCP (Model Context Protocol) server on the specified port.
@@ -166,10 +166,10 @@ fun `run mcp server using stdio`() {
  * @param port The port number on which the SSE server should be started.
  */
 fun `run sse mcp server`(port: Int): Unit = runBlocking {
-//    val server = configureMcpServer()
-//    embeddedServer(CIO, host = "0.0.0.0", port = port) {
-//        mcp {
-//            server
-//        }
-//    }.start(wait = true)
+    val server = configureMcpServer()
+    embeddedServer(CIO, host = "0.0.0.0", port = port) {
+        mcp {
+            server
+        }
+    }.start(wait = true)
 }

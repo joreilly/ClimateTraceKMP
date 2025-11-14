@@ -44,18 +44,12 @@ class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : Sim
         @property:LLMDescription("Year for which emissions occurred")
         val year: String
     )
-
     override val argsSerializer = Args.serializer()
     override val description = "Get the emission data for a country for a particular year."
 
     override suspend fun doExecute(args: Args): String {
-        try {
-            return climateTraceRepository.fetchCountryEmissionsInfo(args.countryCodeList, args.year).joinToString {
-                it.emissions.co2.toString()
-            }
-        } catch (e: Exception) {
-            println("Error: $e")
-            return ""
+        return climateTraceRepository.fetchCountryEmissionsInfo(args.countryCodeList, args.year).joinToString {
+            it.emissions.co2.toString()
         }
     }
 }
