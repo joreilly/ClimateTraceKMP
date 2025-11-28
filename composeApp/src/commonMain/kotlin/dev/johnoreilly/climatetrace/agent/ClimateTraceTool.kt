@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package dev.johnoreilly.climatetrace.agent
 
 import ai.koog.agents.core.tools.SimpleTool
@@ -7,7 +9,12 @@ import ai.koog.agents.core.tools.ToolParameterType
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.Country
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.offsetAt
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 
 class GetCountryTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetCountryTool.Args>() {
@@ -55,6 +62,20 @@ class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : Sim
 }
 
 
+class GetAssetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetAssetEmissionsTool.Args>() {
+    @Serializable
+    data class Args(
+        @property:LLMDescription("ISO country code list (e.g., 'USA', 'GBR', 'FRA')")
+        val countryCodeList: List<String>,
+    )
+    override val argsSerializer = Args.serializer()
+    override val description = "Get the asset emission data for a country."
+
+    override suspend fun doExecute(args: Args): String {
+        return climateTraceRepository.fetchCountryAssetEmissionsInfo(args.countryCodeList).toString()
+    }
+}
+
 class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPopulationTool.Args>() {
     @Serializable
     data class Args(val countryCode: String)
@@ -73,6 +94,7 @@ class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : Si
     )
 
     override suspend fun doExecute(args: Args): String {
+        println("Getting population for ${args.countryCode}")
         try {
             val population = climateTraceRepository.getPopulation(args.countryCode)
             return population.toString()
@@ -80,5 +102,44 @@ class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : Si
             println("Error: $e")
             return ""
         }
+    }
+}
+
+
+/**
+ * Tool for getting the current date and time
+ */
+class CurrentDatetimeTool(
+    val defaultTimeZone: TimeZone = TimeZone.UTC,
+    val clock: Clock = Clock.System,
+) : SimpleTool<CurrentDatetimeTool.Args>() {
+    @Serializable
+    data class Args(
+        @property:LLMDescription("The timezone to get the current date and time in (e.g., 'UTC', 'America/New_York', 'Europe/London'). Defaults to UTC.")
+        val timezone: String = "UTC"
+    )
+
+    override val argsSerializer = Args.serializer()
+
+    override val name = "current_datetime"
+    override val description = "Get the current date and time in the specified timezone"
+
+    override suspend fun doExecute(args: Args): String {
+        val zoneId = try {
+            TimeZone.of(args.timezone)
+        } catch (_: Exception) {
+            defaultTimeZone
+        }
+
+        val now = clock.now()
+        val localDateTime = now.toLocalDateTime(zoneId)
+        val offset = zoneId.offsetAt(now)
+
+        val time = localDateTime.time
+        val timeStr = "${time.hour.toString().padStart(2, '0')}:${
+            time.minute.toString().padStart(2, '0')
+        }:${time.second.toString().padStart(2, '0')}"
+
+        return "${localDateTime.date}T$timeStr$offset"
     }
 }

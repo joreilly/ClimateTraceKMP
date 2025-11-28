@@ -26,7 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import dev.johnoreilly.climatetrace.di.initKoin
-import dev.johnoreilly.climatetrace.ui.AgentsScreen
+import dev.johnoreilly.climatetrace.ui.AgentScreen
 import dev.johnoreilly.climatetrace.ui.ClimateTraceScreen
 import dev.johnoreilly.wordmaster.androidApp.theme.ClimateTraceTheme
 
@@ -71,7 +71,7 @@ fun AndroidApp() {
         Column(modifier = Modifier.padding(paddingValues)) {
             when (selectedIndex) {
                 0 -> Navigator(screen = ClimateTraceScreen())
-                else -> AgentsScreen()
+                else -> AgentScreen()
             }
         }
     }

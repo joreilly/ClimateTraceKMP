@@ -1,6 +1,7 @@
 package dev.johnoreilly.climatetrace.di
 
-import dev.johnoreilly.climatetrace.agent.ClimateTraceAgent
+import dev.johnoreilly.climatetrace.agent.AgentProvider
+import dev.johnoreilly.climatetrace.agent.ClimateTraceAgentProvider
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.PopulationApi
@@ -35,9 +36,9 @@ fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { PopulationApi(get()) }
     single { CountryListViewModel() }
     single { CountryDetailsViewModel() }
-    single { AgentViewModel() }
+    single { AgentViewModel(get()) }
     single { ClimateTraceRepository(get(), get(), get()) }
-    single { ClimateTraceAgent(get()) }
+    single<AgentProvider> { ClimateTraceAgentProvider(get()) }
     includes(dataModule())
 }
 

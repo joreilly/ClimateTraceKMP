@@ -4,6 +4,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import java.util.Properties
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -13,6 +15,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kmpNativeCoroutines)
+    alias(libs.plugins.buildkonfig)
 }
 
 kotlin {
@@ -70,6 +73,7 @@ kotlin {
 
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.datetime)
+
             implementation(libs.bundles.ktor.common)
 
             implementation(libs.voyager)
@@ -162,9 +166,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-//    dependencies {
-//        debugImplementation(libs.compose.ui.tooling)
-//    }
 
     testOptions {
         unitTests {
@@ -187,28 +188,34 @@ compose.desktop {
     }
 }
 
-//compose.experimental {
-//    web.application {}
-//}
-
-
 kotlin.sourceSets.all {
     languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
 }
 
-//configurations.configureEach {
-//    exclude("androidx.window.core", "window-core")
-//}
-//
 configurations.all {
     // FIXME exclude netty from Koog dependencies?
     exclude(group = "io.netty", module = "*")
 }
 
-// Explicitly exclude Ktor CIO engine on iOS/apple targets to avoid bringing non-supported engine
-// can be removed once https://github.com/JetBrains/koog/pull/869 is merged
-configurations.matching { it.name.contains("ios", ignoreCase = true) || it.name.contains("apple", ignoreCase = true) }.all {
-    //exclude(group = "io.ktor", module = "ktor-client-cio")
-    // Exclude kotlinx-datetime to avoid Clock type alias conflict with kotlin.time.Clock in Kotlin 2.2.21
-    //exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-datetime")
+buildkonfig {
+    packageName = "dev.johnoreilly.climatetrace"
+
+    val localPropsFile = rootProject.file("local.properties")
+    val localProperties = Properties()
+    if (localPropsFile.exists()) {
+        runCatching {
+            localProperties.load(localPropsFile.inputStream())
+        }.getOrElse {
+            it.printStackTrace()
+        }
+    }
+    defaultConfigs {
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "GEMINI_API_KEY",
+            localProperties["gemini_api_key"]?.toString() ?: ""
+        )
+    }
+
 }
+

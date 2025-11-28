@@ -1,85 +1,178 @@
 package dev.johnoreilly.climatetrace.viewmodel
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import app.cash.molecule.RecompositionMode
-import app.cash.molecule.launchMolecule
-import com.rickclephas.kmp.observableviewmodel.ViewModel
-import com.rickclephas.kmp.observableviewmodel.coroutineScope
-import dev.johnoreilly.climatetrace.agent.ClimateTraceAgent
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dev.johnoreilly.climatetrace.agent.AgentProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
+// Define message types for the chat
+sealed class Message {
+    data class UserMessage(val text: String) : Message()
+    data class AgentMessage(val text: String) : Message()
+    data class SystemMessage(val text: String) : Message()
+    data class ErrorMessage(val text: String) : Message()
+    data class ToolCallMessage(val text: String) : Message()
+    data class ResultMessage(val text: String) : Message()
+}
 
-data class AgentUIState(
-    val prompt: String = "",
-    val result: String = "",
+// Define UI state for the agent demo screen
+data class AgentDemoUiState(
+    val messages: List<Message> = listOf(Message.SystemMessage("Hi, I'm an agent that can help you")),
+    val inputText: String = "",
     val isInputEnabled: Boolean = true,
     val isLoading: Boolean = false,
+    val isChatEnded: Boolean = false,
 
     // For handling user responses when agent asks a question
     val userResponseRequested: Boolean = false,
     val currentUserResponse: String? = null,
 )
 
-sealed interface AgentEvents {
-    data class SetPrompt(val prompt: String): AgentEvents
-    data object RunAgent: AgentEvents
-}
+class AgentViewModel(private val agentProvider: AgentProvider) : ViewModel() {
+    // UI state
+    private val _uiState = MutableStateFlow(
+        AgentDemoUiState(
+            messages = listOf(Message.SystemMessage(agentProvider.description))
+        )
+    )
+    val uiState: StateFlow<AgentDemoUiState> = _uiState.asStateFlow()
 
-open class AgentViewModel : ViewModel(), KoinComponent {
-    private val climateTraceAgent: ClimateTraceAgent by inject()
-
-    private val events = MutableSharedFlow<AgentEvents>(extraBufferCapacity = 20)
-
-    val uiState: StateFlow<AgentUIState> = viewModelScope.coroutineScope.launchMolecule(mode = RecompositionMode.Immediate) {
-        agentPresenter(events)
+    // Update input text
+    fun updateInputText(text: String) {
+        _uiState.update { it.copy(inputText = text) }
     }
 
+    // Send user message and start agent processing
+    fun sendMessage() {
+        val userInput = _uiState.value.inputText.trim()
+        if (userInput.isEmpty()) return
 
-    fun updatePrompt(prompt: String) = events.tryEmit(AgentEvents.SetPrompt(prompt))
-    fun runAgent() = events.tryEmit(AgentEvents.RunAgent)
+        // If agent is waiting for a response to a question
+        if (_uiState.value.userResponseRequested) {
+            // Add user message to chat and update current response
+            _uiState.update {
+                it.copy(
+                    messages = it.messages + Message.UserMessage(userInput),
+                    inputText = "",
+                    isLoading = true,
+                    userResponseRequested = false,
+                    currentUserResponse = userInput
+                )
+            }
+        } else { // Initial message flow - add user message and start agent
+            _uiState.update {
+                it.copy(
+                    messages = it.messages + Message.UserMessage(userInput),
+                    inputText = "",
+                    isInputEnabled = false,
+                    isLoading = true
+                )
+            }
 
-    @Composable
-    fun agentPresenter(events: Flow<AgentEvents>): AgentUIState {
-        var prompt by remember { mutableStateOf(
-            """
-            Get per capita emission data for Spain, France, Germany, and Italy for the year 2024. 
-            Show results in a table and include full country name, population, and total emissions.
-            Show in decreasing order of per capita emissions.
-            """.trimIndent()
-        )}
-        var isLoading by remember { mutableStateOf(false)}
-        var result by remember { mutableStateOf("")}
+            // Start the agent processing
+            viewModelScope.launch {
+                runAgent(userInput)
+            }
+        }
+    }
 
-        LaunchedEffect(Unit) {
-            events.collect { event ->
-                when (event) {
-                    is AgentEvents.RunAgent -> {
-                        isLoading = true
-                        result = climateTraceAgent.runAgent(prompt)
+    // Run the agent
+    private suspend fun runAgent(userInput: String) {
+        withContext(Dispatchers.Default) {
+            try {
+                // Create and run the agent using the factory
+                val agent = agentProvider.provideAgent(
+                    onToolCallEvent = { message ->
+                        // Add tool call messages to the chat
+                        viewModelScope.launch {
+                            _uiState.update {
+                                it.copy(
+                                    messages = it.messages + Message.ToolCallMessage(message)
+                                )
+                            }
+                        }
+                    },
+                    onErrorEvent = { errorMessage ->
+                        // Handle agent errors
+                        viewModelScope.launch {
+                            _uiState.update {
+                                it.copy(
+                                    messages = it.messages + Message.ErrorMessage(errorMessage),
+                                    isInputEnabled = true,
+                                    isLoading = false
+                                )
+                            }
+                        }
+                    },
+                    onAssistantMessage = { message ->
+                        // Handle agent asking user a question
+                        _uiState.update {
+                            it.copy(
+                                messages = it.messages + Message.AgentMessage(message),
+                                isInputEnabled = true,
+                                isLoading = false,
+                                userResponseRequested = true
+                            )
+                        }
+
+                        // Wait for user response
+                        val userResponse = _uiState
+                            .first { it.currentUserResponse != null }
+                            .currentUserResponse
+                            ?: throw IllegalArgumentException("User response is null")
+
+                        // Update the state to reset current response
+                        _uiState.update {
+                            it.copy(
+                                currentUserResponse = null
+                            )
+                        }
+
+                        // Return it to the agent
+                        userResponse
+                    },
+                )
+
+                // Run the agent
+                val result = agent.run(userInput)
+
+                // Update UI with final state and mark chat as ended
+                _uiState.update {
+                    it.copy(
+                        messages = it.messages +
+                                Message.ResultMessage(result) +
+                                Message.SystemMessage("The agent has stopped."),
+                        isInputEnabled = false,
+                        isLoading = false,
+                        isChatEnded = true
+                    )
+                }
+            } catch (e: Exception) {
+                // Handle errors
+                _uiState.update {
+                    it.copy(
+                        messages = it.messages + Message.ErrorMessage("Error: ${e.message}"),
+                        isInputEnabled = true,
                         isLoading = false
-                    }
-
-                    is AgentEvents.SetPrompt -> {
-                        prompt = event.prompt
-                    }
+                    )
                 }
             }
         }
+    }
 
-        return AgentUIState(
-            prompt = prompt,
-            result = result,
-            isLoading = isLoading
-        )
+    // Restart the chat
+    fun restartChat() {
+        _uiState.update {
+            AgentDemoUiState(
+                messages = listOf(Message.SystemMessage(agentProvider.description))
+            )
+        }
     }
 }
-
