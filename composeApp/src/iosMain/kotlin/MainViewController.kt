@@ -12,9 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeUIViewController
 import dev.johnoreilly.climatetrace.remote.Country
-import dev.johnoreilly.climatetrace.ui.AgentsScreen
+import dev.johnoreilly.climatetrace.ui.AgentScreen
 import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
-import dev.johnoreilly.climatetrace.ui.CountryListView
 import dev.johnoreilly.climatetrace.ui.CountryScreenSuccess
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryListUIState
@@ -58,5 +57,5 @@ fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewControlle
 
 
 fun AgentViewController() = ComposeUIViewController {
-    AgentsScreen()
+    AgentScreen()
 }

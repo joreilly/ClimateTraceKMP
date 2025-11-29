@@ -17,8 +17,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import dev.johnoreilly.climatetrace.di.commonModule
-import dev.johnoreilly.climatetrace.ui.AgentsScreen
+import dev.johnoreilly.climatetrace.ui.AgentScreen
 import dev.johnoreilly.climatetrace.ui.ClimateTraceScreen
+import dev.johnoreilly.climatetrace.ui.theme.ClimateTraceTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 
@@ -29,7 +30,7 @@ fun App() {
     KoinApplication(application = {
         modules(commonModule())
     }) {
-        MaterialTheme {
+        ClimateTraceTheme {
             var selectedIndex by remember { mutableIntStateOf(0) }
 
             Scaffold(
@@ -53,7 +54,7 @@ fun App() {
                 Column(Modifier.padding(paddingValues)) {
                     when (selectedIndex) {
                         0 -> Navigator(screen = ClimateTraceScreen())
-                        else -> AgentsScreen()
+                        else -> AgentScreen()
                     }
                 }
             }
