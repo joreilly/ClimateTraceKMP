@@ -215,6 +215,11 @@ buildkonfig {
             "GEMINI_API_KEY",
             localProperties["gemini_api_key"]?.toString() ?: ""
         )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "OPENAI_API_KEY",
+            localProperties["openai_api_key"]?.toString() ?: ""
+        )
     }
 
 }

@@ -29,7 +29,7 @@ mcp = "0.7.7"
 shadowPlugin = "9.2.2"
 jib = "3.4.5"
 googleAdk = "0.3.0"
-koogAgents = "0.5.3"
+koogAgents = "0.5.4"
 markdownRenderer = "0.38.1"
 buildkonfig = "0.17.1"
 
