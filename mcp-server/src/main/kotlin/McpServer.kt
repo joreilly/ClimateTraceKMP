@@ -1,10 +1,17 @@
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.di.initKoin
 import io.ktor.server.cio.CIO
-import io.ktor.server.engine.*
-import io.ktor.utils.io.streams.*
-import io.modelcontextprotocol.kotlin.sdk.*
-import io.modelcontextprotocol.kotlin.sdk.server.*
+import io.ktor.server.engine.embeddedServer
+import io.ktor.utils.io.streams.asInput
+import io.modelcontextprotocol.kotlin.sdk.types.TextContent
+import io.modelcontextprotocol.kotlin.sdk.server.Server
+import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
+import io.modelcontextprotocol.kotlin.sdk.server.StdioServerTransport
+import io.modelcontextprotocol.kotlin.sdk.server.mcp
+import io.modelcontextprotocol.kotlin.sdk.types.CallToolResult
+import io.modelcontextprotocol.kotlin.sdk.types.Implementation
+import io.modelcontextprotocol.kotlin.sdk.types.ServerCapabilities
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.asSink
@@ -63,7 +70,7 @@ fun configureMcpServer(): Server {
     server.addTool(
         name = "get-country-asset-emissions",
         description = "Get sector emission information for the given countries",
-        inputSchema = Tool.Input(
+        inputSchema = ToolSchema(
             properties = buildJsonObject {
                 putJsonObject("countryCodeList") {
                     put("type", JsonPrimitive("array"))
@@ -75,7 +82,7 @@ fun configureMcpServer(): Server {
             required = listOf("countryCodeList")
         )
     ) { request ->
-        val countryCodeList = request.arguments["countryCodeList"]
+        val countryCodeList = request.arguments?.get("countryCodeList")
         if (countryCodeList == null) {
             return@addTool CallToolResult(
                 content = listOf(TextContent("The 'countryCodeList' parameters are required."))
@@ -96,7 +103,7 @@ fun configureMcpServer(): Server {
     server.addTool(
         name = "get-emissions",
         description = "Get total emission information for the given countries",
-        inputSchema = Tool.Input(
+        inputSchema = ToolSchema(
             properties = buildJsonObject {
                 putJsonObject("countryCodeList") {
                     put("type", JsonPrimitive("array"))
@@ -110,8 +117,8 @@ fun configureMcpServer(): Server {
         )
 
     ) { request ->
-        val countryCodeList = request.arguments["countryCodeList"]
-        val year = request.arguments["year"]
+        val countryCodeList = request.arguments?.get("countryCodeList")
+        val year = request.arguments?.get("year")
         if (countryCodeList == null || year == null) {
             return@addTool CallToolResult(
                 content = listOf(TextContent("The 'countryCodeList' and `year` parameters are required."))
@@ -142,7 +149,7 @@ fun configureMcpServer(): Server {
  * a close event.
  */
 fun `run mcp server using stdio`() {
-`    val server = configureMcpServer()
+    val server = configureMcpServer()
     val transport = StdioServerTransport(
         System.`in`.asInput(),
         System.out.asSink().buffered()
@@ -156,7 +163,7 @@ fun `run mcp server using stdio`() {
         }
         done.join()
     }
-`}
+}
 
 /**
  * Launches an SSE (Server-Sent Events) MCP (Model Context Protocol) server on the specified port.
