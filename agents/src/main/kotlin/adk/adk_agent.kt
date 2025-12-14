@@ -8,6 +8,7 @@ import com.google.adk.models.Gemini
 import com.google.adk.runner.InMemoryRunner
 import com.google.adk.tools.LongRunningFunctionTool
 import com.google.adk.tools.mcp.McpToolset
+import com.google.adk.tools.mcp.StreamableHttpServerParameters
 import com.google.adk.web.AdkWebServer
 import com.google.genai.Client
 import com.google.genai.types.Content
@@ -28,23 +29,23 @@ class ClimateTraceAgent {
             val apiKeyGoogle = ""
 
 //            val mcpTools = McpToolset(
+//                StreamableHttpServerParameters(
+//                    "https://mapstools.googleapis.com/mcp",
+//                    mapOf("X-Goog-Api-Key" to apiKeyGoogle),
+//                    null, null, null
+//                )
+//
 //                ServerParameters
 //                    .builder("java")
 //                    .args("-jar", "/Users/joreilly/dev/github/ClimateTraceKMP/mcp-server/build/libs/serverAll.jar", "--stdio")
 //                    .build()
-//            ).loadTools().join()
+//            ) //.loadTools().join()
 
             val getCountriesTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getCountries")
             val getEmissionsTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getEmissions")
             val mcpTools = listOf(getCountriesTool, getEmissionsTool)
 
-            val model = Gemini(
-                "gemini-1.5-pro",
-                Client.builder()
-                    .apiKey(apiKeyGoogle)
-                    .build()
-            )
-
+            val model = Gemini("gemini-2.5-flash", Client.builder().apiKey(apiKeyGoogle).build())
             return LlmAgent.builder()
                 .name(NAME)
                 .model(model)
@@ -66,7 +67,7 @@ fun main() {
 
     val prompt =
         """
-            Get emission data for EU countries in 2024.
+            Get emission data for Germany and France in 2022.
             Use units of millions for the emissions data.
             Show result in a grid or decreasing order of emissions.
             """.trimIndent()

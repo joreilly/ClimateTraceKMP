@@ -220,6 +220,11 @@ buildkonfig {
             "OPENAI_API_KEY",
             localProperties["openai_api_key"]?.toString() ?: ""
         )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "OPENROUTER_API_KEY",
+            localProperties["openrouter_api_key"]?.toString() ?: ""
+        )
     }
 
 }
