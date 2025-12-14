@@ -42,7 +42,7 @@ object AppDimension {
 
     // Chat/message bubble layout
     // Allow bubbles to grow wider on larger screens while keeping a pleasant line length on phones
-    val chatBubbleMaxWidth = 420.dp
+    val chatBubbleMaxWidth = 600.dp
 
     // Icon button sizes
     val iconButtonSizeSmall = 32.dp

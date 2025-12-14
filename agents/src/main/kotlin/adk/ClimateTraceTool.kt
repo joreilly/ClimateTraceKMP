@@ -1,6 +1,5 @@
 package adk
 
-import ai.koog.agents.core.tools.annotations.LLMDescription
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import io.reactivex.rxjava3.core.Single
 import koin

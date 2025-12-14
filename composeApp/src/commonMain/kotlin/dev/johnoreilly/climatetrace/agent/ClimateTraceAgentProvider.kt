@@ -100,7 +100,7 @@ class ClimateTraceAgentProvider(
                     Use the tools at your disposal to:
                     1. Look up country codes from country names
                     2. Get climate emission information.
-                    3. Get cause of emissions using asset emission information.
+                    3. Get cause of emissions using asset emission information (GetAssetEmissionsTool)
                     4. Get population data.
                     5. Get current date and time.
                 
@@ -125,9 +125,12 @@ class ClimateTraceAgentProvider(
                     onToolCallEvent("Tool ${ctx.tool.name}, args ${ctx.toolArgs}")
                 }
 
+                
                 onAgentExecutionFailed { ctx ->
                     onErrorEvent("${ctx.throwable.message}")
                 }
+
+
 
                 onAgentCompleted { _ ->
                     // Skip finish event handling
