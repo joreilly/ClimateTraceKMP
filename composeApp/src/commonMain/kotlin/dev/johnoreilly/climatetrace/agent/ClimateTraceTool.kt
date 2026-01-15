@@ -55,7 +55,8 @@ class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : Sim
     override val description = "Get the emission data for a country for a particular year."
 
     override suspend fun doExecute(args: Args): String {
-        return climateTraceRepository.fetchCountryEmissionsInfo(args.countryCodeList, args.year).joinToString {
+        val result = climateTraceRepository.fetchCountryEmissionsInfo(args.countryCodeList, args.year)
+        return result.joinToString {
             it.emissions.co2.toString()
         }
     }

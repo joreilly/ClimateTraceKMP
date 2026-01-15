@@ -1,6 +1,8 @@
 package dev.johnoreilly.climatetrace.agent
 
 import ai.koog.agents.core.agent.AIAgent
+import ai.koog.agents.core.agent.FunctionalAIAgent
+import ai.koog.agents.core.agent.GraphAIAgent
 import ai.koog.agents.core.agent.config.AIAgentConfig
 import ai.koog.agents.core.agent.functionalStrategy
 import ai.koog.agents.core.dsl.extension.asAssistantMessage
@@ -14,7 +16,6 @@ import ai.koog.agents.features.eventHandler.feature.EventHandler
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
-import dev.johnoreilly.climatetrace.BuildKonfig
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import kotlin.time.ExperimentalTime
 
@@ -22,6 +23,8 @@ import kotlin.time.ExperimentalTime
 // TODO use Koin for these and inject?
 expect fun getLLModel(): LLModel
 expect fun getPromptExecutor(): PromptExecutor
+// Install platform-specific agent features (e.g., OpenTelemetry on JVM)
+//expect fun GraphAIAgent.FeatureContext.installPlatformAgentFeatures()
 
 class ClimateTraceAgentProvider(
     private val climateTraceRepository: ClimateTraceRepository
@@ -120,9 +123,13 @@ class ClimateTraceAgentProvider(
             agentConfig = agentConfig,
             toolRegistry = toolRegistry,
         ) {
+
+            // Install platform-specific features (actualized per target)
+            //installPlatformAgentFeatures()
+
             install(EventHandler) {
                 onToolCallStarting { ctx ->
-                    onToolCallEvent("Tool ${ctx.tool.name}, args ${ctx.toolArgs}")
+                    onToolCallEvent("Tool ${ctx.toolName}, args ${ctx.toolArgs}")
                 }
 
                 
@@ -138,5 +145,11 @@ class ClimateTraceAgentProvider(
 
             }
         }
+    }
+}
+
+fun FunctionalAIAgent.FeatureContext.test() {
+    install(EventHandler) {
+
     }
 }

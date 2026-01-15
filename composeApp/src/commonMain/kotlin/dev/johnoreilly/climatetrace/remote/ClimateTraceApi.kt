@@ -62,7 +62,8 @@ data class EmissionInfo(
 
 class ClimateTraceApi(
     private val client: HttpClient,
-    private val baseUrl: String = "https://api.climatetrace.org/v6",
+    //private val baseUrl: String = "https://api.climatetrace.org/v6",
+    private val baseUrl: String = "http://localhost:8080/v6",
 )  {
     suspend fun fetchContinents() = client.get("$baseUrl/definitions/continents").body<List<String>>()
     suspend fun fetchCountries() = client.get("$baseUrl/definitions/countries").body<List<Country>>()

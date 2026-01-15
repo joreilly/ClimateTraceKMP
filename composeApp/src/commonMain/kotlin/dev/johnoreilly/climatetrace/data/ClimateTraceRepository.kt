@@ -12,9 +12,11 @@ class ClimateTraceRepository(
     private val populationApi: PopulationApi
 ) {
     suspend fun fetchCountries() : List<Country> {
-        val countries: List<Country>? = store.get()
-        if (countries.isNullOrEmpty()) return climateTraceApi.fetchCountries().also { store.set(it) }
-        return countries
+//        val countries: List<Country>? = store.get()
+//        if (countries.isNullOrEmpty()) return climateTraceApi.fetchCountries().also { store.set(it) }
+//        return countries
+
+        return climateTraceApi.fetchCountries().also { store.set(it) }
     }
 
     suspend fun fetchCountryEmissionsInfo(countryCode: String, year: String) = climateTraceApi.fetchCountryEmissionsInfo(listOf(countryCode), year)

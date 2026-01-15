@@ -6,6 +6,9 @@ import ai.koog.prompt.llm.LLMCapability
 import ai.koog.prompt.llm.LLMProvider
 import ai.koog.prompt.llm.LLModel
 
+import ai.koog.agents.features.opentelemetry.feature.OpenTelemetry
+import ai.koog.agents.features.opentelemetry.integration.langfuse.addLangfuseExporter
+
 
 
 //actual fun getLLModel(): LLModel {

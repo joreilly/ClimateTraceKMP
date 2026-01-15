@@ -90,6 +90,7 @@ kotlin {
             implementation(libs.markdown.renderer)
 
             implementation(libs.koog.agents)
+            implementation(libs.koog.agents.features.opentelemetry)
         }
 
         commonTest.dependencies {
