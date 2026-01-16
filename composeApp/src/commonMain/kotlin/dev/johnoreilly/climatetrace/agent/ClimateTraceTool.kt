@@ -3,9 +3,6 @@
 package dev.johnoreilly.climatetrace.agent
 
 import ai.koog.agents.core.tools.SimpleTool
-import ai.koog.agents.core.tools.ToolDescriptor
-import ai.koog.agents.core.tools.ToolParameterDescriptor
-import ai.koog.agents.core.tools.ToolParameterType
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.Country
@@ -17,19 +14,20 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 
-class GetCountryTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetCountryTool.Args>() {
+class GetCountryTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetCountryTool.Args>(
+    argsSerializer = Args.serializer(),
+    name = "GetCountryTool",
+    description = "Look up country code using country name"
+) {
     @Serializable
     data class Args(
         @property:LLMDescription("Country name")
         val countryName: String
     )
 
-    override val argsSerializer = Args.serializer()
-    override val description = "Look up country code using country name"
-
     private var countryList: List<Country>? = null
 
-    override suspend fun doExecute(args: Args): String {
+    override suspend fun execute(args: Args): String {
         try {
             if (countryList == null) {
                 countryList = climateTraceRepository.fetchCountries()
@@ -43,7 +41,11 @@ class GetCountryTool(val climateTraceRepository: ClimateTraceRepository) : Simpl
 }
 
 
-class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetEmissionsTool.Args>() {
+class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetEmissionsTool.Args>(
+    argsSerializer = Args.serializer(),
+    name = "GetEmissionsTool",
+    description = "Get the emission data for a country for a particular year."
+) {
     @Serializable
     data class Args(
         @property:LLMDescription("ISO country code list (e.g., 'USA', 'GBR', 'FRA')")
@@ -51,10 +53,8 @@ class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : Sim
         @property:LLMDescription("Year for which emissions occurred")
         val year: String
     )
-    override val argsSerializer = Args.serializer()
-    override val description = "Get the emission data for a country for a particular year."
 
-    override suspend fun doExecute(args: Args): String {
+    override suspend fun execute(args: Args): String {
         return climateTraceRepository.fetchCountryEmissionsInfo(args.countryCodeList, args.year).joinToString {
             it.emissions.co2.toString()
         }
@@ -62,38 +62,34 @@ class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : Sim
 }
 
 
-class GetAssetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetAssetEmissionsTool.Args>() {
+class GetAssetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetAssetEmissionsTool.Args>(
+    argsSerializer = Args.serializer(),
+    name = "GetAssetEmissionsTool",
+    description = "Get the asset emission data for a country."
+) {
     @Serializable
     data class Args(
         @property:LLMDescription("ISO country code list (e.g., 'USA', 'GBR', 'FRA')")
         val countryCodeList: List<String>,
     )
-    override val argsSerializer = Args.serializer()
-    override val description = "Get the asset emission data for a country."
 
-    override suspend fun doExecute(args: Args): String {
+    override suspend fun execute(args: Args): String {
         return climateTraceRepository.fetchCountryAssetEmissionsInfo(args.countryCodeList).toString()
     }
 }
 
-class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPopulationTool.Args>() {
+class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPopulationTool.Args>(
+    argsSerializer = Args.serializer(),
+    name = "GetPopulationTool",
+    description = "Get population data for a country by its country code"
+) {
     @Serializable
-    data class Args(val countryCode: String)
-
-    override val argsSerializer = Args.serializer()
-    override val description = "Get population data for a country by its country code"
-
-    override val descriptor = ToolDescriptor(
-        name = "GetPopulationTool",
-        description = "Get population data for a country by its country code",
-        requiredParameters = listOf(
-            ToolParameterDescriptor(
-                name = "countryCode", description = "ISO country code (e.g., 'USA', 'GBR', 'FRA')", type = ToolParameterType.String
-            )
-        ),
+    data class Args(
+        @property:LLMDescription("ISO country code (e.g., 'USA', 'GBR', 'FRA')")
+        val countryCode: String
     )
 
-    override suspend fun doExecute(args: Args): String {
+    override suspend fun execute(args: Args): String {
         println("Getting population for ${args.countryCode}")
         try {
             val population = climateTraceRepository.getPopulation(args.countryCode)
@@ -112,19 +108,18 @@ class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : Si
 class CurrentDatetimeTool(
     val defaultTimeZone: TimeZone = TimeZone.UTC,
     val clock: Clock = Clock.System,
-) : SimpleTool<CurrentDatetimeTool.Args>() {
+) : SimpleTool<CurrentDatetimeTool.Args>(
+    argsSerializer = Args.serializer(),
+    name = "current_datetime",
+    description = "Get the current date and time in the specified timezone"
+) {
     @Serializable
     data class Args(
         @property:LLMDescription("The timezone to get the current date and time in (e.g., 'UTC', 'America/New_York', 'Europe/London'). Defaults to UTC.")
         val timezone: String = "UTC"
     )
 
-    override val argsSerializer = Args.serializer()
-
-    override val name = "current_datetime"
-    override val description = "Get the current date and time in the specified timezone"
-
-    override suspend fun doExecute(args: Args): String {
+    override suspend fun execute(args: Args): String {
         val zoneId = try {
             TimeZone.of(args.timezone)
         } catch (_: Exception) {
