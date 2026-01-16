@@ -1,4 +1,4 @@
-![kotlin-version](https://img.shields.io/badge/kotlin-2.2.0-blue?logo=kotlin)
+![kotlin-version](https://img.shields.io/badge/kotlin-2.3.0-blue?logo=kotlin)
 
 Kotlin/Compose Multiplatform project to show climate related emission data from https://climatetrace.org/data. Development just started so very much work in progress right now!
 Have started with showing sector emission data per country but ton of other info available as well (ideas very welcome!).

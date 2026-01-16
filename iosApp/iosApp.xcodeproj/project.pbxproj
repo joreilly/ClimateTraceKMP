@@ -10,8 +10,8 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		1A64543E2B45D93900204F96 /* KMMViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A64543D2B45D93900204F96 /* KMMViewModel.swift */; };
-		1AA509B02BEF5CAD0081137F /* KMPObservableViewModelCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1AA509AF2BEF5CAD0081137F /* KMPObservableViewModelCore */; };
-		1AA509B22BEF5CAD0081137F /* KMPObservableViewModelSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1AA509B12BEF5CAD0081137F /* KMPObservableViewModelSwiftUI */; };
+		1AEBF8A82F1A9F6D009F846D /* KMPObservableViewModelCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1AEBF8A72F1A9F6D009F846D /* KMPObservableViewModelCore */; };
+		1AEBF8AA2F1A9F6D009F846D /* KMPObservableViewModelSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1AEBF8A92F1A9F6D009F846D /* KMPObservableViewModelSwiftUI */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
@@ -32,8 +32,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1AA509B02BEF5CAD0081137F /* KMPObservableViewModelCore in Frameworks */,
-				1AA509B22BEF5CAD0081137F /* KMPObservableViewModelSwiftUI in Frameworks */,
+				1AEBF8A82F1A9F6D009F846D /* KMPObservableViewModelCore in Frameworks */,
+				1AEBF8AA2F1A9F6D009F846D /* KMPObservableViewModelSwiftUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,8 +112,8 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
-				1AA509AF2BEF5CAD0081137F /* KMPObservableViewModelCore */,
-				1AA509B12BEF5CAD0081137F /* KMPObservableViewModelSwiftUI */,
+				1AEBF8A72F1A9F6D009F846D /* KMPObservableViewModelCore */,
+				1AEBF8A92F1A9F6D009F846D /* KMPObservableViewModelSwiftUI */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* ClimateTraceKMP.app */;
@@ -144,7 +144,7 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				1AA509AE2BEF5CAD0081137F /* XCRemoteSwiftPackageReference "KMP-ObservableViewModel" */,
+				1AEBF8A62F1A9F6D009F846D /* XCRemoteSwiftPackageReference "KMP-ObservableViewModel" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -406,25 +406,25 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		1AA509AE2BEF5CAD0081137F /* XCRemoteSwiftPackageReference "KMP-ObservableViewModel" */ = {
+		1AEBF8A62F1A9F6D009F846D /* XCRemoteSwiftPackageReference "KMP-ObservableViewModel" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/rickclephas/KMP-ObservableViewModel.git";
+			repositoryURL = "https://github.com/rickclephas/KMP-ObservableViewModel";
 			requirement = {
-				kind = exactVersion;
-				version = "1.0.0-BETA-1";
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1AA509AF2BEF5CAD0081137F /* KMPObservableViewModelCore */ = {
+		1AEBF8A72F1A9F6D009F846D /* KMPObservableViewModelCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1AA509AE2BEF5CAD0081137F /* XCRemoteSwiftPackageReference "KMP-ObservableViewModel" */;
+			package = 1AEBF8A62F1A9F6D009F846D /* XCRemoteSwiftPackageReference "KMP-ObservableViewModel" */;
 			productName = KMPObservableViewModelCore;
 		};
-		1AA509B12BEF5CAD0081137F /* KMPObservableViewModelSwiftUI */ = {
+		1AEBF8A92F1A9F6D009F846D /* KMPObservableViewModelSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1AA509AE2BEF5CAD0081137F /* XCRemoteSwiftPackageReference "KMP-ObservableViewModel" */;
+			package = 1AEBF8A62F1A9F6D009F846D /* XCRemoteSwiftPackageReference "KMP-ObservableViewModel" */;
 			productName = KMPObservableViewModelSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */

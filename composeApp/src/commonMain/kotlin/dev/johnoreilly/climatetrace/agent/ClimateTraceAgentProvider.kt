@@ -122,7 +122,7 @@ class ClimateTraceAgentProvider(
         ) {
             install(EventHandler) {
                 onToolCallStarting { ctx ->
-                    onToolCallEvent("Tool ${ctx.tool.name}, args ${ctx.toolArgs}")
+                    onToolCallEvent("Tool ${ctx.toolName}, args ${ctx.toolArgs}")
                 }
 
                 
