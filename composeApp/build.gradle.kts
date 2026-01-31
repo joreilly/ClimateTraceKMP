@@ -79,6 +79,7 @@ kotlin {
             implementation(libs.voyager)
 
             implementation(libs.kmpObservableViewModel)
+            implementation(libs.lifecycleViewmodel)
 
             implementation(libs.koalaplot)
             implementation(libs.treemap.chart)

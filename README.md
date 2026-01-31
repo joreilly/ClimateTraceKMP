@@ -8,7 +8,6 @@ Running on
 * Android
 * Desktop
 * Web (Wasm)
-* Web (Kotlin/JS) - contributed by https://github.com/yogeshVU
 * Kotlin Notebook
 * MCP Server
 

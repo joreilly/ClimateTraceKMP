@@ -14,6 +14,7 @@ import ai.koog.agents.features.eventHandler.feature.EventHandler
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
+import ai.koog.prompt.message.Message
 import dev.johnoreilly.climatetrace.BuildKonfig
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import kotlin.time.ExperimentalTime
@@ -72,7 +73,12 @@ class ClimateTraceAgentProvider(
                 }
 
                 // No more tool calls: deliver assistant message to UI and get possible user follow-up
-                lastAssistantMessage = responses.first().asAssistantMessage().content
+
+                // Find the assistant message, skipping any reasoning messages
+                val assistantMessage = responses.filterIsInstance<Message.Assistant>().firstOrNull()
+                    ?: responses.first().asAssistantMessage() // fallback
+
+                lastAssistantMessage = assistantMessage.content
                 val userReply = onAssistantMessage(lastAssistantMessage)
 
                 // If user provides no reply, consider conversation finished and return assistant response
