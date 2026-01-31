@@ -32,7 +32,8 @@ class GetCountryTool(val climateTraceRepository: ClimateTraceRepository) : Simpl
             if (countryList == null) {
                 countryList = climateTraceRepository.fetchCountries()
             }
-            return countryList?.firstOrNull { it.name == args.countryName }?.alpha3 ?: ""
+            val result = countryList?.firstOrNull { it.name == args.countryName }?.alpha3 ?: ""
+            return result
         } catch (e: Exception) {
             println("Error: $e")
             return ""
