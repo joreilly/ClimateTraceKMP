@@ -24,7 +24,7 @@ jobs:
           xcodes select 16.4
 
       - name: Build iOS app
-        run: xcodebuild -allowProvisioningUpdates -allowProvisioningUpdates -workspace iosApp/iosApp.xcodeproj/project.xcworkspace -configuration Debug -scheme iosApp -sdk iphoneos -destination name='iPhone 16'
+        run: xcodebuild -allowProvisioningUpdates -workspace iosApp/iosApp.xcodeproj/project.xcworkspace -configuration Debug -scheme iosApp -sdk iphonesimulator -destination 'generic/platform=iOS Simulator'
 
 
 

@@ -6,6 +6,7 @@ import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.PopulationApi
 import dev.johnoreilly.climatetrace.viewmodel.AgentViewModel
+import dev.johnoreilly.climatetrace.viewmodel.AssetDetailViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
 import io.ktor.client.HttpClient
@@ -36,6 +37,7 @@ fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { PopulationApi(get()) }
     single { CountryListViewModel() }
     single { CountryDetailsViewModel() }
+    factory { AssetDetailViewModel() }
     single { AgentViewModel(get()) }
     single { ClimateTraceRepository(get(), get(), get()) }
     single<AgentProvider> { ClimateTraceAgentProvider(get()) }

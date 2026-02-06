@@ -23,5 +23,9 @@ class ClimateTraceRepository(
     suspend fun fetchCountryAssetEmissionsInfo(countryCode: String) = climateTraceApi.fetchCountryAssetEmissionsInfo(countryCode)
     suspend fun fetchCountryAssetEmissionsInfo(countryCodeList: List<String>) = climateTraceApi.fetchCountryAssetEmissionsInfo(countryCodeList)
 
+    suspend fun fetchAssetDetail(sourceId: Int) = climateTraceApi.fetchAssetDetail(sourceId)
+
+    suspend fun fetchAssetsByCountry(countryCode: String, limit: Int = 20) = climateTraceApi.fetchAssetsByCountry(countryCode, limit)
+
     suspend fun getPopulation(countryCode: String) = populationApi.getPopulation(countryCode)
 }
