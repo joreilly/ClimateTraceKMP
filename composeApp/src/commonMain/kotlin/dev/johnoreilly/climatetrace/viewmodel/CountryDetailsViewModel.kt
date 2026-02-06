@@ -11,6 +11,7 @@ import app.cash.molecule.launchMolecule
 import com.rickclephas.kmp.observableviewmodel.ViewModel
 import com.rickclephas.kmp.observableviewmodel.coroutineScope
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
+import dev.johnoreilly.climatetrace.remote.Asset
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
 import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
@@ -30,7 +31,8 @@ sealed class CountryDetailsUIState {
         val year: String,
         val availableYears: List<String>,
         val countryEmissionInfo: CountryEmissionsInfo?,
-        val countryAssetEmissionsList: List<CountryAssetEmissionsInfo>
+        val countryAssetEmissionsList: List<CountryAssetEmissionsInfo>,
+        val assets: List<Asset> = emptyList()
     ) : CountryDetailsUIState()
 }
 
@@ -41,7 +43,7 @@ sealed interface CountryDetailsEvents {
 
 open class CountryDetailsViewModel : ViewModel(), KoinComponent {
     private val climateTraceRepository: ClimateTraceRepository by inject()
-    private val availableYears = listOf("2021", "2022", "2023", "2024")
+    private val availableYears = listOf("2021", "2022", "2023", "2024", "2025")
 
     private val events = MutableSharedFlow<CountryDetailsEvents>(extraBufferCapacity = 20)
 
@@ -61,7 +63,7 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
     fun CountryDetailsPresenter(events: Flow<CountryDetailsEvents>): CountryDetailsUIState {
         var uiState by remember { mutableStateOf<CountryDetailsUIState>(CountryDetailsUIState.NoCountrySelected) }
         var selectedCountry by remember { mutableStateOf<Country?>(null) }
-        var selectedYear by remember { mutableStateOf("2024") }
+        var selectedYear by remember { mutableStateOf("2025") }
 
         LaunchedEffect(Unit) {
             events.collect { event ->
@@ -78,7 +80,8 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
                 try {
                     val countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.alpha3, selectedYear).firstOrNull()
                     val countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.alpha3)
-                    uiState = CountryDetailsUIState.Success(country, selectedYear, availableYears, countryEmissionInfo, countryAssetEmissionsList)
+                    val assetsResult = climateTraceRepository.fetchAssetsByCountry(country.alpha3)
+                    uiState = CountryDetailsUIState.Success(country, selectedYear, availableYears, countryEmissionInfo, countryAssetEmissionsList, assetsResult.assets)
                 } catch (e: Exception) {
                     uiState = CountryDetailsUIState.Error("Error retrieving data from backend, ${e.message}")
                 }

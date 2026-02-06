@@ -1,21 +1,28 @@
 package dev.johnoreilly.climatetrace.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import dev.johnoreilly.climatetrace.remote.Asset
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsUIState
 
 @Composable
@@ -67,49 +77,174 @@ fun CountryInfoDetailedViewSuccess(viewState: CountryDetailsUIState.Success, onY
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Header card with flag + country label info
         CountryHeader(viewState)
-
-        Spacer(modifier = Modifier.size(16.dp))
 
         val year = viewState.year
         val countryAssetEmissionsList = viewState.countryAssetEmissionsList
         val countryEmissionInfo = viewState.countryEmissionInfo
 
-        // Year selector row
-        Column {
-            Text(text = "Year", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Spacer(modifier = Modifier.size(6.dp))
-            YearSelector(year, viewState.availableYears, onYearSelected)
-        }
-
-        Spacer(modifier = Modifier.size(12.dp))
-
         countryEmissionInfo?.let {
             val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
-            val percentage = (countryEmissionInfo.emissions.co2 / countryEmissionInfo.worldEmissions.co2).toPercent(2)
+            val percentage = (countryEmissionInfo.emissions.co2.toDouble() / countryEmissionInfo.worldEmissions.co2).toPercent(2)
 
-            // Key figures chips
-            KeyFiguresRow(co2Mt = co2, rank = countryEmissionInfo.rank, share = percentage)
+            // Emissions Summary Section - combines year selector and key figures
+            EmissionsSummarySection(
+                year = year,
+                availableYears = viewState.availableYears,
+                onYearSelected = onYearSelected,
+                co2Mt = co2,
+                rank = countryEmissionInfo.rank,
+                share = percentage
+            )
 
-            Spacer(modifier = Modifier.size(16.dp))
-
+            // Emissions by Sector Section
             val filteredCountryAssetEmissionsList = countryAssetEmissionsList.filter { it.sector != null }
             if (filteredCountryAssetEmissionsList.isNotEmpty()) {
-                // Keep charts unchanged
-                SectorEmissionsPieChart(countryAssetEmissionsList)
-                Spacer(modifier = Modifier.size(32.dp))
-                CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
+                EmissionsBySectorSection(countryAssetEmissionsList)
             } else {
-                Spacer(modifier = Modifier.size(16.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Surface(
+                    tonalElevation = 1.dp,
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.errorContainer,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(
-                        "Invalid data",
-                        style = MaterialTheme.typography.titleMedium.copy(color = Color.Red),
-                        textAlign = TextAlign.Center
+                        "No sector data available",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(16.dp)
                     )
+                }
+            }
+        }
+
+        // Assets Section
+        if (viewState.assets.isNotEmpty()) {
+            AssetsSection(viewState.assets)
+        }
+    }
+}
+
+@Composable
+private fun EmissionsSummarySection(
+    year: String,
+    availableYears: List<String>,
+    onYearSelected: (String) -> Unit,
+    co2Mt: Int,
+    rank: Int,
+    share: String
+) {
+    Surface(
+        tonalElevation = 1.dp,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Emissions Summary",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                YearSelector(year, availableYears, onYearSelected)
+            }
+            Spacer(modifier = Modifier.size(12.dp))
+            KeyFiguresRow(co2Mt = co2Mt, rank = rank, share = share)
+        }
+    }
+}
+
+@Composable
+private fun EmissionsBySectorSection(countryAssetEmissionsList: List<dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo>) {
+    Surface(
+        tonalElevation = 1.dp,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Emissions by Sector",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.size(12.dp))
+            CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
+        }
+    }
+}
+
+@Composable
+private fun AssetsSection(assets: List<Asset>) {
+    val navigator = LocalNavigator.current
+
+    Surface(
+        tonalElevation = 1.dp,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+            Text(
+                text = "Top Emission Sources",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+
+            assets.forEachIndexed { index, asset ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navigator?.push(AssetDetailScreen(asset.id, asset.name))
+                        }
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = asset.name,
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        asset.sector?.let {
+                            Text(
+                                text = it.replace("-", " ").replaceFirstChar { c -> c.uppercase() },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        val validOwners = asset.owners?.filter { !it.companyName.isNullOrBlank() }
+                        if (!validOwners.isNullOrEmpty()) {
+                            Text(
+                                text = "Owners: ${validOwners.distinctBy { it.companyId ?: it.companyName }.joinToString { it.companyName ?: "" }}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "View details",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                if (index < assets.size - 1) {
+                    HorizontalDivider()
                 }
             }
         }

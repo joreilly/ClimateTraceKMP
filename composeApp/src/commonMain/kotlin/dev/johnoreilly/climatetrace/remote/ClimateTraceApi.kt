@@ -12,15 +12,95 @@ data class AssetsResult(val assets: List<Asset>)
 @Serializable
 data class Asset(
     @SerialName("Id")
-    val id: String,
+    val id: Int,
     @SerialName("Name")
     val name: String,
+    @SerialName("NativeId")
+    val nativeId: String? = null,
+    @SerialName("Country")
+    val country: String? = null,
     @SerialName("AssetType")
-    val assetType: String,
+    val assetType: String? = null,
     @SerialName("Sector")
-    val sector: String,
+    val sector: String? = null,
+    @SerialName("ReportingEntity")
+    val reportingEntity: String? = null,
     @SerialName("Thumbnail")
-    val thumbnail: String,
+    val thumbnail: String? = null,
+    @SerialName("Owners")
+    val owners: List<AssetOwner>? = null,
+    @SerialName("EmissionsSummary")
+    val emissionsSummary: List<EmissionMeasurement>? = null,
+)
+
+@Serializable
+data class AssetOwner(
+    @SerialName("CompanyId")
+    val companyId: String? = null,
+    @SerialName("CompanyName")
+    val companyName: String? = null
+)
+
+@Serializable
+data class EmissionMeasurement(
+    @SerialName("Gas")
+    val gas: String? = null,
+    @SerialName("ActivityUnits")
+    val activityUnits: String? = null,
+    @SerialName("Activity")
+    val activity: Double? = null,
+    @SerialName("EmissionsFactorUnits")
+    val emissionsFactorUnits: String? = null,
+    @SerialName("CapacityUnits")
+    val capacityUnits: String? = null,
+    @SerialName("Capacity")
+    val capacity: Double? = null,
+    @SerialName("CapacityFactor")
+    val capacityFactor: Double? = null,
+    @SerialName("EmissionsFactor")
+    val emissionsFactor: Double? = null,
+    @SerialName("EmissionsQuantity")
+    val emissionsQuantity: Double? = null,
+    @SerialName("Year")
+    val year: Int? = null
+)
+
+@Serializable
+data class AssetDetail(
+    @SerialName("Id")
+    val id: Int,
+    @SerialName("Name")
+    val name: String,
+    @SerialName("NativeId")
+    val nativeId: String? = null,
+    @SerialName("Country")
+    val country: String? = null,
+    @SerialName("Sector")
+    val sector: String? = null,
+    @SerialName("AssetType")
+    val assetType: String? = null,
+    @SerialName("ReportingEntity")
+    val reportingEntity: String? = null,
+    @SerialName("Thumbnail")
+    val thumbnail: String? = null,
+    @SerialName("Owners")
+    val owners: List<AssetOwner>? = null,
+    @SerialName("EmissionsDetails")
+    val emissionsDetails: List<EmissionMeasurement>? = null,
+    @SerialName("EmissionsSummary")
+    val emissionsSummary: List<EmissionMeasurement>? = null,
+    @SerialName("SectorRanks")
+    val sectorRanks: Map<String, Int>? = null,
+    @SerialName("Centroid")
+    val centroid: Centroid? = null
+)
+
+@Serializable
+data class Centroid(
+    @SerialName("Geometry")
+    val geometry: List<Double>? = null,
+    @SerialName("SRID")
+    val srid: Int? = null
 )
 
 
@@ -93,4 +173,15 @@ class ClimateTraceApi(
     }
 
     suspend fun fetchCountryAssetEmissionsInfo(countryCode: String) = client.get("$baseUrl/assets/emissions?countries=$countryCode").body<Map<String, List<CountryAssetEmissionsInfo>>>()[countryCode] ?: emptyList()
+
+    suspend fun fetchAssetDetail(sourceId: Int): AssetDetail = client.get("$baseUrl/assets/$sourceId").body<AssetDetail>()
+
+    suspend fun fetchAssetsByCountry(countryCode: String, limit: Int = 20): AssetsResult {
+        return client.get("$baseUrl/assets") {
+            url {
+                parameters.append("countries", countryCode)
+                parameters.append("limit", limit.toString())
+            }
+        }.body<AssetsResult>()
+    }
 }
