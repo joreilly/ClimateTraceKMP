@@ -42,7 +42,7 @@ class ClimateTraceAgentProvider(
             tool(GetCountryTool(climateTraceRepository))
             tool(GetEmissionsTool(climateTraceRepository))
             tool(GetAssetEmissionsTool(climateTraceRepository))
-            tool(GetPopulationTool(climateTraceRepository))
+            tool(createPopulationAgentTool(climateTraceRepository))
 
             tool(ExitTool)
         }
@@ -107,7 +107,7 @@ class ClimateTraceAgentProvider(
                     1. Look up country codes from country names
                     2. Get climate emission information.
                     3. Get cause of emissions using asset emission information (GetAssetEmissionsTool)
-                    4. Get population data.
+                    4. Get population data using the PopulationAgent sub-agent.
                     5. Get current date and time.
                 
                     Pass the list of country codes and the year to the GetEmissionsTool tool to get climate emission information.
