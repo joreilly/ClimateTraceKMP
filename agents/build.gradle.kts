@@ -12,7 +12,7 @@ dependencies {
     implementation (libs.kotlinx.coroutines.rx3)
 
     // following needed for AdkWebServer (dev UI)
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.6")
 
     implementation(projects.composeApp)
 }
