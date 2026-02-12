@@ -5,7 +5,7 @@ kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.10.0"
 kotlinx-dateTime = "0.7.1-0.6.x-compat"
 
-agp = "8.12.3"
+agp = "8.13.2"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
