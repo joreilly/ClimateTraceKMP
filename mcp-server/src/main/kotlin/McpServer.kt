@@ -69,7 +69,7 @@ fun configureMcpServer(): Server {
 
     server.addTool(
         name = "get-country-asset-emissions",
-        description = "Get sector emission information for the given countries",
+        description = "Get total emission information for the given countries (use 3 letter ISO codes)",
         inputSchema = ToolSchema(
             properties = buildJsonObject {
                 putJsonObject("countryCodeList") {
@@ -102,7 +102,7 @@ fun configureMcpServer(): Server {
 
     server.addTool(
         name = "get-emissions",
-        description = "Get total emission information for the given countries",
+        description = "Get total emission information for the given countries (use 3 letter ISO codes)",
         inputSchema = ToolSchema(
             properties = buildJsonObject {
                 putJsonObject("countryCodeList") {
@@ -132,7 +132,7 @@ fun configureMcpServer(): Server {
             year = year.jsonPrimitive.content
         )
         CallToolResult(
-            content = countryEmissionInfo.map { TextContent(it.emissions.co2.toString()) }
+            content = countryEmissionInfo.map { TextContent(it.emissionsQuantity.toString()) }
         )
     }
 
