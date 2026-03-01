@@ -5,7 +5,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.runComposeUiTest
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
-import dev.johnoreilly.climatetrace.remote.EmissionInfo
 import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
 import dev.johnoreilly.climatetrace.ui.CountryListView
 import dev.johnoreilly.climatetrace.ui.toPercent
@@ -14,12 +13,16 @@ import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)
 class ClimateTraceScreenTest {
-    private val country = Country("IRL", "IE", "Ireland", "Europe")
+    private val country = Country("IRL", name = "Ireland", continent = "Europe")
     private val countryList = listOf<Country>(country)
-    private val countryEmissions = EmissionInfo(53_000_000.0f, 75_000_000.0f, 100_000_000.0f)
-    private val worldEmissions = EmissionInfo(53_000_000_000.0f, 75_000_000_000.0f, 100_000_000_000.0f)
-    private val countryEmissionsInfo = CountryEmissionsInfo(country = country.alpha3,
-        rank = 73, emissions = countryEmissions, worldEmissions = worldEmissions)
+    private val emissionsQuantity = 53_000_000.0
+    private val percentage = emissionsQuantity / 53_000_000_000.0
+    private val countryEmissionsInfo = CountryEmissionsInfo(
+        country = country.id,
+        rank = 73,
+        emissionsQuantity = emissionsQuantity,
+        percentage = percentage,
+    )
     private val year = "2022"
 
     @Test
@@ -42,11 +45,10 @@ class ClimateTraceScreenTest {
         }
 
         onNodeWithText(country.name).assertExists()
-        val millionTonnes = (countryEmissions.co2 / 1_000_000).toInt()
-        val percentage = (countryEmissions.co2.toDouble() / worldEmissions.co2).toPercent(2)
+        val millionTonnes = (emissionsQuantity / 1_000_000).toInt()
+        val percentageStr = percentage.toPercent(2)
         onNodeWithText("$millionTonnes").assertExists()
-        onNodeWithText(percentage).assertExists()
+        onNodeWithText(percentageStr).assertExists()
     }
 
 }
-

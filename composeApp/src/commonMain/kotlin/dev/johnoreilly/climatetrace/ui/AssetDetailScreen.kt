@@ -37,6 +37,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.johnoreilly.climatetrace.remote.AssetDetail
 import dev.johnoreilly.climatetrace.remote.AssetOwner
+import dev.johnoreilly.climatetrace.remote.AssetSubsectorRank
 import dev.johnoreilly.climatetrace.remote.EmissionMeasurement
 import dev.johnoreilly.climatetrace.viewmodel.AssetDetailUIState
 import dev.johnoreilly.climatetrace.viewmodel.AssetDetailViewModel
@@ -139,14 +140,14 @@ fun AssetDetailContent(assetDetail: AssetDetail) {
         }
 
         // Emissions Summary Section
-        if (!assetDetail.emissionsSummary.isNullOrEmpty()) {
-            EmissionsSummarySection(assetDetail.emissionsSummary)
+        if (!assetDetail.emissions.isNullOrEmpty()) {
+            EmissionsSummarySection(assetDetail.emissions)
             Spacer(modifier = Modifier.size(16.dp))
         }
 
         // Sector Ranks Section
-        if (!assetDetail.sectorRanks.isNullOrEmpty()) {
-            SectorRanksSection(assetDetail.sectorRanks)
+        if (!assetDetail.subsectorRanks.isNullOrEmpty()) {
+            SectorRanksSection(assetDetail.subsectorRanks)
         }
     }
 }
@@ -201,7 +202,7 @@ private fun AssetInfoChips(assetDetail: AssetDetail) {
                 }
             )
         }
-        assetDetail.reportingEntity?.let {
+        assetDetail.sourceType?.let {
             AssistChip(
                 onClick = {},
                 label = {
@@ -222,7 +223,7 @@ private fun AssetInfoChips(assetDetail: AssetDetail) {
 @Composable
 private fun OwnershipSection(owners: List<AssetOwner>) {
     // Filter out owners with null/blank names
-    val validOwners = owners.filter { !it.companyName.isNullOrBlank() }
+    val validOwners = owners.filter { !it.name.isNullOrBlank() }
     if (validOwners.isEmpty()) return
 
     Surface(
@@ -238,8 +239,8 @@ private fun OwnershipSection(owners: List<AssetOwner>) {
             )
             Spacer(modifier = Modifier.size(8.dp))
 
-            // Get unique owners by companyId or companyName
-            val uniqueOwners = validOwners.distinctBy { it.companyId ?: it.companyName }
+            // Get unique owners by id or name
+            val uniqueOwners = validOwners.distinctBy { it.id ?: it.name }
 
             uniqueOwners.forEachIndexed { index, owner ->
                 Row(
@@ -248,10 +249,10 @@ private fun OwnershipSection(owners: List<AssetOwner>) {
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = owner.companyName ?: "",
+                            text = owner.name ?: "",
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        owner.companyId?.let { id ->
+                        owner.id?.let { id ->
                             Text(
                                 text = "ID: $id",
                                 style = MaterialTheme.typography.bodySmall,
@@ -307,7 +308,7 @@ private fun EmissionsSummarySection(emissions: List<EmissionMeasurement>) {
 }
 
 @Composable
-private fun SectorRanksSection(sectorRanks: Map<String, Int>) {
+private fun SectorRanksSection(subsectorRanks: List<AssetSubsectorRank>) {
     Surface(
         tonalElevation = 1.dp,
         shape = MaterialTheme.shapes.medium,
@@ -321,17 +322,17 @@ private fun SectorRanksSection(sectorRanks: Map<String, Int>) {
             )
             Spacer(modifier = Modifier.size(8.dp))
 
-            sectorRanks.entries.sortedByDescending { it.key }.forEach { (year, rank) ->
+            subsectorRanks.sortedByDescending { it.year }.forEach { entry ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = year,
+                        text = entry.year.toString(),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "#$rank",
+                        text = "#${entry.rank}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )

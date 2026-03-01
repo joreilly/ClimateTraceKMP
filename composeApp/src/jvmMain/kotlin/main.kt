@@ -4,21 +4,27 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.di.initKoin
+import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 
-/*
+
 val koin = initKoin(enableNetworkLogs = true).koin
 
+/*
 suspend fun main() {
     println("hello")
 
-    val climateTraceRepository = koin.get<ClimateTraceRepository>()
+    val api = koin.get<ClimateTraceApi>()
 
-    val agent: ClimateTraceAgent = ClimateTraceAgent(climateTraceRepository)
+    val result = api.fetchCountries()
+    println(result)
 
-    //agent.runAgent("What were the emissions for the UK in 2024?")
-
-    agent.runAgent("compare the per-capita emissions of the UK and France in 2024")
+//    val agent: ClimateTraceAgent = ClimateTraceAgent(climateTraceRepository)
+//
+//    //agent.runAgent("What were the emissions for the UK in 2024?")
+//
+//    agent.runAgent("compare the per-capita emissions of the UK and France in 2024")
 }
+
 */
 
 fun main() = application {

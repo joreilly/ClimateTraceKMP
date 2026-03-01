@@ -10,7 +10,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 private const val PACKAGE_NAME = "dev.johnoreilly.climatetrace"
-private const val VERSION = "1.0.0"
+private const val VERSION = "2.0.0"
 private const val AUTHOR = "johnoreilly"
 
 actual fun dataModule(): Module = module {

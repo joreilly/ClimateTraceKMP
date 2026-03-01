@@ -78,10 +78,10 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
             selectedCountry?.let { country ->
                 uiState = CountryDetailsUIState.Loading
                 try {
-                    val countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.alpha3, selectedYear).firstOrNull()
-                    val countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.alpha3)
-                    val assetsResult = climateTraceRepository.fetchAssetsByCountry(country.alpha3)
-                    uiState = CountryDetailsUIState.Success(country, selectedYear, availableYears, countryEmissionInfo, countryAssetEmissionsList, assetsResult.assets)
+                    val countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.id, selectedYear).firstOrNull()
+                    val countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.id)
+                    val assets = climateTraceRepository.fetchAssetsByCountry(country.id)
+                    uiState = CountryDetailsUIState.Success(country, selectedYear, availableYears, countryEmissionInfo, countryAssetEmissionsList, assets)
                 } catch (e: Exception) {
                     uiState = CountryDetailsUIState.Error("Error retrieving data from backend, ${e.message}")
                 }

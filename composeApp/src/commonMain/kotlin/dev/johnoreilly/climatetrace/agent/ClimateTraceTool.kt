@@ -32,7 +32,7 @@ class GetCountryTool(val climateTraceRepository: ClimateTraceRepository) : Simpl
             if (countryList == null) {
                 countryList = climateTraceRepository.fetchCountries()
             }
-            val result = countryList?.firstOrNull { it.name == args.countryName }?.alpha3 ?: ""
+            val result = countryList?.firstOrNull { it.name == args.countryName }?.id ?: ""
             return result
         } catch (e: Exception) {
             println("Error: $e")
@@ -57,7 +57,7 @@ class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : Sim
 
     override suspend fun execute(args: Args): String {
         return climateTraceRepository.fetchCountryEmissionsInfo(args.countryCodeList, args.year).joinToString {
-            it.emissions.co2.toString()
+            it.emissionsQuantity.toString()
         }
     }
 }

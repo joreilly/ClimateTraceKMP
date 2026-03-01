@@ -3,7 +3,6 @@ package dev.johnoreilly.climatetrace.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,7 +46,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
 import cafe.adriel.voyager.core.screen.Screen
-import dev.carlsen.flagkit.FlagKit
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.utils.PanelState
 import dev.johnoreilly.climatetrace.ui.utils.ResizablePanel
@@ -174,7 +172,7 @@ fun SearchableList(
     countrySelected: (country: Country) -> Unit
 ) {
     val filteredCountryList = countryList
-        .filter { it.name.contains(searchQuery.value, ignoreCase = true) || it.alpha2.contains(searchQuery.value, true) || it.alpha3.contains(searchQuery.value, true) }
+        .filter { it.name.contains(searchQuery.value, ignoreCase = true) || it.id.contains(searchQuery.value, true) }
         .sortedBy { it.name }
     val keyboardController = LocalSoftwareKeyboardController.current
     SearchBar(
@@ -264,16 +262,6 @@ fun CountryRow(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val imageVector = FlagKit.getFlag(countryCode = country.alpha2)
-            imageVector?.let {
-                Image(
-                    imageVector = imageVector,
-                    contentDescription = country.name,
-                )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
             // Title and subtitle
             Column(Modifier.weight(1f)) {
                 Text(
@@ -281,7 +269,7 @@ fun CountryRow(
                     style = if (country.name == selectedCountry?.name) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = "${country.continent} • ${country.alpha2} / ${country.alpha3}",
+                    text = "${country.continent} • ${country.id}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
