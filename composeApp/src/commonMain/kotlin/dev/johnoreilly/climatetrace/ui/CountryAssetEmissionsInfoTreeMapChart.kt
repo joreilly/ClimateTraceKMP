@@ -111,13 +111,13 @@ fun SectionItem(
 suspend fun buildAssetTree(assetEmissionInfoList: List<CountryAssetEmissionsInfo>): Tree<ChartNode> = withContext(
     Dispatchers.Default) {
     val filteredList = assetEmissionInfoList
-        .filter { it.emissions > 0 }
-        .sortedByDescending(CountryAssetEmissionsInfo::emissions)
+        .filter { it.emissionsQuantity > 0 }
+        .sortedByDescending(CountryAssetEmissionsInfo::emissionsQuantity)
         .take(10)
 
     val colors = generateHueColorPalette(filteredList.size)
 
-    val total = filteredList.sumOf { it.emissions.toDouble() }  //.sumOf(CountryAssetEmissionsInfo::emissions)
+    val total = filteredList.sumOf { it.emissionsQuantity }
     tree(
         ChartNode.Section(
             name = "Total",
@@ -127,16 +127,16 @@ suspend fun buildAssetTree(assetEmissionInfoList: List<CountryAssetEmissionsInfo
         ),
     ) {
         assetEmissionInfoList
-            .filter { it.emissions > 0 }
-            .sortedByDescending(CountryAssetEmissionsInfo::emissions)
+            .filter { it.emissionsQuantity > 0 }
+            .sortedByDescending(CountryAssetEmissionsInfo::emissionsQuantity)
             .take(10)
             .forEachIndexed { index, assetEmissionInfo ->
                 assetEmissionInfo.sector?.let {
-                    val productPercentage = assetEmissionInfo.emissions / total
+                    val productPercentage = assetEmissionInfo.emissionsQuantity / total
                     node(
                         ChartNode.Leaf(
                             name = assetEmissionInfo.sector,
-                            value = assetEmissionInfo.emissions.toDouble(),
+                            value = assetEmissionInfo.emissionsQuantity,
                             percentage = productPercentage,
                             color = colors[index]
                         ),

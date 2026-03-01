@@ -62,7 +62,7 @@ fun configureMcpServer(): Server {
         val countries = climateTraceRepository.fetchCountries()
         CallToolResult(
             content =
-                countries.map { TextContent("${it.name}, ${it.alpha3}") }
+                countries.map { TextContent("${it.name}, ${it.id}") }
         )
     }
 

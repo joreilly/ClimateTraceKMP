@@ -31,8 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -88,8 +86,8 @@ fun CountryInfoDetailedViewSuccess(viewState: CountryDetailsUIState.Success, onY
         val countryEmissionInfo = viewState.countryEmissionInfo
 
         countryEmissionInfo?.let {
-            val co2 = (countryEmissionInfo.emissions.co2 / 1_000_000).toInt()
-            val percentage = (countryEmissionInfo.emissions.co2.toDouble() / countryEmissionInfo.worldEmissions.co2).toPercent(2)
+            val co2 = (countryEmissionInfo.emissionsQuantity / 1_000_000).toInt()
+            val percentage = countryEmissionInfo.percentage.toPercent(2)
 
             // Emissions Summary Section - combines year selector and key figures
             EmissionsSummarySection(
@@ -226,10 +224,10 @@ private fun AssetsSection(assets: List<Asset>) {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        val validOwners = asset.owners?.filter { !it.companyName.isNullOrBlank() }
+                        val validOwners = asset.owners?.filter { !it.name.isNullOrBlank() }
                         if (!validOwners.isNullOrEmpty()) {
                             Text(
-                                text = "Owners: ${validOwners.distinctBy { it.companyId ?: it.companyName }.joinToString { it.companyName ?: "" }}",
+                                text = "Owners: ${validOwners.distinctBy { it.id ?: it.name }.joinToString { it.name ?: "" }}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 maxLines = 1,
@@ -266,7 +264,7 @@ private fun CountryHeader(viewState: CountryDetailsUIState.Success) {
             )
             Spacer(modifier = Modifier.size(4.dp))
             Text(
-                text = "${c.continent} • ${c.alpha2} / ${c.alpha3}",
+                text = "${c.continent} • ${c.id}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
