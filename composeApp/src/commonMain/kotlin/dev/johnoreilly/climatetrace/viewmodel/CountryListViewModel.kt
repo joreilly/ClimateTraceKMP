@@ -34,7 +34,7 @@ open class CountryListViewModel : ViewModel(), KoinComponent {
                 _viewState.value =  CountryListUIState.Success(countries)
 
             } catch (e: Exception) {
-                _viewState.value = CountryListUIState.Error(e.message ?: "Uknown Error")
+                _viewState.value = CountryListUIState.Error(e.message ?: "Unknown Error")
             }
         }
     }

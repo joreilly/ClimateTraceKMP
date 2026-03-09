@@ -252,7 +252,7 @@ private fun AssetsSection(assets: List<Asset>) {
 @Composable
 private fun CountryHeader(viewState: CountryDetailsUIState.Success) {
     val c = viewState.country
-    androidx.compose.material3.Surface(
+    Surface(
         tonalElevation = 2.dp,
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceVariant
