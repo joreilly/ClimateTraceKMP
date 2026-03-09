@@ -157,7 +157,7 @@ fun ShrinkableHidableText(
     modifier: Modifier = Modifier,
     shrinkSizeFactor: Float = 0.9F,
     textAlign: TextAlign = TextAlign.Center,
-    style: TextStyle =MaterialTheme.typography.bodyMedium
+    style: TextStyle = MaterialTheme.typography.bodyMedium
 ) {
     var fontStyle by remember { mutableStateOf(style) }
     var shouldDraw by remember { mutableStateOf(false) }
