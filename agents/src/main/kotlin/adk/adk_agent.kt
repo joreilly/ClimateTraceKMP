@@ -28,19 +28,6 @@ class ClimateTraceAgent {
         fun initAgent(): BaseAgent {
             val apiKeyGoogle = ""
 
-//            val mcpTools = McpToolset(
-//                StreamableHttpServerParameters(
-//                    "https://mapstools.googleapis.com/mcp",
-//                    mapOf("X-Goog-Api-Key" to apiKeyGoogle),
-//                    null, null, null
-//                )
-//
-//                ServerParameters
-//                    .builder("java")
-//                    .args("-jar", "/Users/joreilly/dev/github/ClimateTraceKMP/mcp-server/build/libs/serverAll.jar", "--stdio")
-//                    .build()
-//            ) //.loadTools().join()
-
             val getCountriesTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getCountries")
             val getEmissionsTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getEmissions")
             val mcpTools = listOf(getCountriesTool, getEmissionsTool)
@@ -67,7 +54,8 @@ fun main() {
 
     val prompt =
         """
-            Get emission data for Germany and France in 2022.
+            You have data up to and including 2025.
+            Get emission data for Germany and France in 2025.
             Use units of millions for the emissions data.
             Show result in a grid or decreasing order of emissions.
             """.trimIndent()
