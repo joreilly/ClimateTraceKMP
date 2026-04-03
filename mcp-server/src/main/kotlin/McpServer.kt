@@ -77,21 +77,24 @@ fun configureMcpServer(): Server {
                     putJsonObject("items") {
                         put("type", JsonPrimitive("string"))
                     }
+                    putJsonObject("year") { put("type", JsonPrimitive("string")) }
                 }
             },
-            required = listOf("countryCodeList")
+            required = listOf("countryCodeList", "year")
         )
     ) { request ->
         val countryCodeList = request.arguments?.get("countryCodeList")
-        if (countryCodeList == null) {
+        val year = request.arguments?.get("year")
+        if (countryCodeList == null || year == null) {
             return@addTool CallToolResult(
-                content = listOf(TextContent("The 'countryCodeList' parameters are required."))
+                content = listOf(TextContent("The 'countryCodeList' and year parameters are required."))
             )
         }
         val countryAssetEmissionInfo = climateTraceRepository.fetchCountryAssetEmissionsInfo(
             countryCodeList = countryCodeList
                 .jsonArray
-                .map { it.jsonPrimitive.content }
+                .map { it.jsonPrimitive.content },
+            year = year.jsonPrimitive.content
         )
         CallToolResult(
             content = countryAssetEmissionInfo.map { TextContent("${it.key}, ${it.value}") }

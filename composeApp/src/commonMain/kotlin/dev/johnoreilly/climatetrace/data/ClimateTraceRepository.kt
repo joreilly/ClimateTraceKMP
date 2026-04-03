@@ -20,8 +20,8 @@ class ClimateTraceRepository(
     suspend fun fetchCountryEmissionsInfo(countryCode: String, year: String) = climateTraceApi.fetchCountryEmissionsInfo(listOf(countryCode), year)
     suspend fun fetchCountryEmissionsInfo(countryCodeList: List<String>, year: String) = climateTraceApi.fetchCountryEmissionsInfo(countryCodeList, year)
 
-    suspend fun fetchCountryAssetEmissionsInfo(countryCode: String) = climateTraceApi.fetchCountryAssetEmissionsInfo(countryCode)
-    suspend fun fetchCountryAssetEmissionsInfo(countryCodeList: List<String>) = climateTraceApi.fetchCountryAssetEmissionsInfo(countryCodeList)
+    suspend fun fetchCountryAssetEmissionsInfo(countryCode: String, year: String) = climateTraceApi.fetchCountryAssetEmissionsInfo(countryCode, year)
+    suspend fun fetchCountryAssetEmissionsInfo(countryCodeList: List<String>, year: String) = climateTraceApi.fetchCountryAssetEmissionsInfo(countryCodeList, year)
 
     suspend fun fetchAssetDetail(sourceId: Int) = climateTraceApi.fetchAssetDetail(sourceId)
 
