@@ -79,7 +79,7 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
                 uiState = CountryDetailsUIState.Loading
                 try {
                     val countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.id, selectedYear).firstOrNull()
-                    val countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.id)
+                    val countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.id, selectedYear)
                     val assets = climateTraceRepository.fetchAssetsByCountry(country.id)
                     uiState = CountryDetailsUIState.Success(country, selectedYear, availableYears, countryEmissionInfo, countryAssetEmissionsList, assets)
                 } catch (e: Exception) {

@@ -110,6 +110,7 @@ data class AggregatedEmissionsOverview(
 @Serializable
 data class AggregatedEmissionsResponse(
     val sectors: AggregatedEmissionsOverview? = null,
+    val subsectors: AggregatedEmissionsOverview? = null,
 )
 
 class ClimateTraceApi(
@@ -134,17 +135,24 @@ class ClimateTraceApi(
         return response.rankings.filter { it.country in countryCodeList }
     }
 
-    suspend fun fetchCountryAssetEmissionsInfo(countryCode: String): List<CountryAssetEmissionsInfo> {
-        val response = client.get("$baseUrl/sources/emissions") {
-            url {
-                parameters.append("gadmId", countryCode)
-            }
-        }.body<AggregatedEmissionsResponse>()
-        return response.sectors?.summaries ?: emptyList()
+    suspend fun fetchCountryAssetEmissionsInfo(countryCode: String, year: String): List<CountryAssetEmissionsInfo> {
+        val response = fetchCountryEmissionsResponse(countryCode, year)
+        val sectorSummaries = response.sectors?.summaries ?: emptyList()
+        val subsectorSummaries = response.subsectors?.summaries ?: emptyList()
+        return sectorSummaries + subsectorSummaries
     }
 
-    suspend fun fetchCountryAssetEmissionsInfo(countryCodeList: List<String>): Map<String, List<CountryAssetEmissionsInfo>> {
-        return countryCodeList.associateWith { fetchCountryAssetEmissionsInfo(it) }
+    suspend fun fetchCountryAssetEmissionsInfo(countryCodeList: List<String>, year: String): Map<String, List<CountryAssetEmissionsInfo>> {
+        return countryCodeList.associateWith { fetchCountryAssetEmissionsInfo(it, year) }
+    }
+
+    suspend fun fetchCountryEmissionsResponse(countryCode: String, year: String): AggregatedEmissionsResponse {
+        return client.get("$baseUrl/sources/emissions") {
+            url {
+                parameters.append("gadmId", countryCode)
+                parameters.append("year", year)
+            }
+        }.body<AggregatedEmissionsResponse>()
     }
 
     suspend fun fetchAssetDetail(sourceId: Int): AssetDetail = client.get("$baseUrl/sources/$sourceId").body<AssetDetail>()

@@ -72,10 +72,12 @@ class GetAssetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) 
     data class Args(
         @property:LLMDescription("ISO country code list (e.g., 'USA', 'GBR', 'FRA')")
         val countryCodeList: List<String>,
+        @property:LLMDescription("Year for which emissions occurred")
+        val year: String
     )
 
     override suspend fun execute(args: Args): String {
-        return climateTraceRepository.fetchCountryAssetEmissionsInfo(args.countryCodeList).toString()
+        return climateTraceRepository.fetchCountryAssetEmissionsInfo(args.countryCodeList, args.year).toString()
     }
 }
 
