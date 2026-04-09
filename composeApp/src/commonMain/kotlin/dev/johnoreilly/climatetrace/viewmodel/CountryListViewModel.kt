@@ -16,7 +16,7 @@ import org.koin.core.component.inject
 sealed class CountryListUIState {
     object Loading : CountryListUIState()
     data class Error(val message: String) : CountryListUIState()
-    data class Success(val countryList: List<Country>) : CountryListUIState()
+    data class Success(val countryList: List<Country>, val rankings: Map<String, Int> = emptyMap()) : CountryListUIState()
 }
 
 open class CountryListViewModel : ViewModel(), KoinComponent {
@@ -31,7 +31,9 @@ open class CountryListViewModel : ViewModel(), KoinComponent {
         viewModelScope.coroutineScope.launch {
             try {
                 val countries = climateTraceRepository.fetchCountries().sortedBy { it.name }
-                _viewState.value =  CountryListUIState.Success(countries)
+                val rankingsResponse = climateTraceRepository.fetchRankings("2025")
+                val rankings = rankingsResponse.rankings.associate { it.country to it.rank }
+                _viewState.value =  CountryListUIState.Success(countries, rankings)
 
             } catch (e: Exception) {
                 _viewState.value = CountryListUIState.Error(e.message ?: "Unknown Error")

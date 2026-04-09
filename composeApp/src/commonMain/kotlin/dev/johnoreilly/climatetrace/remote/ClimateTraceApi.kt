@@ -125,6 +125,15 @@ class ClimateTraceApi(
 
     suspend fun fetchAssets() = client.get("$baseUrl/sources").body<List<Asset>>()
 
+    suspend fun fetchRankings(year: String): CountryEmissionsRankingsResponse {
+        return client.get("$baseUrl/rankings/countries") {
+            url {
+                parameters.append("start", "$year-01-01")
+                parameters.append("end", "$year-12-31")
+            }
+        }.body<CountryEmissionsRankingsResponse>()
+    }
+
     suspend fun fetchCountryEmissionsInfo(countryCodeList: List<String>, year: String): List<CountryEmissionsInfo> {
         val response = client.get("$baseUrl/rankings/countries") {
             url {

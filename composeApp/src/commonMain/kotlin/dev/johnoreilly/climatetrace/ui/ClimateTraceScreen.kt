@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
@@ -72,7 +73,7 @@ class ClimateTraceScreen: Screen {
                     Text("Error")
                 }
                 is CountryListUIState.Success -> {
-                    CountryScreenSuccess(state.countryList)
+                    CountryScreenSuccess(state.countryList, state.rankings)
                 }
             }
         }
@@ -80,8 +81,8 @@ class ClimateTraceScreen: Screen {
 }
 
 @Composable
-fun CountryScreenSuccess(countryList: List<Country>) {
-    val windowAdaptiveInfo = currentWindowAdaptiveInfo() 
+fun CountryScreenSuccess(countryList: List<Country>, rankings: Map<String, Int> = emptyMap()) {
+    val windowAdaptiveInfo = currentWindowAdaptiveInfo()
     val countryDetailsViewModel = koinInject<CountryDetailsViewModel>()
     val countryDetailsViewState by countryDetailsViewModel.viewState.collectAsState()
     var selectedCountry by remember {  mutableStateOf<Country?>(null) }
@@ -104,10 +105,12 @@ fun CountryScreenSuccess(countryList: List<Country>) {
                     CountryListView(
                         countryList = countryList,
                         selectedCountry = selectedCountry,
-                    ) { country ->
-                        selectedCountry = country
-                        countryDetailsViewModel.setCountry(country)
-                    }
+                        countrySelected = { country ->
+                            selectedCountry = country
+                            countryDetailsViewModel.setCountry(country)
+                         },
+                        rankings = rankings
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
@@ -125,10 +128,12 @@ fun CountryScreenSuccess(countryList: List<Country>) {
                 CountryListView(
                     countryList = countryList,
                     selectedCountry = selectedCountry,
-                ) { country ->
-                    selectedCountry = country
-                    countryDetailsViewModel.setCountry(country)
-                }
+                    countrySelected = { country ->
+                        selectedCountry = country
+                        countryDetailsViewModel.setCountry(country)
+                      },
+                    rankings = rankings
+                 )
             }
 
             VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
@@ -147,7 +152,8 @@ fun CountryScreenSuccess(countryList: List<Country>) {
 fun CountryListView(
     countryList: List<Country>,
     selectedCountry: Country?,
-    countrySelected: (country: Country) -> Unit
+    countrySelected: (country: Country) -> Unit,
+    rankings: Map<String, Int> = emptyMap()
 ) {
     val searchQuery = remember { mutableStateOf("") }
 
@@ -157,7 +163,8 @@ fun CountryListView(
             onSearchQueryChange = { query -> searchQuery.value = query },
             countryList = countryList,
             selectedCountry = selectedCountry,
-            countrySelected = countrySelected
+            countrySelected = countrySelected,
+            rankings = rankings
         )
     }
 }
@@ -169,7 +176,8 @@ fun SearchableList(
     onSearchQueryChange: (String) -> Unit,
     countryList: List<Country>,
     selectedCountry: Country?,
-    countrySelected: (country: Country) -> Unit
+    countrySelected: (country: Country) -> Unit,
+    rankings: Map<String, Int> = emptyMap()
 ) {
     val filteredCountryList = countryList
         .filter { it.name.contains(searchQuery.value, ignoreCase = true) || it.id.contains(searchQuery.value, true) }
@@ -218,7 +226,8 @@ fun SearchableList(
                         CountryRow(
                             country = country,
                             selectedCountry = selectedCountry,
-                            countrySelected = countrySelected
+                            countrySelected = countrySelected,
+                            rankings = rankings
                         )
                     }
                 }
@@ -252,18 +261,37 @@ fun EmptyState(
 fun CountryRow(
     country: Country,
     selectedCountry: Country?,
-    countrySelected: (country: Country) -> Unit
+    countrySelected: (country: Country) -> Unit,
+    rankings: Map<String, Int> = emptyMap()
 ) {
+    val rank = rankings[country.id]
+
     Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = { countrySelected(country) })
                 .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Rank badge
+            if (rank != null) {
+                Box(
+                    modifier = Modifier
+                        .padding(end = 12.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "#$rank",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+
             // Title and subtitle
-            Column(Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = country.name,
                     style = if (country.name == selectedCountry?.name) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge
