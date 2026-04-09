@@ -50,9 +50,9 @@ class CountryListScreen : Screen {
                     }
                     is CountryListUIState.Error -> {}
                     is CountryListUIState.Success -> {
-                        CountryListView(state.countryList, null) { country ->
+                        CountryListView(state.countryList, null, countrySelected = { country ->
                             navigator.push(CountryEmissionsScreen(country))
-                        }
+                          }, rankings = state.rankings)
                     }
                 }
             }
