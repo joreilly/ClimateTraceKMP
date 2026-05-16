@@ -3,19 +3,12 @@ package dev.johnoreilly.climatetrace.agent
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.agent.config.AIAgentConfig
 import ai.koog.agents.core.agent.functionalStrategy
-import ai.koog.agents.core.dsl.extension.asAssistantMessage
-import ai.koog.agents.core.dsl.extension.containsToolCalls
-import ai.koog.agents.core.dsl.extension.executeMultipleTools
-import ai.koog.agents.core.dsl.extension.extractToolCalls
-import ai.koog.agents.core.dsl.extension.requestLLMMultiple
-import ai.koog.agents.core.dsl.extension.sendMultipleToolResults
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.EventHandler
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
 import ai.koog.prompt.message.Message
-import dev.johnoreilly.climatetrace.BuildKonfig
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import kotlin.time.ExperimentalTime
 
@@ -101,7 +94,7 @@ class ClimateTraceAgentProvider(
                     """                
                     You an AI assistant specialising in providing information about global climate emissions.
                     Use 3 letter country codes.
-                    The year is currently 2025.
+                    The year is currently 2026.
                 
                     Use the tools at your disposal to:
                     1. Look up country codes from country names

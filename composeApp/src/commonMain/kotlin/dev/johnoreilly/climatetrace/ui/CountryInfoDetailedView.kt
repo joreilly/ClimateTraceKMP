@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import dev.johnoreilly.climatetrace.remote.Asset
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsUIState
-
 @Composable
 fun CountryInfoDetailedView(
     viewState: CountryDetailsUIState,
