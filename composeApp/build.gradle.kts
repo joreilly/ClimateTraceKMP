@@ -19,7 +19,7 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(24)
 
     wasmJs {
         browser {
@@ -37,10 +37,13 @@ kotlin {
     }
 
 
-    jvm()
-    
+    jvm {
+        mainRun {
+            mainClass = "MainKt"
+        }
+    }
+
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -164,8 +167,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_24
+        targetCompatibility = JavaVersion.VERSION_24
     }
 
     testOptions {
