@@ -18,10 +18,10 @@ jobs:
           distribution: 'zulu'
           java-version: 24
 
-      - name: Set Xcode Version 16.4
+      - name: Set Xcode Version 26
         shell: bash
         run: |
-          xcodes select 16.4
+          xcodes select 26
 
       - name: Build iOS app
         run: xcodebuild -allowProvisioningUpdates -workspace iosApp/iosApp.xcodeproj/project.xcworkspace -configuration Debug -scheme iosApp -sdk iphonesimulator -destination 'generic/platform=iOS Simulator'
