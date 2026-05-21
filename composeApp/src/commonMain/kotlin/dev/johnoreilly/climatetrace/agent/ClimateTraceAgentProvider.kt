@@ -44,7 +44,7 @@ class ClimateTraceAgentProvider(
             var inputMessage = initialInput
             var lastAssistantMessage = ""
 
-            repeat(50) { // align with agentConfig.maxAgentIterations
+            while (inputMessage.isNotEmpty()) {
                 println("Calling LLM with Input = $inputMessage")
                 var responses = requestLLMMultiple(inputMessage)
 
@@ -124,12 +124,9 @@ class ClimateTraceAgentProvider(
                     onToolCallEvent("Tool ${ctx.toolName}, args ${ctx.toolArgs}")
                 }
 
-                
                 onAgentExecutionFailed { ctx ->
                     onErrorEvent("${ctx.throwable.message}")
                 }
-
-
 
                 onAgentCompleted { _ ->
                     // Skip finish event handling
