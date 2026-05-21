@@ -5,13 +5,17 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,26 +37,30 @@ import by.overpass.treemapchart.core.tree.tree
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
 import io.github.koalaplot.core.util.generateHueColorPalette
 import io.github.koalaplot.core.util.toString
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAssetEmissionsInfo>) {
-    var tree by remember { mutableStateOf<Tree<ChartNode>?>(null) }
+    val leaves = remember(countryAssetEmissions) { buildAssetLeaves(countryAssetEmissions) }
+    val tree = remember(leaves) { buildAssetTree(leaves) }
+    var selectedSector by remember(countryAssetEmissions) { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(countryAssetEmissions) {
-        tree = buildAssetTree(countryAssetEmissions)
+    val toggle: (String) -> Unit = { sector ->
+        selectedSector = if (selectedSector == sector) null else sector
     }
 
-    Column(Modifier.height(500.dp).fillMaxWidth(0.8f)) {
-        tree?.let {
+    Column(Modifier.fillMaxWidth()) {
+        Box(Modifier.height(360.dp).fillMaxWidth()) {
             TreemapChart(
-                data = it,
+                data = tree,
                 evaluateItem = ChartNode::value
             ) { node, groupContent ->
                 val export = node.data
                 if (node.children.isEmpty() && export is ChartNode.Leaf) {
-                    LeafItem(item = export, onClick = { })
+                    LeafItem(
+                        item = export,
+                        dimmed = selectedSector != null && selectedSector != export.name,
+                        onClick = { toggle(export.name) }
+                    )
                 } else if (export is ChartNode.Section) {
                     SectionItem(export.color) {
                         groupContent(node)
@@ -60,6 +68,76 @@ fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAss
                 }
             }
         }
+        if (leaves.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            SectorLegend(leaves, selectedSector, toggle)
+        }
+    }
+}
+
+@Composable
+private fun SectorLegend(
+    leaves: List<ChartNode.Leaf>,
+    selectedSector: String?,
+    onSectorTap: (String) -> Unit
+) {
+    Column(Modifier.fillMaxWidth()) {
+        leaves.forEach { leaf ->
+            val isSelected = leaf.name == selectedSector
+            val dimmed = selectedSector != null && !isSelected
+            val rowBackground = if (isSelected) {
+                MaterialTheme.colorScheme.secondaryContainer
+            } else {
+                Color.Transparent
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(rowBackground, shape = RoundedCornerShape(6.dp))
+                    .clickable { onSectorTap(leaf.name) }
+                    .padding(horizontal = 6.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(12.dp)
+                        .background(
+                            leaf.color.copy(alpha = if (dimmed) 0.35f else 1f),
+                            shape = RoundedCornerShape(2.dp)
+                        )
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                val labelAlpha = if (dimmed) 0.5f else 1f
+                Text(
+                    text = leaf.name.replace("-", " ").replaceFirstChar { it.uppercase() },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = labelAlpha),
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = formatMt(leaf.value),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = labelAlpha)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = leaf.percentage.toPercent(1),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = labelAlpha),
+                    modifier = Modifier.width(56.dp),
+                    textAlign = TextAlign.End
+                )
+            }
+        }
+    }
+}
+
+private fun formatMt(tonnes: Double): String {
+    val mt = tonnes / 1_000_000.0
+    return when {
+        mt >= 100 -> "${mt.toInt()} Mt"
+        mt >= 1 -> "${(mt * 10).toInt() / 10.0} Mt"
+        else -> "${(tonnes / 1_000.0).toInt()} kt"
     }
 }
 
@@ -69,13 +147,14 @@ fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAss
 fun LeafItem(
     item: ChartNode.Leaf,
     modifier: Modifier = Modifier,
+    dimmed: Boolean = false,
     onClick: (ChartNode.Leaf) -> Unit,
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .border(0.5.dp, Color.White)
-            .background(item.color)
+            .background(item.color.copy(alpha = if (dimmed) 0.3f else 1f))
             .clickable { onClick(item) }
             .padding(4.dp),
     ) {
@@ -108,17 +187,26 @@ fun SectionItem(
 }
 
 
-suspend fun buildAssetTree(assetEmissionInfoList: List<CountryAssetEmissionsInfo>): Tree<ChartNode> = withContext(
-    Dispatchers.Default) {
-    val filteredList = assetEmissionInfoList
-        .filter { it.emissionsQuantity > 0 }
+fun buildAssetLeaves(assetEmissionInfoList: List<CountryAssetEmissionsInfo>): List<ChartNode.Leaf> {
+    val filtered = assetEmissionInfoList
+        .filter { it.emissionsQuantity > 0 && it.sector != null }
         .sortedByDescending(CountryAssetEmissionsInfo::emissionsQuantity)
         .take(10)
+    val total = filtered.sumOf { it.emissionsQuantity }.takeIf { it > 0 } ?: return emptyList()
+    val colors = generateHueColorPalette(filtered.size)
+    return filtered.mapIndexed { index, info ->
+        ChartNode.Leaf(
+            name = info.sector ?: "",
+            value = info.emissionsQuantity,
+            percentage = info.emissionsQuantity / total,
+            color = colors[index]
+        )
+    }
+}
 
-    val colors = generateHueColorPalette(filteredList.size)
-
-    val total = filteredList.sumOf { it.emissionsQuantity }
-    tree(
+fun buildAssetTree(leaves: List<ChartNode.Leaf>): Tree<ChartNode> {
+    val total = leaves.sumOf { it.value }
+    return tree(
         ChartNode.Section(
             name = "Total",
             value = total,
@@ -126,24 +214,7 @@ suspend fun buildAssetTree(assetEmissionInfoList: List<CountryAssetEmissionsInfo
             color = null,
         ),
     ) {
-        assetEmissionInfoList
-            .filter { it.emissionsQuantity > 0 }
-            .sortedByDescending(CountryAssetEmissionsInfo::emissionsQuantity)
-            .take(10)
-            .forEachIndexed { index, assetEmissionInfo ->
-                assetEmissionInfo.sector?.let {
-                    val productPercentage = assetEmissionInfo.emissionsQuantity / total
-                    node(
-                        ChartNode.Leaf(
-                            name = assetEmissionInfo.sector,
-                            value = assetEmissionInfo.emissionsQuantity,
-                            percentage = productPercentage,
-                            color = colors[index]
-                        ),
-                    )
-                }
-            }
-
+        leaves.forEach { leaf -> node(leaf) }
     }
 }
 

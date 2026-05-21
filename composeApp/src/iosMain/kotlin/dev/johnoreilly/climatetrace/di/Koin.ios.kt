@@ -30,7 +30,3 @@ actual fun dataModule(): Module = module {
         storeOf(file = Path(path = "$filesDir/countries.json"), default = emptyList())
     }
 }
-
-actual fun createHttpClientEngine(): HttpClientEngine {
-    return Darwin.create()
-}

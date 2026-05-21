@@ -85,6 +85,7 @@ data class CountryEmissionsInfo(
     val emissionsQuantity: Double = 0.0,
     val emissionsPerCapita: Double = 0.0,
     val percentage: Double = 0.0,
+    val emissionsPercentChange: Double = 0.0,
     val gas: String = "",
 )
 
@@ -173,5 +174,5 @@ class ClimateTraceApi(
                 parameters.append("limit", limit.toString())
             }
         }.body<List<Asset>>()
-    }
+     }
 }

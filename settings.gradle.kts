@@ -21,5 +21,6 @@ dependencyResolutionManagement {
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "ClimateTraceKMP"
 include(":composeApp")
+include(":androidApp")
 include(":mcp-server")
 include(":agents")

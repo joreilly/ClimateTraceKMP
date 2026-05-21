@@ -8,7 +8,6 @@ import ai.koog.agents.core.agent.functionalStrategy
 import ai.koog.agents.core.tools.Tool
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.prompt.dsl.prompt
-import ai.koog.prompt.message.Message
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 
 /**
@@ -23,26 +22,25 @@ fun createPopulationAgentTool(
     climateTraceRepository: ClimateTraceRepository
 ): Tool<*, *> {
     val toolRegistry = ToolRegistry {
-        tool(GetCountryTool(climateTraceRepository))
+        //tool(GetCountryTool(climateTraceRepository))
         tool(GetPopulationTool(climateTraceRepository))
     }
 
     val strategy = functionalStrategy<String, String> { input ->
-        var responses = requestLLMMultiple(input)
+        var assistantMessage = requestLLM(input)
 
         repeat(10) {
-            if (!responses.containsToolCalls()) {
-                val assistantMessage = responses.filterIsInstance<Message.Assistant>().firstOrNull()
-                return@functionalStrategy assistantMessage?.content ?: responses.first().content
+            if (getToolCalls(assistantMessage).isEmpty()) {
+                return@functionalStrategy getTextParts(assistantMessage).joinToString("") { it.text }
             }
 
-            val pendingCalls = extractToolCalls(responses)
-            val results = executeMultipleTools(pendingCalls, parallelTools = true)
-            responses = sendMultipleToolResults(results)
+            val pendingCalls = getToolCalls(assistantMessage)
+            val results = executeTools(pendingCalls, parallelTools = true)
+            assistantMessage = sendToolResults(results)
         }
 
-        responses.filterIsInstance<Message.Assistant>().firstOrNull()?.content
-            ?: "Could not determine population data."
+        getTextParts(assistantMessage).joinToString("") { it.text }
+            .ifBlank { "Could not determine population data." }
     }
 
     val agentConfig = AIAgentConfig(
@@ -50,12 +48,6 @@ fun createPopulationAgentTool(
             system(
                 """
                 You are a specialist agent for looking up population data for countries.
-                You have access to tools to look up country codes and get population data.
-                
-                When given a country name, first look up its country code using GetCountryTool,
-                then use GetPopulationTool to get the population data.
-                When given a country code directly, use GetPopulationTool directly.
-                
                 Return the population data clearly and concisely.
                 """.trimIndent()
             )

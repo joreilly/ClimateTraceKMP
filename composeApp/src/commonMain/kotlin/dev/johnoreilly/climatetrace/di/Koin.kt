@@ -49,9 +49,9 @@ expect fun dataModule(): Module
 fun createJson() = Json { isLenient = true; ignoreUnknownKeys = true }
 
 
-expect fun createHttpClientEngine(): HttpClientEngine
+//expect fun createHttpClientEngine(): HttpClientEngine
 
-fun createHttpClient(json: Json, enableNetworkLogs: Boolean) = HttpClient(createHttpClientEngine()) {
+fun createHttpClient(json: Json, enableNetworkLogs: Boolean) = HttpClient {
     install(ContentNegotiation) {
         json(json)
     }

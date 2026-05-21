@@ -94,6 +94,10 @@ kotlin {
             implementation(libs.markdown.renderer)
 
             implementation(libs.koog.agents)
+            implementation(libs.koog.prompt.executor.llms.all)
+            implementation(libs.koog.prompt.executor.litert.client)
+            implementation(libs.koog.prompt.executor.google.client)
+            implementation(libs.koog.http.client.ktor)
         }
 
         commonTest.dependencies {
@@ -109,6 +113,8 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.kstore.file)
             implementation(libs.ktor.client.android)
+
+
         }
 
         jvmMain.dependencies {
@@ -196,10 +202,6 @@ kotlin.sourceSets.all {
     languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
 }
 
-configurations.all {
-    // FIXME exclude netty from Koog dependencies?
-    exclude(group = "io.netty", module = "*")
-}
 
 buildkonfig {
     packageName = "dev.johnoreilly.climatetrace"

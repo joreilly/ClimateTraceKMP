@@ -1,31 +1,29 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import dev.johnoreilly.climatetrace.agent.ClimateTraceAgentProvider
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.di.initKoin
-import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 
 
 val koin = initKoin(enableNetworkLogs = true).koin
 
-/*
-suspend fun main() {
-    println("hello")
-
-    val api = koin.get<ClimateTraceApi>()
-
-    val result = api.fetchCountries()
-    println(result)
-
-//    val agent: ClimateTraceAgent = ClimateTraceAgent(climateTraceRepository)
 //
-//    //agent.runAgent("What were the emissions for the UK in 2024?")
+//suspend fun main() {
+//    println("hello")
 //
-//    agent.runAgent("compare the per-capita emissions of the UK and France in 2024")
-}
+//    val rep = koin.get<ClimateTraceRepository>()
+//
+//
+//    val agent = ClimateTraceAgentProvider(rep).provideAgent(
+//        onToolCallEvent = {  },
+//        onErrorEvent = {},
+//        onAssistantMessage = { "" }
+//    )
+//
+//    agent.run("get emissions for Germany for 2025")
+//}
 
-*/
+
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "ClimateTraceKMP") {
@@ -33,9 +31,4 @@ fun main() = application {
     }
 }
 
-@Preview
-@Composable
-fun AppDesktopPreview() {
-    App()
-}
 

@@ -39,19 +39,10 @@ import dev.johnoreilly.climatetrace.remote.AssetDetail
 import dev.johnoreilly.climatetrace.remote.AssetOwner
 import dev.johnoreilly.climatetrace.remote.AssetSubsectorRank
 import dev.johnoreilly.climatetrace.remote.EmissionMeasurement
+import dev.johnoreilly.climatetrace.ui.utils.formatEmissionsQuantity
 import dev.johnoreilly.climatetrace.viewmodel.AssetDetailUIState
 import dev.johnoreilly.climatetrace.viewmodel.AssetDetailViewModel
 import org.koin.compose.koinInject
-import kotlin.math.roundToInt
-
-private fun formatEmissionsQuantity(quantity: Double): String {
-    return when {
-        quantity >= 1_000_000_000 -> "${(quantity / 1_000_000_000 * 100).roundToInt() / 100.0} Gt"
-        quantity >= 1_000_000 -> "${(quantity / 1_000_000 * 100).roundToInt() / 100.0} Mt"
-        quantity >= 1_000 -> "${(quantity / 1_000 * 100).roundToInt() / 100.0} kt"
-        else -> "${(quantity * 100).roundToInt() / 100.0} t"
-    }
-}
 
 data class AssetDetailScreen(val sourceId: Int, val assetName: String) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)

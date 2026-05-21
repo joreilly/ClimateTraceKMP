@@ -18,7 +18,7 @@ import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
-data class CountryEmissionsScreen(val country: Country) : Screen {
+data class CountryEmissionsScreen(val country: Country, val perCapitaRank: Int? = null) : Screen {
 
     @Composable
     override fun Content() {
@@ -46,9 +46,11 @@ data class CountryEmissionsScreen(val country: Country) : Screen {
             }
         ) {
             Column(Modifier.padding(it)) {
-                CountryInfoDetailedView(viewState) { year ->
-                    viewModel.setYear(year)
-                }
+                CountryInfoDetailedView(
+                    viewState = viewState,
+                    perCapitaRank = perCapitaRank,
+                    onYearSelected = { year -> viewModel.setYear(year) }
+                )
             }
         }
     }

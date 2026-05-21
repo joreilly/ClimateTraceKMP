@@ -3,6 +3,8 @@ package dev.johnoreilly.climatetrace.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,10 +14,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -23,6 +26,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,15 +45,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import dev.carlsen.flagkit.FlagKit
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.utils.PanelState
 import dev.johnoreilly.climatetrace.ui.utils.ResizablePanel
+import dev.johnoreilly.climatetrace.ui.utils.alpha3ToAlpha2
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryListUIState
 import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
@@ -73,7 +81,7 @@ class ClimateTraceScreen: Screen {
                     Text("Error")
                 }
                 is CountryListUIState.Success -> {
-                    CountryScreenSuccess(state.countryList, state.rankings)
+                    CountryScreenSuccess(state.countryList, state.rankings, state.perCapitaRankings)
                 }
             }
         }
@@ -81,70 +89,79 @@ class ClimateTraceScreen: Screen {
 }
 
 @Composable
-fun CountryScreenSuccess(countryList: List<Country>, rankings: Map<String, Int> = emptyMap()) {
+fun CountryScreenSuccess(
+    countryList: List<Country>,
+    rankings: Map<String, Int> = emptyMap(),
+    perCapitaRankings: Map<String, Int> = emptyMap()
+) {
     val windowAdaptiveInfo = currentWindowAdaptiveInfo()
+    val windowSizeClass = windowAdaptiveInfo.windowSizeClass
+
+    if (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT) {
+        CompactCountryLayout(countryList = countryList, rankings = rankings, perCapitaRankings = perCapitaRankings)
+    } else {
+        ExpandedCountryLayout(countryList = countryList, rankings = rankings, perCapitaRankings = perCapitaRankings)
+    }
+}
+
+@Composable
+private fun CompactCountryLayout(
+    countryList: List<Country>,
+    rankings: Map<String, Int>,
+    perCapitaRankings: Map<String, Int>
+) {
+    val navigator = LocalNavigator.current
+    Column(Modifier.fillMaxSize()) {
+        CountryListView(
+            countryList = countryList,
+            selectedCountry = null,
+            countrySelected = { country ->
+                navigator?.push(CountryEmissionsScreen(country, perCapitaRankings[country.id]))
+            },
+            rankings = rankings
+        )
+    }
+}
+
+@Composable
+private fun ExpandedCountryLayout(
+    countryList: List<Country>,
+    rankings: Map<String, Int>,
+    perCapitaRankings: Map<String, Int>
+) {
     val countryDetailsViewModel = koinInject<CountryDetailsViewModel>()
     val countryDetailsViewState by countryDetailsViewModel.viewState.collectAsState()
-    var selectedCountry by remember {  mutableStateOf<Country?>(null) }
+    var selectedCountry by remember { mutableStateOf<Country?>(null) }
 
     val panelState = remember { PanelState() }
-
-    val animatedSize = if (panelState.splitter.isResizing) {
-        if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
-    } else {
-        if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
-    }
+    val animatedSize = if (panelState.isExpanded) panelState.expandedSize else panelState.collapsedSize
 
     Row(Modifier.fillMaxSize()) {
-        val windowSizeClass = windowAdaptiveInfo.windowSizeClass
-        if (windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT) {
-            Column(Modifier.fillMaxWidth()) {
-                Box(
-                    Modifier.height(250.dp).fillMaxWidth()
-                ) {
-                    CountryListView(
-                        countryList = countryList,
-                        selectedCountry = selectedCountry,
-                        countrySelected = { country ->
-                            selectedCountry = country
-                            countryDetailsViewModel.setCountry(country)
-                         },
-                        rankings = rankings
-                    )
-                }
+        ResizablePanel(
+            Modifier.width(animatedSize).fillMaxHeight(),
+            title = "Countries",
+            state = panelState
+        ) {
+            CountryListView(
+                countryList = countryList,
+                selectedCountry = selectedCountry,
+                countrySelected = { country ->
+                    selectedCountry = country
+                    countryDetailsViewModel.setCountry(country)
+                },
+                rankings = rankings
+            )
+        }
 
-                Spacer(modifier = Modifier.width(1.dp).fillMaxWidth())
-                CountryInfoDetailedView(countryDetailsViewState) {
-                    countryDetailsViewModel.setYear(it)
-                }
-            }
-        } else {
-
-            ResizablePanel(
-                Modifier.width(animatedSize).fillMaxHeight(),
-                title = "Countries",
-                state = panelState
-            ) {
-                CountryListView(
-                    countryList = countryList,
-                    selectedCountry = selectedCountry,
-                    countrySelected = { country ->
-                        selectedCountry = country
-                        countryDetailsViewModel.setCountry(country)
-                      },
-                    rankings = rankings
-                 )
-            }
-
-            VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
-            Box(Modifier.fillMaxHeight()) {
-                CountryInfoDetailedView(countryDetailsViewState) {
-                    countryDetailsViewModel.setYear(it)
-                }
-            }
+        VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
+        Box(Modifier.fillMaxHeight()) {
+            CountryInfoDetailedView(
+                viewState = countryDetailsViewState,
+                perCapitaRank = selectedCountry?.let { perCapitaRankings[it.id] },
+                onYearSelected = { countryDetailsViewModel.setYear(it) }
+            )
         }
     }
-
 }
 
 
@@ -169,6 +186,8 @@ fun CountryListView(
     }
 }
 
+enum class CountrySort { Name, Rank }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchableList(
@@ -179,9 +198,15 @@ fun SearchableList(
     countrySelected: (country: Country) -> Unit,
     rankings: Map<String, Int> = emptyMap()
 ) {
+    var sortMode by remember { mutableStateOf(CountrySort.Name) }
     val filteredCountryList = countryList
         .filter { it.name.contains(searchQuery.value, ignoreCase = true) || it.id.contains(searchQuery.value, true) }
-        .sortedBy { it.name }
+        .let { list ->
+            when (sortMode) {
+                CountrySort.Name -> list.sortedBy { it.name }
+                CountrySort.Rank -> list.sortedBy { rankings[it.id] ?: Int.MAX_VALUE }
+            }
+        }
     val keyboardController = LocalSoftwareKeyboardController.current
     SearchBar(
         query = searchQuery.value,
@@ -218,6 +243,21 @@ fun SearchableList(
             }
         },
         content = {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = sortMode == CountrySort.Name,
+                    onClick = { sortMode = CountrySort.Name },
+                    label = { Text("Name") }
+                )
+                FilterChip(
+                    selected = sortMode == CountrySort.Rank,
+                    onClick = { sortMode = CountrySort.Rank },
+                    label = { Text("Rank") }
+                )
+            }
             if (filteredCountryList.isEmpty()) {
                 EmptyState(message = "")
             } else {
@@ -265,41 +305,77 @@ fun CountryRow(
     rankings: Map<String, Int> = emptyMap()
 ) {
     val rank = rankings[country.id]
+    val isSelected = country.id == selectedCountry?.id
+    val rowBackground = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
+    val primaryTextColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+    val secondaryTextColor = if (isSelected) {
+        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75f)
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+    }
+    val rankBadgeColor = if (isSelected) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+    }
 
     Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(rowBackground)
                 .clickable(onClick = { countrySelected(country) })
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Rank badge
-            if (rank != null) {
-                Box(
-                    modifier = Modifier
-                        .padding(end = 12.dp)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
+            Box(
+                modifier = Modifier
+                    .width(48.dp)
+                    .padding(end = 8.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                if (rank != null) {
                     Text(
                         text = "#$rank",
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = rankBadgeColor
                     )
                 }
             }
+
+            // Flag
+            Box(
+                modifier = Modifier
+                    .size(width = 32.dp, height = 22.dp)
+                    .clip(RoundedCornerShape(3.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                val flag = alpha3ToAlpha2(country.id)?.let { FlagKit.getFlag(it) }
+                flag?.let {
+                    Image(
+                        imageVector = it,
+                        contentDescription = country.name,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
 
             // Title and subtitle
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = country.name,
-                    style = if (country.name == selectedCountry?.name) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                    color = primaryTextColor
                 )
                 Text(
                     text = "${country.continent} • ${country.id}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = secondaryTextColor
                 )
             }
         }

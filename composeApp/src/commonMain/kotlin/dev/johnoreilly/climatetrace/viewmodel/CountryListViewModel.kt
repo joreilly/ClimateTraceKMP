@@ -16,7 +16,11 @@ import org.koin.core.component.inject
 sealed class CountryListUIState {
     object Loading : CountryListUIState()
     data class Error(val message: String) : CountryListUIState()
-    data class Success(val countryList: List<Country>, val rankings: Map<String, Int> = emptyMap()) : CountryListUIState()
+    data class Success(
+        val countryList: List<Country>,
+        val rankings: Map<String, Int> = emptyMap(),
+        val perCapitaRankings: Map<String, Int> = emptyMap()
+    ) : CountryListUIState()
 }
 
 open class CountryListViewModel : ViewModel(), KoinComponent {
@@ -33,7 +37,12 @@ open class CountryListViewModel : ViewModel(), KoinComponent {
                 val countries = climateTraceRepository.fetchCountries().sortedBy { it.name }
                 val rankingsResponse = climateTraceRepository.fetchRankings("2025")
                 val rankings = rankingsResponse.rankings.associate { it.country to it.rank }
-                _viewState.value =  CountryListUIState.Success(countries, rankings)
+                val perCapitaRankings = rankingsResponse.rankings
+                    .filter { it.emissionsPerCapita > 0 }
+                    .sortedByDescending { it.emissionsPerCapita }
+                    .mapIndexed { index, info -> info.country to (index + 1) }
+                    .toMap()
+                _viewState.value = CountryListUIState.Success(countries, rankings, perCapitaRankings)
 
             } catch (e: Exception) {
                 _viewState.value = CountryListUIState.Error(e.message ?: "Unknown Error")
