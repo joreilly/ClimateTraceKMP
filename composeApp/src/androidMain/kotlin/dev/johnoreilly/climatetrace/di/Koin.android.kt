@@ -4,8 +4,6 @@ import android.content.Context
 import dev.johnoreilly.climatetrace.remote.Country
 import io.github.xxfast.kstore.KStore
 import io.github.xxfast.kstore.file.storeOf
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.android.Android
 import kotlinx.io.files.Path
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
@@ -21,7 +19,3 @@ actual fun dataModule(): Module = module {
         storeOf(file = Path(path = "$filesDir/countries.json"), default = emptyList())
     }
 }
-
-//actual fun createHttpClientEngine(): HttpClientEngine {
-//    return Android.create()
-//}

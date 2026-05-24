@@ -22,7 +22,6 @@ fun createPopulationAgentTool(
     climateTraceRepository: ClimateTraceRepository
 ): Tool<*, *> {
     val toolRegistry = ToolRegistry {
-        //tool(GetCountryTool(climateTraceRepository))
         tool(GetPopulationTool(climateTraceRepository))
     }
 
