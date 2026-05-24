@@ -39,13 +39,16 @@ import io.github.koalaplot.core.util.generateHueColorPalette
 import io.github.koalaplot.core.util.toString
 
 @Composable
-fun CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissions: List<CountryAssetEmissionsInfo>) {
+fun CountryAssetEmissionsInfoTreeMapChart(
+    countryAssetEmissions: List<CountryAssetEmissionsInfo>,
+    selectedSector: String? = null,
+    onSectorChange: (String?) -> Unit = {}
+) {
     val leaves = remember(countryAssetEmissions) { buildAssetLeaves(countryAssetEmissions) }
     val tree = remember(leaves) { buildAssetTree(leaves) }
-    var selectedSector by remember(countryAssetEmissions) { mutableStateOf<String?>(null) }
 
     val toggle: (String) -> Unit = { sector ->
-        selectedSector = if (selectedSector == sector) null else sector
+        onSectorChange(if (selectedSector == sector) null else sector)
     }
 
     Column(Modifier.fillMaxWidth()) {

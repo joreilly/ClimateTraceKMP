@@ -6,6 +6,7 @@ import com.rickclephas.kmp.observableviewmodel.ViewModel
 import com.rickclephas.kmp.observableviewmodel.coroutineScope
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.Country
+import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -19,7 +20,8 @@ sealed class CountryListUIState {
     data class Success(
         val countryList: List<Country>,
         val rankings: Map<String, Int> = emptyMap(),
-        val perCapitaRankings: Map<String, Int> = emptyMap()
+        val perCapitaRankings: Map<String, Int> = emptyMap(),
+        val rankingsList: List<CountryEmissionsInfo> = emptyList()
     ) : CountryListUIState()
 }
 
@@ -42,7 +44,12 @@ open class CountryListViewModel : ViewModel(), KoinComponent {
                     .sortedByDescending { it.emissionsPerCapita }
                     .mapIndexed { index, info -> info.country to (index + 1) }
                     .toMap()
-                _viewState.value = CountryListUIState.Success(countries, rankings, perCapitaRankings)
+                _viewState.value = CountryListUIState.Success(
+                    countryList = countries,
+                    rankings = rankings,
+                    perCapitaRankings = perCapitaRankings,
+                    rankingsList = rankingsResponse.rankings
+                )
 
             } catch (e: Exception) {
                 _viewState.value = CountryListUIState.Error(e.message ?: "Unknown Error")

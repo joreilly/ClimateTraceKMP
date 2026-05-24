@@ -82,6 +82,7 @@ data class Centroid(
 data class CountryEmissionsInfo(
     val country: String,
     val rank: Int,
+    val name: String? = null,
     val emissionsQuantity: Double = 0.0,
     val emissionsPerCapita: Double = 0.0,
     val percentage: Double = 0.0,
