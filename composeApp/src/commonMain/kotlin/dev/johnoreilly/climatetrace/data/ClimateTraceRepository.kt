@@ -25,7 +25,7 @@ class ClimateTraceRepository(
 
     suspend fun fetchAssetDetail(sourceId: Int) = climateTraceApi.fetchAssetDetail(sourceId)
 
-    suspend fun fetchAssetsByCountry(countryCode: String, limit: Int = 20) = climateTraceApi.fetchAssetsByCountry(countryCode, limit)
+    suspend fun fetchAssetsByCountry(countryCode: String, limit: Int = 20) = climateTraceApi.fetchAssetsByCountry(countryCode, 20)
 
     suspend fun fetchRankings(year: String) = climateTraceApi.fetchRankings(year)
 

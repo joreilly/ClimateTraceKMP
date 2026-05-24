@@ -13,6 +13,3 @@ actual fun dataModule(): Module = module {
         storeOf(key = "countries", default = emptyList())
     }
 }
-    actual fun createHttpClientEngine(): HttpClientEngine {
-        return Js.create()
-    }

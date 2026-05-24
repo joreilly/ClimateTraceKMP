@@ -8,7 +8,6 @@ import ai.koog.agents.features.eventHandler.feature.EventHandler
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
-import ai.koog.prompt.message.Message
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import kotlin.time.ExperimentalTime
 
@@ -31,80 +30,19 @@ class ClimateTraceAgentProvider(
     ): AIAgent<String, String> {
 
         val toolRegistry = ToolRegistry {
-            tool(CurrentDatetimeTool())
-            tool(GetCountryTool(climateTraceRepository))
             tool(GetEmissionsTool(climateTraceRepository))
             tool(GetAssetEmissionsTool(climateTraceRepository))
             tool(createPopulationAgentTool(climateTraceRepository))
-
-            tool(ExitTool)
         }
-
-        val strategy = functionalStrategy<String, String> { initialInput ->
-            var inputMessage = initialInput
-            var lastAssistantMessage = ""
-
-            while (inputMessage.isNotEmpty()) {
-                println("Calling LLM with Input = $inputMessage")
-                var responses = requestLLMMultiple(inputMessage)
-
-                // Resolve tools until none left, mirroring graph strategy
-                while (responses.containsToolCalls()) {
-                    val pendingCalls = extractToolCalls(responses)
-                    println("Pending Calls")
-                    println(pendingCalls.map { "${it.tool} ${it.content}" })
-
-                    val results = executeMultipleTools(pendingCalls, parallelTools = true)
-
-                    // Finish condition: if ExitTool is called, return its result directly
-                    if (results.size == 1 && results.first().tool == ExitTool.name) {
-                        return@functionalStrategy results.first().result!!.toString()
-                    }
-
-                    // Send tool results back to LLM
-                    responses = sendMultipleToolResults(results)
-                }
-
-                // No more tool calls: deliver assistant message to UI and get possible user follow-up
-
-                // Find the assistant message, skipping any reasoning messages
-                val assistantMessage = responses.filterIsInstance<Message.Assistant>().firstOrNull()
-                    ?: responses.first().asAssistantMessage() // fallback
-
-                lastAssistantMessage = assistantMessage.content
-                val userReply = onAssistantMessage(lastAssistantMessage)
-
-                // If user provides no reply, consider conversation finished and return assistant response
-                if (userReply.isBlank()) {
-                    return@functionalStrategy lastAssistantMessage
-                }
-
-                // Prepare for next loop iteration with user's reply
-                inputMessage = userReply
-            }
-
-            // Max iterations reached; return last assistant message
-            lastAssistantMessage
-        }
-
 
         val agentConfig = AIAgentConfig(
             prompt = prompt("climateTrace") {
                 system(
                     """                
-                    You an AI assistant specialising in providing information about global climate emissions.
-                    Use 3 letter country codes.
+                    You are an AI assistant specialising in providing information about global climate emissions.
                     The year is currently 2026.
-                
-                    Use the tools at your disposal to:
-                    1. Look up country codes from country names
-                    2. Get climate emission information.
-                    3. Get cause of emissions using asset emission information (GetAssetEmissionsTool)
-                    4. Get population data using the PopulationAgent sub-agent.
-                    5. Get current date and time.
-                
-                    Pass the list of country codes and the year to the GetEmissionsTool tool to get climate emission information.
-                    Use units of millions for the emissions data.                    
+                    You have data up to and including 2025.
+                    Use units of millions of tonnes of CO2 equivalent.
                     """.trimIndent(),
                 )
             },
@@ -115,7 +53,7 @@ class ClimateTraceAgentProvider(
         // Return the agent
         return AIAgent(
             promptExecutor = getPromptExecutor(),
-            strategy = strategy,
+            strategy = createStrategy(onAssistantMessage),
             agentConfig = agentConfig,
             toolRegistry = toolRegistry,
         ) {
@@ -125,14 +63,58 @@ class ClimateTraceAgentProvider(
                 }
 
                 onAgentExecutionFailed { ctx ->
-                    onErrorEvent("${ctx.throwable.message}")
+                    onErrorEvent("${ctx.error.message}")
                 }
-
-                onAgentCompleted { _ ->
-                    // Skip finish event handling
-                }
-
             }
         }
     }
+
+
+    /**
+     * Creates the agent's conversation strategy — the core loop that coordinates
+     * LLM calls, tool execution, and multi-turn interaction with the user.
+     *
+     * The strategy implements a two-level loop:
+     *
+     * **Outer loop** — runs for as long as the user keeps sending messages. After each
+     * assistant response, [onAssistantMessage] suspends until the user replies; an empty
+     * reply signals the end of the conversation.
+     *
+     * **Inner loop** — handles agentic tool use. After each LLM response, if the model
+     * has requested tool calls, those tools are executed and their results are fed back
+     * to the LLM. This repeats until the LLM produces a plain text response with no
+     * further tool calls.
+     */
+    fun createStrategy(onAssistantMessage: suspend (String) -> String) =
+        functionalStrategy<String, String> { initialInput ->
+            var inputMessage = initialInput
+            var assistantMessage = ""
+
+            // Outer loop: continue the conversation until the user sends an empty reply.
+            while (inputMessage.isNotEmpty()) {
+                // Send the user input to the LLM and get the assistant response.
+                println("Calling LLM with Input = $inputMessage")
+                var response = requestLLM(inputMessage)
+
+                // Inner loop: if the LLM requested tool calls, execute them and send
+                // the results back. The LLM may chain multiple rounds of tool calls
+                // before producing a final text answer.
+                while (getToolCalls(response).isNotEmpty()) {
+                    // Execute the tools and return the results
+                    val results = executeTools(response)
+
+                    // Send the tool results back to the LLM. The LLM may call more tools or return a final output
+                    response = sendToolResults(results)
+                }
+
+                // No more tool calls — extract the assistant's final text response.
+                assistantMessage = response.textContent()
+
+                // Deliver the response to the UI and suspend until the user replies.
+                // An empty reply will exit the outer loop.
+                inputMessage = onAssistantMessage(assistantMessage)
+            }
+            assistantMessage
+        }
+
 }

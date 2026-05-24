@@ -2,10 +2,11 @@ package dev.johnoreilly.climatetrace.agent
 
 import ai.koog.agents.core.tools.SimpleTool
 import ai.koog.agents.core.tools.annotations.LLMDescription
+import ai.koog.serialization.typeToken
 import kotlinx.serialization.Serializable
 
 object ExitTool : SimpleTool<ExitTool.Args>(
-    argsSerializer = Args.serializer(),
+    argsType = typeToken<Args>(),
     name = "ExitTool",
     description = "Exit the agent session with the specified result. Call this tool to finish the conversation with the user."
 ) {

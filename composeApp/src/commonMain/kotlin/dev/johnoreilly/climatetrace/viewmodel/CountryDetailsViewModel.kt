@@ -15,6 +15,8 @@ import dev.johnoreilly.climatetrace.remote.Asset
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
 import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +34,8 @@ sealed class CountryDetailsUIState {
         val availableYears: List<String>,
         val countryEmissionInfo: CountryEmissionsInfo?,
         val countryAssetEmissionsList: List<CountryAssetEmissionsInfo>,
-        val assets: List<Asset> = emptyList()
+        val assets: List<Asset> = emptyList(),
+        val yearlyEmissions: Map<String, Double> = emptyMap()
     ) : CountryDetailsUIState()
 }
 
@@ -43,7 +46,10 @@ sealed interface CountryDetailsEvents {
 
 open class CountryDetailsViewModel : ViewModel(), KoinComponent {
     private val climateTraceRepository: ClimateTraceRepository by inject()
-    private val availableYears = listOf("2021", "2022", "2023", "2024", "2025")
+    private val availableYears = listOf(
+        "2016", "2017", "2018", "2019", "2020",
+        "2021", "2022", "2023", "2024", "2025"
+    )
 
     private val events = MutableSharedFlow<CountryDetailsEvents>(extraBufferCapacity = 20)
 
@@ -64,12 +70,35 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
         var uiState by remember { mutableStateOf<CountryDetailsUIState>(CountryDetailsUIState.NoCountrySelected) }
         var selectedCountry by remember { mutableStateOf<Country?>(null) }
         var selectedYear by remember { mutableStateOf("2025") }
+        var yearlyEmissions by remember { mutableStateOf<Map<String, Double>>(emptyMap()) }
 
         LaunchedEffect(Unit) {
             events.collect { event ->
                 when (event) {
                     is CountryDetailsEvents.SetCountry -> selectedCountry = event.country
                     is CountryDetailsEvents.SetYear -> selectedYear = event.year
+                }
+            }
+        }
+
+        LaunchedEffect(selectedCountry) {
+            yearlyEmissions = emptyMap()
+            selectedCountry?.let { country ->
+                try {
+                    yearlyEmissions = coroutineScope {
+                        availableYears.map { y ->
+                            y to async {
+                                runCatching {
+                                    climateTraceRepository.fetchCountryEmissionsInfo(country.id, y)
+                                        .firstOrNull()?.emissionsQuantity
+                                }.getOrNull()
+                            }
+                        }.mapNotNull { (y, deferred) ->
+                            deferred.await()?.let { y to it }
+                        }.toMap()
+                    }
+                } catch (_: Exception) {
+                    yearlyEmissions = emptyMap()
                 }
             }
         }
@@ -81,10 +110,17 @@ open class CountryDetailsViewModel : ViewModel(), KoinComponent {
                     val countryEmissionInfo = climateTraceRepository.fetchCountryEmissionsInfo(country.id, selectedYear).firstOrNull()
                     val countryAssetEmissionsList = climateTraceRepository.fetchCountryAssetEmissionsInfo(country.id, selectedYear)
                     val assets = climateTraceRepository.fetchAssetsByCountry(country.id)
-                    uiState = CountryDetailsUIState.Success(country, selectedYear, availableYears, countryEmissionInfo, countryAssetEmissionsList, assets)
+                    uiState = CountryDetailsUIState.Success(country, selectedYear, availableYears, countryEmissionInfo, countryAssetEmissionsList, assets, yearlyEmissions)
                 } catch (e: Exception) {
                     uiState = CountryDetailsUIState.Error("Error retrieving data from backend, ${e.message}")
                 }
+            }
+        }
+
+        LaunchedEffect(yearlyEmissions) {
+            val current = uiState
+            if (current is CountryDetailsUIState.Success && yearlyEmissions.isNotEmpty()) {
+                uiState = current.copy(yearlyEmissions = yearlyEmissions)
             }
         }
 

@@ -25,7 +25,7 @@ sealed class Message {
 // Define UI state for the agent demo screen
 data class AgentDemoUiState(
     val messages: List<Message> = listOf(Message.SystemMessage("Hi, I'm an agent that can help you")),
-    val inputText: String = "",
+    val inputText: String = "Get emissions for Germany for 2025",
     val isInputEnabled: Boolean = true,
     val isLoading: Boolean = false,
     val isChatEnded: Boolean = false,
