@@ -7,8 +7,9 @@ import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
 import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
 import dev.johnoreilly.climatetrace.ui.CountryListView
-import dev.johnoreilly.climatetrace.ui.toPercent
+import dev.johnoreilly.climatetrace.ui.utils.formatEmissionsQuantity
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsUIState
+import io.github.koalaplot.core.util.toString
 import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)
@@ -45,10 +46,8 @@ class ClimateTraceScreenTest {
         }
 
         onNodeWithText(country.name).assertExists()
-        val millionTonnes = (emissionsQuantity / 1_000_000).toInt()
-        val percentageStr = percentage.toPercent(2)
-        onNodeWithText("$millionTonnes").assertExists()
-        onNodeWithText(percentageStr).assertExists()
+        onNodeWithText(formatEmissionsQuantity(emissionsQuantity)).assertExists()
+        onNodeWithText("${percentage.toString(2)}%").assertExists()
     }
 
 }
