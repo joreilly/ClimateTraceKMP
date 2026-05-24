@@ -41,7 +41,7 @@ class ClimateTraceScreenTest {
             year, listOf("2022", "2023"), countryEmissionsInfo, emptyList(),
         )
         setContent {
-            CountryInfoDetailedView(state, {})
+            CountryInfoDetailedView(state, onYearSelected = {})
         }
 
         onNodeWithText(country.name).assertExists()
