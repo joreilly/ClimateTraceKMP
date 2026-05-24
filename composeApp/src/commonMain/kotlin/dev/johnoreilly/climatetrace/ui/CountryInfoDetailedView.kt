@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -427,15 +428,15 @@ private fun StatCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            if (secondary != null) {
-                Text(
-                    text = secondary,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = secondaryColor ?: MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            // Always reserve space so all four cards share the same height
+            Text(
+                text = secondary ?: "—",
+                modifier = if (secondary == null) Modifier.alpha(0f) else Modifier,
+                style = MaterialTheme.typography.labelSmall,
+                color = secondaryColor ?: MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

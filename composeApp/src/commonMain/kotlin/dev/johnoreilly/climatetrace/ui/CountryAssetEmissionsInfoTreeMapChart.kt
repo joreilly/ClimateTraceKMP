@@ -188,8 +188,11 @@ fun SectionItem(
 
 
 fun buildAssetLeaves(assetEmissionInfoList: List<CountryAssetEmissionsInfo>): List<ChartNode.Leaf> {
+    // API returns both sector totals (subsector == null) and a parallel subsector
+    // breakdown that sums to the same totals. Keep only sector-level rows so the
+    // treemap doesn't double-count the same emissions at two granularities.
     val filtered = assetEmissionInfoList
-        .filter { it.emissionsQuantity > 0 && it.sector != null }
+        .filter { it.emissionsQuantity > 0 && it.sector != null && it.subsector == null }
         .sortedByDescending(CountryAssetEmissionsInfo::emissionsQuantity)
         .take(10)
     val total = filtered.sumOf { it.emissionsQuantity }.takeIf { it > 0 } ?: return emptyList()
