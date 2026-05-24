@@ -26,28 +26,30 @@ Related posts:
 
 ### Android (Compose)
 
-<img width="405" height="900" alt="Screenshot_20250824_175635" src="https://github.com/user-attachments/assets/bcce6d6e-85b2-4c27-aa12-eed898173b30" />
 
+<img width="672" height="1496" alt="Screenshot_20260524_101722" src="https://github.com/user-attachments/assets/db9a4f57-f1a0-40de-b82b-755ceb47e429" />
 
 
 
 ### iOS (SwiftUI/Compose)
 
-![Simulator Screenshot - iPhone 15 Pro - 2023-12-10 at 19 31 59](https://github.com/joreilly/ClimateTraceKMP/assets/6302/ed0f6b1c-ce30-4f99-98d5-9bbdae49bcd3)
 
+<img width="603" height="1311" alt="Simulator Screenshot - iPhone 17 Pro - 2026-05-24 at 10 18 46" src="https://github.com/user-attachments/assets/8464442f-d35c-40fd-a6f2-ec8247feb926" />
 
 
 
 ### Compose for Desktop 
 
-<img width="1275" height="866" alt="Screenshot 2025-08-24 at 17 54 45" src="https://github.com/user-attachments/assets/534206cd-1a49-40ca-9a5f-3d7b54f4e4e5" />
 
+
+<img width="1084" height="701" alt="Screenshot 2026-05-24 at 10 11 18" src="https://github.com/user-attachments/assets/660aaff6-69e6-4f57-82d7-446b5f03d687" />
+<img width="1084" height="701" alt="Screenshot 2026-05-24 at 10 12 37" src="https://github.com/user-attachments/assets/80d9c80b-69db-4133-be03-be4e55448056" />
 
 
 ### Compose for Web (Wasm)
 
-<img width="1336" height="930" alt="Screenshot 2025-08-24 at 17 53 09" src="https://github.com/user-attachments/assets/9905a7bb-b10f-43a5-8428-7971a8ac4a9f" />
 
+<img width="1084" height="701" alt="Screenshot 2026-05-24 at 10 10 29" src="https://github.com/user-attachments/assets/91f36296-7514-4065-857c-8c59e1c8dd16" />
 
 
 ### Kotlin Notebook
