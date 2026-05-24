@@ -2,6 +2,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountTree
+import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +20,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import dev.johnoreilly.climatetrace.di.commonModule
 import dev.johnoreilly.climatetrace.ui.AgentScreen
 import dev.johnoreilly.climatetrace.ui.ClimateTraceScreen
+import dev.johnoreilly.climatetrace.ui.RankingsScreen
 import dev.johnoreilly.climatetrace.ui.theme.ClimateTraceTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
@@ -45,6 +47,12 @@ fun App() {
                         NavigationBarItem(
                             selected = selectedIndex == 1,
                             onClick = { selectedIndex = 1 },
+                            icon = { Icon(Icons.Default.Leaderboard, contentDescription = "Rankings") },
+                            label = { Text("Rankings") }
+                        )
+                        NavigationBarItem(
+                            selected = selectedIndex == 2,
+                            onClick = { selectedIndex = 2 },
                             icon = { Icon(Icons.Default.AccountTree, contentDescription = "Agents") },
                             label = { Text("Agent") }
                         )
@@ -54,6 +62,7 @@ fun App() {
                 Column(Modifier.padding(paddingValues)) {
                     when (selectedIndex) {
                         0 -> Navigator(screen = ClimateTraceScreen())
+                        1 -> Navigator(screen = RankingsScreen())
                         else -> AgentScreen()
                     }
                 }

@@ -22,6 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -33,7 +35,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -95,6 +99,8 @@ fun CountryInfoDetailedViewSuccess(
     perCapitaRank: Int?,
     onYearSelected: (String) -> Unit
 ) {
+    var selectedSector by remember(viewState.country.id) { mutableStateOf<String?>(null) }
+
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -132,7 +138,11 @@ fun CountryInfoDetailedViewSuccess(
             // Emissions by Sector Section
             val filteredCountryAssetEmissionsList = countryAssetEmissionsList.filter { it.sector != null }
             if (filteredCountryAssetEmissionsList.isNotEmpty()) {
-                EmissionsBySectorSection(countryAssetEmissionsList)
+                EmissionsBySectorSection(
+                    countryAssetEmissionsList = countryAssetEmissionsList,
+                    selectedSector = selectedSector,
+                    onSectorChange = { selectedSector = it }
+                )
             } else {
                 Surface(
                     tonalElevation = 1.dp,
@@ -153,7 +163,11 @@ fun CountryInfoDetailedViewSuccess(
 
         // Assets Section
         if (viewState.assets.isNotEmpty()) {
-            AssetsSection(viewState.assets)
+            AssetsSection(
+                assets = viewState.assets,
+                selectedSector = selectedSector,
+                onClearSector = { selectedSector = null }
+            )
         }
     }
 }
@@ -209,7 +223,11 @@ private fun EmissionsSummarySection(
 }
 
 @Composable
-private fun EmissionsBySectorSection(countryAssetEmissionsList: List<dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo>) {
+private fun EmissionsBySectorSection(
+    countryAssetEmissionsList: List<dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo>,
+    selectedSector: String?,
+    onSectorChange: (String?) -> Unit
+) {
     Surface(
         tonalElevation = 1.dp,
         shape = MaterialTheme.shapes.medium,
@@ -223,14 +241,29 @@ private fun EmissionsBySectorSection(countryAssetEmissionsList: List<dev.johnore
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.size(12.dp))
-            CountryAssetEmissionsInfoTreeMapChart(countryAssetEmissionsList)
+            CountryAssetEmissionsInfoTreeMapChart(
+                countryAssetEmissions = countryAssetEmissionsList,
+                selectedSector = selectedSector,
+                onSectorChange = onSectorChange
+            )
         }
     }
 }
 
+private fun prettySectorName(sector: String): String =
+    sector.replace("-", " ").replaceFirstChar { it.uppercase() }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AssetsSection(assets: List<Asset>) {
+private fun AssetsSection(
+    assets: List<Asset>,
+    selectedSector: String?,
+    onClearSector: () -> Unit
+) {
     val navigator = LocalNavigator.current
+    val filtered = remember(assets, selectedSector) {
+        if (selectedSector == null) assets else assets.filter { it.sector == selectedSector }
+    }
 
     Surface(
         tonalElevation = 1.dp,
@@ -238,14 +271,47 @@ private fun AssetsSection(assets: List<Asset>) {
         color = MaterialTheme.colorScheme.surface
     ) {
         Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-            Text(
-                text = "Top Emission Sources",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (selectedSector != null) {
+                        "Top Sources · ${prettySectorName(selectedSector)}"
+                    } else {
+                        "Top Emission Sources"
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
+                )
+                if (selectedSector != null) {
+                    AssistChip(
+                        onClick = onClearSector,
+                        label = { Text("All sectors") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Clear filter",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    )
+                }
+            }
             Spacer(modifier = Modifier.size(8.dp))
 
-            assets.forEachIndexed { index, asset ->
+            if (filtered.isEmpty()) {
+                Text(
+                    text = "No tracked sources in this sector.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                return@Column
+            }
+
+            filtered.forEachIndexed { index, asset ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -302,7 +368,7 @@ private fun AssetsSection(assets: List<Asset>) {
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                if (index < assets.size - 1) {
+                if (index < filtered.size - 1) {
                     HorizontalDivider()
                 }
             }
