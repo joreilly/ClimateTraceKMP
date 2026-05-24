@@ -5,7 +5,7 @@ kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.11.0"
 kotlinx-dateTime = "0.7.1-0.6.x-compat"
 
-agp = "8.13.2"
+agp = "9.0.1"
 android-compileSdk = "36"
 android-minSdk = "35"
 android-targetSdk = "36"
@@ -33,7 +33,7 @@ googleAdk = "1.0.0"
 koogAgents = "1.0.0"
 koogPromptExecutorAll = "1.0.0-beta"
 markdownRenderer = "0.40.2"
-buildkonfig = "0.20.0"
+buildkonfig = "0.21.2"
 
 
 [libraries]
@@ -101,6 +101,7 @@ ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "k
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
