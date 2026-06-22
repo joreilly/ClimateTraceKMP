@@ -32,7 +32,7 @@ jib = "3.5.3"
 googleAdk = "1.0.0"
 koogAgents = "1.0.0"
 koogPromptExecutorAll = "1.0.0-beta"
-markdownRenderer = "0.40.2"
+markdownRenderer = "0.43.0"
 buildkonfig = "0.21.2"
 
 
