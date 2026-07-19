@@ -26,6 +26,11 @@ application {
     mainClass = "McpServerKt"
 }
 
+// lifecycle desktop jars appear twice (identical files) on the runtime classpath with lifecycle 2.11.0
+tasks.distTar { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+tasks.distZip { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+tasks.installDist { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+
 tasks.shadowJar {
     archiveFileName.set("serverAll.jar")
     archiveClassifier.set("")
