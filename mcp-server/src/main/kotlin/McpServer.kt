@@ -159,7 +159,7 @@ fun `run mcp server using stdio`() {
     )
 
     runBlocking {
-        server.connect(transport)
+        server.createSession(transport)
         val done = Job()
         server.onClose {
             done.complete()

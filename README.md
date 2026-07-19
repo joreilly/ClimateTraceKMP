@@ -1,4 +1,6 @@
-![kotlin-version](https://img.shields.io/badge/kotlin-2.3.21-blue?logo=kotlin)
+# ClimateTraceKMP
+
+![kotlin-version](https://img.shields.io/badge/kotlin-2.4.10-blue?logo=kotlin)
 
 Kotlin/Compose Multiplatform project to show climate related emission data from https://climatetrace.org/data.
 
@@ -9,6 +11,7 @@ Running on
 * Web (Wasm)
 * Kotlin Notebook
 * MCP Server
+* AI Agents (Koog + Google ADK)
 
 The iOS client as mentioned includes shared Compose Multiplatform UI code.  It also includes option to use either SwiftUI or Compose code for the Country List screen (in both cases selecting a country will navigate to shared Compose emissions details screen).
 
@@ -21,7 +24,28 @@ Related posts:
 * [Kotlin MCP 💜 Kotlin Multiplatform](https://johnoreilly.dev/posts/kotlin-mcp-kmp/)
 * [Initial exploration of using Koog for developing Kotlin based AI agents](https://johnoreilly.dev/posts/kotlin-koog/)
 * [Using Google's Agent Development Kit for Java from Kotlin code](https://johnoreilly.dev/posts/kotlin-adk/)
-  
+
+
+## Project structure
+
+* `composeApp` - shared Kotlin Multiplatform code (data layer, view models and Compose Multiplatform UI) along with desktop and web entry points
+* `androidApp` - Android app
+* `iosApp` - iOS app (SwiftUI + shared Compose UI)
+* `mcp-server` - MCP server that exposes emissions data as MCP tools (using the [Kotlin MCP SDK](https://github.com/modelcontextprotocol/kotlin-sdk))
+* `agents` - Kotlin based AI agent built using Google's [Agent Development Kit](https://github.com/google/adk-java) (ADK)
+
+Uses, amongst other things, [Ktor](https://ktor.io/), [Koin](https://insert-koin.io/), [kstore](https://github.com/xxfast/KStore), [Voyager](https://github.com/adrielcafe/voyager), [KoalaPlot](https://github.com/KoalaPlot/koalaplot-core) and [Koog](https://github.com/JetBrains/koog).
+
+
+## Building and running
+
+* Android: open the project in Android Studio, or run `./gradlew :androidApp:installDebug`
+* iOS: open `iosApp/iosApp.xcodeproj` in Xcode and run
+* Desktop: `./gradlew :composeApp:run`
+* Web (Wasm): `./gradlew :composeApp:wasmJsBrowserDevelopmentRun`
+* MCP server: `./gradlew :mcp-server:shadowJar` (see MCP Server section below)
+* ADK agent Dev UI: `./gradlew :agents:startDevUI`
+
 
 ### Android (Compose)
 
@@ -53,9 +77,11 @@ Related posts:
 
 ### Kotlin Notebook
 
+See [ClimateTrace.ipynb](composeApp/ClimateTrace.ipynb)
+
 <img width="694" alt="Screenshot 2023-12-14 at 20 33 45" src="https://github.com/joreilly/ClimateTraceKMP/assets/6302/82ed364a-0284-4e5c-b81e-40fdfc58f312">
 
-**MCP Server**
+### MCP Server
 
 The `mcp-server` module uses the [Kotlin MCP SDK](https://github.com/modelcontextprotocol/kotlin-sdk) to expose an MCP tools endpoint (returning per country emission data) that
 can for example be plugged in to Claude Desktop as shown below.  That module uses same KMP shared code.
@@ -69,17 +95,25 @@ like the following (update with your path)
 ```
 {
   "mcpServers": {
-    "kotlin-peopleinspace": {
+    "climatetrace": {
       "command": "java",
       "args": [
         "-jar",
-        "/Users/john.oreilly/github/ClimateTraceKMP/mcp-server/build/libs/serverAll.jar",
+        "/path/to/ClimateTraceKMP/mcp-server/build/libs/serverAll.jar",
         "--stdio"
       ]
     }
   }
 }
 ```
+
+
+### AI Agents
+
+The app includes an Agents screen, built using [Koog](https://github.com/JetBrains/koog), that allows querying emissions data using an LLM based agent.
+
+The `agents` module also includes a Kotlin based agent built using Google's [Agent Development Kit](https://github.com/google/adk-java) (ADK), making use of the same
+shared KMP code to provide emissions data as a tool.  Its dev UI can be run using `./gradlew :agents:startDevUI`.
 
 
 ## Full set of Kotlin Multiplatform/Compose/SwiftUI samples

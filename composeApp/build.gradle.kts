@@ -93,7 +93,7 @@ kotlin {
             implementation(libs.koalaplot)
             implementation(libs.treemap.chart)
             implementation(libs.treemap.chart.compose)
-            implementation("dev.carlsen.flagkit:flagkit:1.1.0")
+            implementation(libs.flagkit)
             api(libs.compose.adaptive)
             api(libs.compose.adaptive.layout)
 
@@ -120,7 +120,7 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${libs.versions.kotlinx.coroutines}")
+            implementation(libs.kotlinx.coroutines.swing)
             implementation(compose.desktop.currentOs)
             implementation(libs.harawata.appdirs)
             implementation(libs.kstore.file)

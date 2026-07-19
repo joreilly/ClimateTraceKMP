@@ -1,56 +1,58 @@
 [versions]
-kotlin = "2.3.21"
-ksp = "2.3.2"
+kotlin = "2.4.10"
+ksp = "2.3.10"
 kotlinx-coroutines = "1.11.0"
-kotlinx-serialization = "1.11.0"
-kotlinx-dateTime = "0.7.1-0.6.x-compat"
+kotlinx-dateTime = "0.8.0-0.6.x-compat"
 
-agp = "9.0.1"
-android-compileSdk = "36"
+agp = "9.1.1"
+android-compileSdk = "37"
 android-minSdk = "35"
 android-targetSdk = "36"
 androidx-activityCompose = "1.13.0"
-androidx-datastore = "1.2.1"
-compose = "1.11.2"
-compose-plugin = "1.11.0"
+androidx-composeBom = "2026.06.01"
+compose = "1.11.4"
+compose-plugin = "1.11.1"
 composeAdaptiveLayout = "1.2.0"
+flagkit = "1.1.0"
 harawata-appdirs = "1.5.0"
-koalaplot = "0.10.4"
-koin = "4.2.1"
-koin-compose-multiplatform = "4.2.1"
-kmpNativeCoroutines = "1.0.3"
-kmpObservableViewModel = "1.0.4"
-lifecycle-viewmodel = "2.10.0"
-kstore = "1.0.0"
-ktor = "3.5.0"
+httpclient5 = "5.6.2"
+koalaplot = "0.11.2"
+koin = "4.2.2"
+koin-compose-multiplatform = "4.2.2"
+kmpNativeCoroutines = "1.0.5"
+kmpObservableViewModel = "1.0.6"
+lifecycle-viewmodel = "2.11.0"
+kstore = "1.1.0"
+ktor = "3.5.1"
 treemapChart = "0.1.3"
-voyager= "1.1.0-beta03"
-molecule =  "2.2.0"
-mcp = "0.12.0"
-shadowPlugin = "9.4.1"
-jib = "3.5.3"
-googleAdk = "1.0.0"
+voyager = "2.2.21-1.10.3"
+molecule = "2.2.0"
+mcp = "0.14.0"
+shadowPlugin = "9.6.0"
+jib = "3.5.4"
+googleAdk = "1.6.0"
 koogAgents = "1.0.0"
 koogPromptExecutorAll = "1.0.0-beta"
-markdownRenderer = "0.40.2"
-buildkonfig = "0.21.2"
+markdownRenderer = "0.43.0"
+buildkonfig = "0.22.0"
 
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
-androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidx-composeBom" }
 
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "composeAdaptiveLayout" }
 compose-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "composeAdaptiveLayout" }
 
+flagkit = { module = "dev.carlsen.flagkit:flagkit", version.ref = "flagkit" }
+
 google-adk = { module = "com.google.adk:google-adk", version.ref = "googleAdk" }
 google-adk-dev = { module = "com.google.adk:google-adk-dev", version.ref = "googleAdk" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose-multiplatform" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-
 
 koog-agents = { module = "ai.koog:koog-agents", version.ref = "koogAgents" }
 koog-prompt-executor-llms-all = { module = "ai.koog:prompt-executor-llms-all", version.ref = "koogPromptExecutorAll" }
@@ -60,8 +62,7 @@ koog-http-client-ktor = { module = "ai.koog:http-client-ktor", version.ref = "ko
 
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-rx3 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx3", version.ref = "kotlinx-coroutines" }
-kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-dateTime" }
 
 kmpObservableViewModel = { module = "com.rickclephas.kmp:kmp-observableviewmodel-core", version.ref = "kmpObservableViewModel" }
@@ -72,9 +73,7 @@ kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" 
 kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "kstore" }
 
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
-ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
-ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
@@ -85,22 +84,21 @@ ktor-server-sse = { group = "io.ktor", name = "ktor-server-sse", version.ref = "
 
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 harawata-appdirs = { module = "net.harawata:appdirs", version.ref = "harawata-appdirs" }
+httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
 koalaplot = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
 treemap-chart = { module = "io.github.overpas:treemap-chart", version.ref = "treemapChart" }
 treemap-chart-compose = { module = "io.github.overpas:treemap-chart-compose", version.ref = "treemapChart" }
 markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "markdownRenderer" }
 
-
 molecule = { module = "app.cash.molecule:molecule-runtime", version.ref = "molecule" }
 mcp-kotlin = { group = "io.modelcontextprotocol", name = "kotlin-sdk", version.ref = "mcp" }
 
 [bundles]
-ktor-common = ["ktor-client-core", "ktor-client-json", "ktor-client-logging", "ktor-client-serialization", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
+ktor-common = ["ktor-client-core", "ktor-client-logging", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
 
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -112,6 +110,3 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm" }
 shadowPlugin = { id = "com.gradleup.shadow", version.ref = "shadowPlugin" }
 jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
-
-
-
