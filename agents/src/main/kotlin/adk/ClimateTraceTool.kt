@@ -1,27 +1,23 @@
 package adk
 
+import com.google.adk.kt.annotations.Param
+import com.google.adk.kt.annotations.Tool
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
-import io.reactivex.rxjava3.core.Single
 import koin
-import kotlinx.coroutines.rx3.rxSingle
 
 class ClimateTraceTool {
+    private val climateTraceRepository = koin.get<ClimateTraceRepository>()
 
-    companion object {
-        val climateTraceRepository = koin.get<ClimateTraceRepository>()
+    @Tool
+    suspend fun getCountries(): Map<String, String> {
+        return mapOf("countries" to climateTraceRepository.fetchCountries().toString())
+    }
 
-        @JvmStatic
-        fun getCountries(): Single<Map<String, String>> {
-            return rxSingle {
-                mapOf("countries" to climateTraceRepository.fetchCountries().toString())
-            }
-        }
-
-        @JvmStatic
-        fun getEmissions(countryCode: String, year: String): Single<Map<String, String>> {
-            return rxSingle {
-                mapOf("emissions" to climateTraceRepository.fetchCountryEmissionsInfo(countryCode, year).toString())
-            }
-        }
+    @Tool
+    suspend fun getEmissions(
+        @Param("Three letter country code") countryCode: String,
+        @Param("Year to fetch emissions data for") year: String,
+    ): Map<String, String> {
+        return mapOf("emissions" to climateTraceRepository.fetchCountryEmissionsInfo(countryCode, year).toString())
     }
 }

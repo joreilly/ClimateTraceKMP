@@ -32,7 +32,7 @@ Related posts:
 * `androidApp` - Android app
 * `iosApp` - iOS app (SwiftUI + shared Compose UI)
 * `mcp-server` - MCP server that exposes emissions data as MCP tools (using the [Kotlin MCP SDK](https://github.com/modelcontextprotocol/kotlin-sdk))
-* `agents` - Kotlin based AI agent built using Google's [Agent Development Kit](https://github.com/google/adk-java) (ADK)
+* `agents` - Kotlin based AI agent built using Google's [Agent Development Kit for Kotlin](https://github.com/google/adk-kotlin) (ADK)
 
 Uses, amongst other things, [Ktor](https://ktor.io/), [Koin](https://insert-koin.io/), [kstore](https://github.com/xxfast/KStore), [Voyager](https://github.com/adrielcafe/voyager), [KoalaPlot](https://github.com/KoalaPlot/koalaplot-core) and [Koog](https://github.com/JetBrains/koog).
 
@@ -112,7 +112,7 @@ like the following (update with your path)
 
 The app includes an Agents screen, built using [Koog](https://github.com/JetBrains/koog), that allows querying emissions data using an LLM based agent.
 
-The `agents` module also includes a Kotlin based agent built using Google's [Agent Development Kit](https://github.com/google/adk-java) (ADK), making use of the same
+The `agents` module also includes a Kotlin based agent built using Google's [Agent Development Kit for Kotlin](https://github.com/google/adk-kotlin) (ADK), making use of the same
 shared KMP code to provide emissions data as a tool.  Its dev UI can be run using `./gradlew :agents:startDevUI`.
 
 

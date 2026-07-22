@@ -1,56 +1,39 @@
 package adk
 
 import adk.ClimateTraceAgent.Companion.initAgent
-import com.google.adk.agents.BaseAgent
-import com.google.adk.agents.LlmAgent
-import com.google.adk.events.Event
-import com.google.adk.models.Gemini
-import com.google.adk.runner.InMemoryRunner
-import com.google.adk.tools.LongRunningFunctionTool
-import com.google.adk.tools.mcp.McpToolset
-import com.google.adk.tools.mcp.StreamableHttpServerParameters
-import com.google.adk.web.AdkWebServer
-import com.google.genai.Client
-import com.google.genai.types.Content
-import com.google.genai.types.Part
-import io.modelcontextprotocol.client.transport.ServerParameters
-import io.reactivex.rxjava3.functions.Consumer
-import kotlin.jvm.optionals.getOrNull
-
+import com.google.adk.kt.agents.BaseAgent
+import com.google.adk.kt.agents.Instruction
+import com.google.adk.kt.agents.LlmAgent
+import com.google.adk.kt.events.Event
+import com.google.adk.kt.models.Gemini
+import com.google.adk.kt.runners.InMemoryRunner
+import com.google.adk.kt.sessions.SessionKey
+import com.google.adk.kt.types.Content
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.runBlocking
 
 const val USER_ID = "MainUser"
 const val NAME = "ClimateTrace Agent"
 
-
 class ClimateTraceAgent {
     companion object {
-        @JvmStatic
         fun initAgent(): BaseAgent {
-            val apiKeyGoogle = ""
-
-            val getCountriesTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getCountries")
-            val getEmissionsTool = LongRunningFunctionTool.create(ClimateTraceTool::class.java, "getEmissions")
-            val mcpTools = listOf(getCountriesTool, getEmissionsTool)
-
-            val model = Gemini("gemini-2.5-flash", Client.builder().apiKey(apiKeyGoogle).build())
-            return LlmAgent.builder()
-                .name(NAME)
-                .model(model)
-                .description("Agent to answer climate emissions related questions.")
-                .instruction("You are an agent that provides climate emissions related information. Use 3 letter country codes.")
-                .tools(mcpTools)
-                .build()
+            // Falls back to the GOOGLE_API_KEY / GEMINI_API_KEY environment variables.
+            val model = Gemini(name = "gemini-2.5-flash")
+            return LlmAgent(
+                name = NAME,
+                model = model,
+                description = "Agent to answer climate emissions related questions.",
+                instruction = Instruction("You are an agent that provides climate emissions related information. Use 3 letter country codes."),
+                tools = ClimateTraceTool().generatedTools(),
+            )
         }
     }
 }
 
-
-fun main() {
+fun main() = runBlocking {
     val runner = InMemoryRunner(initAgent())
-    val session = runner
-        .sessionService()
-        .createSession(NAME, USER_ID)
-        .blockingGet()
+    val session = runner.sessionService.createSession(SessionKey(NAME, USER_ID, null))
 
     val prompt =
         """
@@ -60,17 +43,17 @@ fun main() {
             Show result in a grid or decreasing order of emissions.
             """.trimIndent()
 
-    val userMsg = Content.fromParts(Part.fromText(prompt))
-    val events = runner.runAsync(USER_ID, session.id(), userMsg)
+    val userMsg = Content.fromText("user", prompt)
+    val events = runner.runAsync(USER_ID, session.key.id!!, newMessage = userMsg)
 
-    events.blockingForEach(Consumer { event: Event ->
-        event.content().get().parts().getOrNull()?.forEach { part ->
-            part.text().getOrNull()?.let { println(it) }
-            part.functionCall().getOrNull()?.let { println(it) }
-            part.functionResponse().getOrNull()?.let { println(it) }
+    events.collect { event: Event ->
+        event.content?.parts?.forEach { part ->
+            part.text?.let { println(it) }
+            part.functionCall?.let { println(it) }
+            part.functionResponse?.let { println(it) }
         }
-        if (event.errorCode().isPresent || event.errorMessage().isPresent) {
-            println("error: ${event.errorCode().get()}, ${event.errorMessage().get()}")
+        if (event.errorCode != null || event.errorMessage != null) {
+            println("error: ${event.errorCode}, ${event.errorMessage}")
         }
-    })
+    }
 }

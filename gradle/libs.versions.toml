@@ -15,7 +15,6 @@ compose-plugin = "1.11.1"
 composeAdaptiveLayout = "1.2.0"
 flagkit = "1.1.0"
 harawata-appdirs = "1.5.0"
-httpclient5 = "5.6.2"
 koalaplot = "0.11.2"
 koin = "4.2.2"
 koin-compose-multiplatform = "4.2.2"
@@ -30,7 +29,8 @@ molecule = "2.2.0"
 mcp = "0.14.0"
 shadowPlugin = "9.6.0"
 jib = "3.5.4"
-googleAdk = "1.6.0"
+googleAdkKotlin = "0.6.0"
+opentelemetry = "1.56.0"
 koogAgents = "1.0.0"
 koogPromptExecutorAll = "1.0.0-beta"
 markdownRenderer = "0.43.0"
@@ -48,8 +48,10 @@ compose-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:a
 
 flagkit = { module = "dev.carlsen.flagkit:flagkit", version.ref = "flagkit" }
 
-google-adk = { module = "com.google.adk:google-adk", version.ref = "googleAdk" }
-google-adk-dev = { module = "com.google.adk:google-adk-dev", version.ref = "googleAdk" }
+google-adk-kotlin-core = { module = "com.google.adk:google-adk-kotlin-core", version.ref = "googleAdkKotlin" }
+google-adk-kotlin-webserver = { module = "com.google.adk:google-adk-kotlin-webserver", version.ref = "googleAdkKotlin" }
+google-adk-kotlin-processor = { module = "com.google.adk:google-adk-kotlin-processor", version.ref = "googleAdkKotlin" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose-multiplatform" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
@@ -79,12 +81,12 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
 ktor-client-java = { group = "io.ktor", name = "ktor-client-java", version.ref = "ktor" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 ktor-server-cio = { group = "io.ktor", name = "ktor-server-cio", version.ref = "ktor" }
 ktor-server-sse = { group = "io.ktor", name = "ktor-server-sse", version.ref = "ktor" }
 
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 harawata-appdirs = { module = "net.harawata:appdirs", version.ref = "harawata-appdirs" }
-httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
 koalaplot = { module = "io.github.koalaplot:koalaplot-core", version.ref = "koalaplot" }
 treemap-chart = { module = "io.github.overpas:treemap-chart", version.ref = "treemapChart" }
 treemap-chart-compose = { module = "io.github.overpas:treemap-chart-compose", version.ref = "treemapChart" }
