@@ -4,7 +4,7 @@ ksp = "2.3.10"
 kotlinx-coroutines = "1.11.0"
 kotlinx-dateTime = "0.8.0-0.6.x-compat"
 
-agp = "9.1.1"
+agp = "9.3.1"
 android-compileSdk = "37"
 android-minSdk = "35"
 android-targetSdk = "36"
