@@ -4,22 +4,25 @@ name: Build and Publish
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Test and Build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v7
 
-      # Setup Java 1.8 environment for the next steps
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: 17
 
-      # Check out current repository
-      - name: Fetch Sources
-        uses: actions/checkout@v7
+      - uses: gradle/actions/setup-gradle@v6
 
       # Build application
       - name: Build
