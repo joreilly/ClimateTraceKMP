@@ -250,7 +250,7 @@ private fun EmissionsBySectorSection(
     }
 }
 
-private fun prettySectorName(sector: String): String =
+internal fun prettySectorName(sector: String): String =
     sector.replace("-", " ").replaceFirstChar { it.uppercase() }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -377,7 +377,7 @@ private fun AssetsSection(
 }
 
 @Composable
-private fun CountryHeader(viewState: CountryDetailsUIState.Success) {
+internal fun CountryHeader(viewState: CountryDetailsUIState.Success) {
     val c = viewState.country
     Surface(
         tonalElevation = 2.dp,
@@ -416,7 +416,7 @@ private fun CountryHeader(viewState: CountryDetailsUIState.Success) {
 }
 
 @Composable
-private fun KeyFiguresRow(
+internal fun KeyFiguresRow(
     co2Value: String,
     co2PercentChange: Double,
     rank: Int,
@@ -508,7 +508,7 @@ private fun StatCard(
 }
 
 @Composable
-private fun CO2TrendSparkline(
+internal fun CO2TrendSparkline(
     yearlyEmissions: Map<String, Double>,
     selectedYear: String,
     modifier: Modifier = Modifier,

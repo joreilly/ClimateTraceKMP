@@ -70,3 +70,9 @@ private val alpha3ToAlpha2Map = mapOf(
 )
 
 fun alpha3ToAlpha2(code: String): String? = alpha3ToAlpha2Map[code.uppercase()]
+
+private val alpha2ToAlpha3Map: Map<String, String> by lazy {
+    alpha3ToAlpha2Map.entries.associate { (alpha3, alpha2) -> alpha2 to alpha3 }
+}
+
+fun alpha2ToAlpha3(code: String): String? = alpha2ToAlpha3Map[code.uppercase()]

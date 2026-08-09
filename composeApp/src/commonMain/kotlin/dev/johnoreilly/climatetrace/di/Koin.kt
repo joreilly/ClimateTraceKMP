@@ -4,11 +4,14 @@ import dev.johnoreilly.climatetrace.agent.AgentProvider
 import dev.johnoreilly.climatetrace.agent.ClimateTraceAgentProvider
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
+import dev.johnoreilly.climatetrace.remote.IssPositionApi
 import dev.johnoreilly.climatetrace.remote.PopulationApi
+import dev.johnoreilly.climatetrace.remote.ReverseGeocodeApi
 import dev.johnoreilly.climatetrace.viewmodel.AgentViewModel
 import dev.johnoreilly.climatetrace.viewmodel.AssetDetailViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
+import dev.johnoreilly.climatetrace.viewmodel.IssTrackerViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -35,11 +38,14 @@ fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { createHttpClient(get(), enableNetworkLogs = enableNetworkLogs) }
     single { ClimateTraceApi(get()) }
     single { PopulationApi(get()) }
+    single { IssPositionApi(get()) }
+    single { ReverseGeocodeApi(get()) }
     single { CountryListViewModel() }
     single { CountryDetailsViewModel() }
     factory { AssetDetailViewModel() }
     single { AgentViewModel(get()) }
-    single { ClimateTraceRepository(get(), get(), get()) }
+    single { IssTrackerViewModel() }
+    single { ClimateTraceRepository(get(), get(), get(), get(), get()) }
     single<AgentProvider> { ClimateTraceAgentProvider(get()) }
     includes(dataModule())
 }
