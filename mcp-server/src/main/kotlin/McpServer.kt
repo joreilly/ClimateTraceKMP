@@ -8,6 +8,7 @@ import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
 import io.modelcontextprotocol.kotlin.sdk.server.StdioServerTransport
 import io.modelcontextprotocol.kotlin.sdk.server.mcp
+import io.modelcontextprotocol.kotlin.sdk.server.mcpStreamableHttp
 import io.modelcontextprotocol.kotlin.sdk.types.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.types.Implementation
 import io.modelcontextprotocol.kotlin.sdk.types.ServerCapabilities
@@ -30,6 +31,7 @@ fun main(args: Array<String>) {
     val port = args.getOrNull(1)?.toIntOrNull() ?: 8080
     when (command) {
         "--sse-server" -> `run sse mcp server`(port)
+        "--streamable-http-server" -> `run streamable http mcp server`(port)
         "--stdio" -> `run mcp server using stdio`()
         else -> {
             System.err.println("Unknown command: $command")
@@ -77,8 +79,8 @@ fun configureMcpServer(): Server {
                     putJsonObject("items") {
                         put("type", JsonPrimitive("string"))
                     }
-                    putJsonObject("year") { put("type", JsonPrimitive("string")) }
                 }
+                putJsonObject("year") { put("type", JsonPrimitive("string")) }
             },
             required = listOf("countryCodeList", "year")
         )
@@ -179,6 +181,21 @@ fun `run sse mcp server`(port: Int): Unit = runBlocking {
     val server = configureMcpServer()
     embeddedServer(CIO, host = "0.0.0.0", port = port) {
         mcp {
+            server
+        }
+    }.start(wait = true)
+}
+
+/**
+ * Launches an MCP (Model Context Protocol) server using the Streamable HTTP transport on the
+ * specified port, at the default "/mcp" path.
+ *
+ * @param port The port number on which the server should be started.
+ */
+fun `run streamable http mcp server`(port: Int): Unit = runBlocking {
+    val server = configureMcpServer()
+    embeddedServer(CIO, host = "0.0.0.0", port = port) {
+        mcpStreamableHttp {
             server
         }
     }.start(wait = true)

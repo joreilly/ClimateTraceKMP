@@ -32,7 +32,7 @@ Related posts:
 * `androidApp` - Android app
 * `iosApp` - iOS app (SwiftUI + shared Compose UI)
 * `mcp-server` - MCP server that exposes emissions data as MCP tools (using the [Kotlin MCP SDK](https://github.com/modelcontextprotocol/kotlin-sdk))
-* `agents` - Kotlin based AI agent built using Google's [Agent Development Kit](https://github.com/google/adk-java) (ADK)
+* `agents` - Kotlin based AI agent built using Google's [Agent Development Kit](https://github.com/google/adk-kotlin) (ADK), which connects to `mcp-server` as an MCP client
 
 Uses, amongst other things, [Ktor](https://ktor.io/), [Koin](https://insert-koin.io/), [kstore](https://github.com/xxfast/KStore), [Voyager](https://github.com/adrielcafe/voyager), [KoalaPlot](https://github.com/KoalaPlot/koalaplot-core) and [Koog](https://github.com/JetBrains/koog).
 
@@ -44,7 +44,7 @@ Uses, amongst other things, [Ktor](https://ktor.io/), [Koin](https://insert-koin
 * Desktop: `./gradlew :composeApp:run`
 * Web (Wasm): `./gradlew :composeApp:wasmJsBrowserDevelopmentRun`
 * MCP server: `./gradlew :mcp-server:shadowJar` (see MCP Server section below)
-* ADK agent Dev UI: `./gradlew :agents:startDevUI`
+* ADK agent Dev UI: `./gradlew :agents:startDevUI` (see AI Agents section below; requires the MCP server to be running)
 
 
 ### Android (Compose)
@@ -112,8 +112,19 @@ like the following (update with your path)
 
 The app includes an Agents screen, built using [Koog](https://github.com/JetBrains/koog), that allows querying emissions data using an LLM based agent.
 
-The `agents` module also includes a Kotlin based agent built using Google's [Agent Development Kit](https://github.com/google/adk-java) (ADK), making use of the same
-shared KMP code to provide emissions data as a tool.  Its dev UI can be run using `./gradlew :agents:startDevUI`.
+The `agents` module also includes a Kotlin based agent built using Google's [Agent Development Kit for Kotlin](https://github.com/google/adk-kotlin) (ADK). Rather than
+depending on the shared KMP code directly, it acts as an MCP client and connects to the `mcp-server` module (over the Streamable HTTP transport) to fetch emissions data as tools.
+
+To run it, first start the MCP server in Streamable HTTP mode, then the ADK Dev UI (in a separate terminal):
+
+```
+./gradlew :mcp-server:run --args="--streamable-http-server 8080"
+./gradlew :agents:startDevUI
+```
+
+The Dev UI is then available at http://localhost:8081. A `gemini_api_key` entry in `local.properties` (the same one used by the Koog agent) is picked up automatically; alternatively set a `GEMINI_API_KEY`/`GOOGLE_API_KEY` environment variable.
+
+There's also a `./gradlew :agents:runAdkAgent` task that runs the agent once against a fixed prompt from the console.
 
 
 ## Full set of Kotlin Multiplatform/Compose/SwiftUI samples
