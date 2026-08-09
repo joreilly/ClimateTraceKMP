@@ -35,6 +35,8 @@ class ClimateTraceAgent {
                     Never refuse a request based on your own assumptions about what years might have data available -
                     always call the tools with the year the user asked for and report whatever they return. Only tell
                     the user data isn't available if the tool call itself indicates that.
+                    When asked for per-capita emissions, call get-emissions and get-population and divide the emissions
+                    by the population yourself.
                     """.trimIndent()
                 ),
                 toolsets = listOf(
@@ -55,9 +57,8 @@ fun main() = runBlocking {
     val prompt =
         """
             You have data up to and including 2025.
-            Get emission data for Germany and France in 2025.
-            Use units of millions for the emissions data.
-            Show result in a grid or decreasing order of emissions.
+            Get per-capita emissions for Germany and France in 2025.
+            Show result in a grid, in decreasing order of per-capita emissions.
             """.trimIndent()
 
     runner

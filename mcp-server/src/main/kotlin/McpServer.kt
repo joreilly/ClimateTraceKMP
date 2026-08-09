@@ -141,6 +141,30 @@ fun configureMcpServer(): Server {
         )
     }
 
+
+    server.addTool(
+        name = "get-population",
+        description = "Get the total population for a country (use a 3 letter ISO code). Useful for computing per-capita emissions.",
+        inputSchema = ToolSchema(
+            properties = buildJsonObject {
+                putJsonObject("countryCode") { put("type", JsonPrimitive("string")) }
+            },
+            required = listOf("countryCode")
+        )
+    ) { request ->
+        val countryCode = request.arguments?.get("countryCode")
+        if (countryCode == null) {
+            return@addTool CallToolResult(
+                content = listOf(TextContent("The 'countryCode' parameter is required."))
+            )
+        }
+
+        val population = climateTraceRepository.getPopulation(countryCode.jsonPrimitive.content)
+        CallToolResult(
+            content = listOf(TextContent(population.toString()))
+        )
+    }
+
     return server
 }
 
