@@ -2,14 +2,26 @@ package dev.johnoreilly.climatetrace.data
 
 import dev.johnoreilly.climatetrace.remote.ClimateTraceApi
 import dev.johnoreilly.climatetrace.remote.Country
+import dev.johnoreilly.climatetrace.remote.IssPosition
+import dev.johnoreilly.climatetrace.remote.IssPositionApi
 import dev.johnoreilly.climatetrace.remote.PopulationApi
+import dev.johnoreilly.climatetrace.remote.ReverseGeocodeApi
+import dev.johnoreilly.climatetrace.ui.utils.alpha2ToAlpha3
 import io.github.xxfast.kstore.KStore
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.isActive
 
 
 class ClimateTraceRepository(
     private val store: KStore<List<Country>>,
     private val climateTraceApi: ClimateTraceApi,
-    private val populationApi: PopulationApi
+    private val populationApi: PopulationApi,
+    private val issPositionApi: IssPositionApi,
+    private val reverseGeocodeApi: ReverseGeocodeApi,
 ) {
     suspend fun fetchCountries() : List<Country> {
         val countries: List<Country>? = store.get()
@@ -30,4 +42,31 @@ class ClimateTraceRepository(
     suspend fun fetchRankings(year: String) = climateTraceApi.fetchRankings(year)
 
     suspend fun getPopulation(countryCode: String) = populationApi.getPopulation(countryCode)
+
+    fun pollISSPosition(): Flow<IssPosition> = flow {
+        while (true) {
+            try {
+                val position = issPositionApi.fetchISSPosition().iss_position
+                if (currentCoroutineContext().isActive) {
+                    emit(position)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // ignore transient failures, next poll will retry
+            }
+            delay(ISS_POLL_INTERVAL_MS)
+        }
+    }
+
+    // Returns the ISO alpha-3 country code (matching ClimateTrace's Country.id) for the given
+    // coordinates, or null if they're over open ocean / no country match was found.
+    suspend fun reverseGeocodeCountry(latitude: Double, longitude: Double): String? {
+        val alpha2 = reverseGeocodeApi.reverseGeocode(latitude, longitude).countryCode
+        return alpha2?.let { alpha2ToAlpha3(it) }
+    }
+
+    companion object {
+        private const val ISS_POLL_INTERVAL_MS = 10_000L
+    }
 }

@@ -99,6 +99,9 @@ kotlin {
 
             implementation(libs.markdown.renderer)
 
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor3)
+
             implementation(libs.koog.agents)
             implementation(libs.koog.prompt.executor.llms.all)
             implementation(libs.koog.prompt.executor.litert.client)

@@ -35,6 +35,7 @@ koogAgents = "1.1.1"
 koogPromptExecutorAll = "1.1.1-beta"
 markdownRenderer = "0.43.0"
 buildkonfig = "0.22.0"
+coil = "3.5.0"
 
 
 [libraries]
@@ -93,6 +94,9 @@ markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer-m3"
 
 molecule = { module = "app.cash.molecule:molecule-runtime", version.ref = "molecule" }
 mcp-kotlin = { group = "io.modelcontextprotocol", name = "kotlin-sdk", version.ref = "mcp" }
+
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-logging", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json"]
