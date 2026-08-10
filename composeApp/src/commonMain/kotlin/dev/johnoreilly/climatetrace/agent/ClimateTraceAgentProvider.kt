@@ -5,9 +5,12 @@ import ai.koog.agents.core.agent.config.AIAgentConfig
 import ai.koog.agents.core.agent.functionalStrategy
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.EventHandler
+import ai.koog.agents.features.opentelemetry.feature.OpenTelemetry
+import ai.koog.agents.features.opentelemetry.integration.langfuse.addLangfuseExporter
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
+import dev.johnoreilly.climatetrace.BuildKonfig
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import kotlin.time.ExperimentalTime
 
@@ -66,6 +69,15 @@ class ClimateTraceAgentProvider(
                     onErrorEvent("${ctx.error.message}")
                 }
             }
+
+            install(OpenTelemetry) {
+                setVerbose(true)
+                addLangfuseExporter(
+                    langfusePublicKey = BuildKonfig.LANGFUSE_PUBLIC_KEY,
+                    langfuseSecretKey = BuildKonfig.LANGFUSE_SECRET_KEY,
+                )
+            }
+
         }
     }
 

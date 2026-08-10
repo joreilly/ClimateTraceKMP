@@ -193,6 +193,16 @@ buildkonfig {
             "OPENROUTER_API_KEY",
             localProperties["openrouter_api_key"]?.toString() ?: ""
         )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "LANGFUSE_PUBLIC_KEY",
+            localProperties["langfusePublicKey"]?.toString() ?: ""
+        )
+        buildConfigField(
+            FieldSpec.Type.STRING,
+            "LANGFUSE_SECRET_KEY",
+            localProperties["langfuseSecretKey"]?.toString() ?: ""
+        )
     }
 
 }
