@@ -15,10 +15,13 @@ import dev.johnoreilly.climatetrace.viewmodel.IssTrackerViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
+import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.context.loadKoinModules
@@ -60,6 +63,11 @@ fun createJson() = Json { isLenient = true; ignoreUnknownKeys = true }
 fun createHttpClient(json: Json, enableNetworkLogs: Boolean) = HttpClient {
     install(ContentNegotiation) {
         json(json)
+    }
+    // Nominatim (used for ISS-position reverse geocoding) requires an identifying
+    // User-Agent: https://operations.osmfoundation.org/policies/nominatim/
+    defaultRequest {
+        header(HttpHeaders.UserAgent, "ClimateTraceKMP/1.0 (+https://github.com/joreilly/ClimateTraceKMP)")
     }
     if (enableNetworkLogs) {
         install(Logging) {
