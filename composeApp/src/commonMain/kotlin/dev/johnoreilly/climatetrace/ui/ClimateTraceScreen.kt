@@ -1,8 +1,5 @@
 package dev.johnoreilly.climatetrace.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -257,18 +254,12 @@ fun SearchableList(
                 )
             },
             trailingIcon = {
-                AnimatedVisibility(
-                    visible = searchQuery.value.isNotBlank(),
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    IconButton(onClick = { onClearSearch() }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            contentDescription = "clear_search"
-                        )
-                    }
+                IconButton(onClick = { onClearSearch() }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        contentDescription = "close_search"
+                    )
                 }
             },
             content = {
@@ -287,8 +278,10 @@ fun SearchableList(
                     }
                 }
             },
-            active = true,
-            onActiveChange = { onClearSearch() },
+            active = isSearching,
+            onActiveChange = { isActive ->
+                if (!isActive) onClearSearch()
+            },
             colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
         )
     } else {
