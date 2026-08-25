@@ -16,8 +16,14 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -65,12 +71,13 @@ class RankingsScreen : Screen {
             Column(Modifier.padding(paddingValues).fillMaxSize()) {
                 when (val s = state) {
                     is CountryListUIState.Loading -> {
-                        Column(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)) {
+                        Column(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
+                            Text("Loading rankings…", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     is CountryListUIState.Error -> {
-                        Text("Error: ${s.message}", modifier = Modifier.padding(16.dp))
+                        ErrorState(message = s.message, onRetry = { viewModel.refresh() })
                     }
                     is CountryListUIState.Success -> {
                         RankingsContent(s)
@@ -184,6 +191,15 @@ private fun RankingRow(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
+            if (country != null) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "View details",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
         HorizontalDivider()
     }

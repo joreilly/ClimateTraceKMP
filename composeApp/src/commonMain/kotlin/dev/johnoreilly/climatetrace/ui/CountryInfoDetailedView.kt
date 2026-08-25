@@ -23,7 +23,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -79,13 +82,48 @@ fun CountryInfoDetailedView(
         }
         is CountryDetailsUIState.Loading -> {
             Column(
-                modifier = Modifier.fillMaxSize()
-                    .wrapContentSize(Alignment.Center)
+                modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 CircularProgressIndicator()
+                Text(
+                    text = "Loading emissions data…",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
-        is CountryDetailsUIState.Error -> { Text("Error") }
+        is CountryDetailsUIState.Error -> {
+            Column(
+                modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center).padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ErrorOutline,
+                    contentDescription = "Error",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(48.dp)
+                )
+                Text(
+                    text = "Unable to Load Details",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+                Text(
+                    text = viewState.message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.75f),
+                    textAlign = TextAlign.Center
+                )
+                Button(onClick = { onYearSelected("2025") }) {
+                    Icon(Icons.Default.Refresh, contentDescription = "Retry", modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Retry")
+                }
+            }
+        }
         is CountryDetailsUIState.Success -> {
             CountryInfoDetailedViewSuccess(viewState, perCapitaRank, onYearSelected)
         }
@@ -460,7 +498,7 @@ internal fun KeyFiguresRow(
             secondary = perCapitaSecondary,
             modifier = Modifier.weight(1f)
         )
-        StatCard(label = "Share", value = share, modifier = Modifier.weight(1f))
+        StatCard(label = "Global Share", value = share, modifier = Modifier.weight(1f))
     }
 }
 

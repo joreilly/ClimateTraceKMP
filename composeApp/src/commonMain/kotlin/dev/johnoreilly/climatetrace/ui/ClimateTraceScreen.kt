@@ -22,8 +22,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -32,6 +36,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.HorizontalDivider
@@ -48,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
@@ -70,19 +76,18 @@ class ClimateTraceScreen: Screen {
         val countryListViewModel = koinInject<CountryListViewModel>()
         val countryListViewState by countryListViewModel.viewState.collectAsState()
 
-        Column(Modifier) {
-            when (val state = countryListViewState) {
-                is CountryListUIState.Loading -> {
-                    Column(modifier = Modifier.fillMaxSize().fillMaxHeight().wrapContentSize(Alignment.Center)) {
-                        CircularProgressIndicator()
-                    }
+        when (val state = countryListViewState) {
+            is CountryListUIState.Loading -> {
+                Column(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator()
+                    Text("Loading global emissions data…", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                is CountryListUIState.Error -> {
-                    Text("Error")
-                }
-                is CountryListUIState.Success -> {
-                    CountryScreenSuccess(state.countryList, state.rankings, state.perCapitaRankings)
-                }
+            }
+            is CountryListUIState.Error -> {
+                ErrorState(message = state.message, onRetry = { countryListViewModel.refresh() })
+            }
+            is CountryListUIState.Success -> {
+                CountryScreenSuccess(state.countryList, state.rankings, state.perCapitaRankings)
             }
         }
     }
@@ -173,6 +178,7 @@ fun CountryListView(
     rankings: Map<String, Int> = emptyMap()
 ) {
     val searchQuery = remember { mutableStateOf("") }
+    var isSearching by remember { mutableStateOf(false) }
 
     Column {
         SearchableList(
@@ -181,7 +187,10 @@ fun CountryListView(
             countryList = countryList,
             selectedCountry = selectedCountry,
             countrySelected = countrySelected,
-            rankings = rankings
+            rankings = rankings,
+            isSearching = isSearching,
+            onSearchToggle = { isSearching = !isSearching },
+            onClearSearch = { isSearching = false; searchQuery.value = "" }
         )
     }
 }
@@ -196,7 +205,10 @@ fun SearchableList(
     countryList: List<Country>,
     selectedCountry: Country?,
     countrySelected: (country: Country) -> Unit,
-    rankings: Map<String, Int> = emptyMap()
+    rankings: Map<String, Int> = emptyMap(),
+    isSearching: Boolean = false,
+    onSearchToggle: () -> Unit = {},
+    onClearSearch: () -> Unit = {}
 ) {
     var sortMode by remember { mutableStateOf(CountrySort.Name) }
     val filteredCountryList = countryList
@@ -208,75 +220,150 @@ fun SearchableList(
             }
         }
     val keyboardController = LocalSoftwareKeyboardController.current
-    SearchBar(
-        query = searchQuery.value,
-        onQueryChange = onSearchQueryChange,
-        onSearch = {
-            onSearchQueryChange.invoke(searchQuery.value)
-            keyboardController?.hide()
-        },
-        placeholder = {
-            Text(text = "Search countries")
-        },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                tint = MaterialTheme.colorScheme.onSurface,
-                contentDescription = "search"
-            )
-        },
-        trailingIcon = {
-            AnimatedVisibility(
-                visible = searchQuery.value.isNotBlank(),
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                IconButton(onClick = {
-                    onSearchQueryChange("")
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        contentDescription = "clear_search"
-                    )
-                }
-            }
-        },
-        content = {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FilterChip(
-                    selected = sortMode == CountrySort.Name,
-                    onClick = { sortMode = CountrySort.Name },
-                    label = { Text("Name") }
+
+    // Sort chips always visible above the search bar
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FilterChip(
+            selected = sortMode == CountrySort.Name,
+            onClick = { sortMode = CountrySort.Name },
+            label = { Text("Name") }
+        )
+        FilterChip(
+            selected = sortMode == CountrySort.Rank,
+            onClick = { sortMode = CountrySort.Rank },
+            label = { Text("Rank") }
+        )
+    }
+
+    if (isSearching) {
+        SearchBar(
+            query = searchQuery.value,
+            onQueryChange = onSearchQueryChange,
+            onSearch = {
+                onSearchQueryChange.invoke(searchQuery.value)
+                keyboardController?.hide()
+            },
+            placeholder = {
+                Text(text = "Search countries")
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    contentDescription = "search"
                 )
-                FilterChip(
-                    selected = sortMode == CountrySort.Rank,
-                    onClick = { sortMode = CountrySort.Rank },
-                    label = { Text("Rank") }
-                )
-            }
-            if (filteredCountryList.isEmpty()) {
-                EmptyState(message = "")
-            } else {
-                LazyColumn {
-                    items(filteredCountryList) { country ->
-                        CountryRow(
-                            country = country,
-                            selectedCountry = selectedCountry,
-                            countrySelected = countrySelected,
-                            rankings = rankings
+            },
+            trailingIcon = {
+                AnimatedVisibility(
+                    visible = searchQuery.value.isNotBlank(),
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    IconButton(onClick = { onClearSearch() }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "clear_search"
                         )
                     }
                 }
+            },
+            content = {
+                if (filteredCountryList.isEmpty()) {
+                    EmptyState(message = "No matches for \"${searchQuery.value}\"")
+                } else {
+                    LazyColumn {
+                        items(filteredCountryList) { country ->
+                            CountryRow(
+                                country = country,
+                                selectedCountry = selectedCountry,
+                                countrySelected = countrySelected,
+                                rankings = rankings
+                            )
+                        }
+                    }
+                }
+            },
+            active = true,
+            onActiveChange = { onClearSearch() },
+            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
+        )
+    } else {
+        // Collapsed state: search button + list
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onSearchToggle)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                contentDescription = "Search",
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Search countries…",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        if (filteredCountryList.isEmpty()) {
+            EmptyState()
+        } else {
+            LazyColumn {
+                items(filteredCountryList) { country ->
+                    CountryRow(
+                        country = country,
+                        selectedCountry = selectedCountry,
+                        countrySelected = countrySelected,
+                        rankings = rankings
+                    )
+                }
             }
-        },
-        active = true,
-        onActiveChange = {},
-        colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
-    )
+        }
+    }
+}
+
+@Composable
+fun ErrorState(
+    message: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize().wrapContentSize(Alignment.Center).padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.ErrorOutline,
+            contentDescription = "Error",
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier.size(48.dp)
+        )
+        Text(
+            text = "Unable to Load Data",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onErrorContainer
+        )
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.75f),
+            textAlign = TextAlign.Center
+        )
+        Button(onClick = onRetry) {
+            Icon(Icons.Default.Refresh, contentDescription = "Retry", modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Retry")
+        }
+    }
 }
 
 @Composable
@@ -291,7 +378,7 @@ fun EmptyState(
     ) {
         Text(title ?: "No Countries Found!", style = MaterialTheme.typography.titleMedium)
         message?.let {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
+            Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -378,6 +465,14 @@ fun CountryRow(
                     color = secondaryTextColor
                 )
             }
+
+            // Trailing chevron to indicate clickability
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = "View details",
+                tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
+            )
         }
         HorizontalDivider()
     }
