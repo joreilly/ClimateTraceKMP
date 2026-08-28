@@ -33,7 +33,7 @@ jib = "3.5.4"
 googleAdkKotlin = "0.7.0"
 koogAgents = "1.1.1"
 koogPromptExecutorAll = "1.1.1-beta"
-markdownRenderer = "0.43.0"
+markdownRenderer = "0.45.0"
 buildkonfig = "0.22.0"
 coil = "3.5.0"
 
