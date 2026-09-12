@@ -1,6 +1,7 @@
 package dev.johnoreilly.climatetrace.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -122,36 +123,45 @@ private fun AgentScreenContent(
                 .padding(paddingValues)
                 .imePadding()
         ) {
-            // Messages list
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = AppDimension.spacingMedium),
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(AppDimension.spacingMedium)
-            ) {
-                items(messages) { message ->
-                    when (message) {
-                        is Message.UserMessage -> UserMessageBubble(message.text)
-                        is Message.AgentMessage -> AgentMessageBubble(message.text)
-                        is Message.SystemMessage -> SystemMessageItem(message.text)
-                        is Message.ErrorMessage -> ErrorMessageItem(message.text)
-                        is Message.ToolCallMessage -> ToolCallMessageItem(message.text)
-                        is Message.ResultMessage -> ResultMessageItem(message.text)
+            if (messages.isEmpty() && !isLoading) {
+                WelcomeScreen(
+                    onPromptSelected = { prompt ->
+                        onInputTextChanged(prompt)
+                        onSendClicked()
                     }
-                }
+                )
+            } else {
+                // Messages list
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = AppDimension.spacingMedium),
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(AppDimension.spacingMedium)
+                ) {
+                    items(messages) { message ->
+                        when (message) {
+                            is Message.UserMessage -> UserMessageBubble(message.text)
+                            is Message.AgentMessage -> AgentMessageBubble(message.text)
+                            is Message.SystemMessage -> SystemMessageItem(message.text)
+                            is Message.ErrorMessage -> ErrorMessageItem(message.text)
+                            is Message.ToolCallMessage -> ToolCallMessageItem(message.text)
+                            is Message.ResultMessage -> ResultMessageItem(message.text)
+                        }
+                    }
 
-                // Typing indicator while waiting for agent response
-                if (isLoading) {
+                    // Typing indicator while waiting for agent response
+                    if (isLoading) {
+                        item {
+                            AgentTypingIndicator()
+                        }
+                    }
+
+                    // Add extra space at the bottom for better UX
                     item {
-                        AgentTypingIndicator()
+                        Spacer(modifier = Modifier.height(AppDimension.spacingMedium))
                     }
-                }
-
-                // Add extra space at the bottom for better UX
-                item {
-                    Spacer(modifier = Modifier.height(AppDimension.spacingMedium))
                 }
             }
 
@@ -487,6 +497,64 @@ private fun InputArea(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun WelcomeScreen(
+    onPromptSelected: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val suggestedPrompts = listOf(
+        "Which country emits the most?",
+        "Compare emissions between UK and France",
+        "Show me the top 5 emitting countries",
+        "What are the main sectors contributing to emissions?"
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = AppDimension.spacingLarge, vertical = AppDimension.spacingMedium),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Ask About Climate Data",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "I can help you explore global emissions data, compare countries, and analyze trends.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            text = "Try asking:",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        for (prompt in suggestedPrompts) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = { onPromptSelected(prompt) }),
+                shape = RoundedCornerShape(AppDimension.radiusMedium),
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                tonalElevation = 0.dp
+            ) {
+                Text(
+                    text = prompt,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

@@ -62,6 +62,7 @@ fun CountryAssetEmissionsInfoTreeMapChart(
                     LeafItem(
                         item = export,
                         dimmed = selectedSector != null && selectedSector != export.name,
+                        isSelected = selectedSector == export.name,
                         onClick = { toggle(export.name) }
                     )
                 } else if (export is ChartNode.Section) {
@@ -151,12 +152,16 @@ fun LeafItem(
     item: ChartNode.Leaf,
     modifier: Modifier = Modifier,
     dimmed: Boolean = false,
+    isSelected: Boolean = false,
     onClick: (ChartNode.Leaf) -> Unit,
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .border(0.5.dp, Color.White)
+            .border(
+                width = if (isSelected) 3.dp else 0.5.dp,
+                color = if (isSelected) MaterialTheme.colorScheme.onSurface else Color.White,
+            )
             .background(item.color.copy(alpha = if (dimmed) 0.3f else 1f))
             .clickable { onClick(item) }
             .padding(4.dp),

@@ -34,7 +34,16 @@ open class CountryListViewModel : ViewModel(), KoinComponent {
 
 
     init {
+        loadCountryData()
+    }
+
+    fun refresh() {
+        loadCountryData()
+    }
+
+    private fun loadCountryData() {
         viewModelScope.coroutineScope.launch {
+            _viewState.value = CountryListUIState.Loading
             try {
                 val countries = climateTraceRepository.fetchCountries().sortedBy { it.name }
                 val rankingsResponse = climateTraceRepository.fetchRankings("2025")
