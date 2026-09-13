@@ -1,17 +1,10 @@
 package adk
 
-import com.google.adk.kt.artifacts.InMemoryArtifactService
-import com.google.adk.kt.sessions.InMemorySessionService
-import com.google.adk.kt.webserver.AdkWebServer
-import com.google.adk.kt.webserver.loaders.SingleAgentLoader
-import com.google.adk.kt.webserver.telemetry.ApiServerSpanExporter
+import com.google.adk.kt.webserver.AdkServerConfig
+import com.google.adk.kt.webserver.dev.AdkDevServer
 
 fun main() {
-    AdkWebServer(
-        port = 8081,
-        sessionService = InMemorySessionService(),
-        artifactService = InMemoryArtifactService(),
-        agentLoader = SingleAgentLoader(ClimateTraceAgent.initAgent()),
-        apiServerSpanExporter = ApiServerSpanExporter(),
+    AdkDevServer(
+        AdkServerConfig.inMemory(ClimateTraceAgent.initAgent(), port = 8081)
     ).start(wait = true)
 }
