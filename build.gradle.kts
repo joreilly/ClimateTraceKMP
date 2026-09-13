@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kmpNativeCoroutines) apply false
     alias(libs.plugins.jib) apply false
+    alias(libs.plugins.hotswan.compiler) apply false
 }

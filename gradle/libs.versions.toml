@@ -15,6 +15,7 @@ compose-plugin = "1.12.0"
 composeAdaptiveLayout = "1.2.0"
 flagkit = "1.1.0"
 harawata-appdirs = "1.5.0"
+hotswan = "2.0.0"
 httpclient5 = "5.6.4"
 koalaplot = "0.12.1"
 koin = "4.2.2"
@@ -68,6 +69,7 @@ kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-dateTime" }
 
 kmpObservableViewModel = { module = "com.rickclephas.kmp:kmp-observableviewmodel-core", version.ref = "kmpObservableViewModel" }
+hotswan-interpreter-runtime-core = { module = "com.github.skydoves.compose.hotswan:interpreter-runtime-core", version.ref = "hotswan" }
 lifecycleViewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle-viewmodel" }
 
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
@@ -115,3 +117,4 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm" }
 shadowPlugin = { id = "com.gradleup.shadow", version.ref = "shadowPlugin" }
 jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
+hotswan-compiler = { id = "com.github.skydoves.compose.hotswan.compiler", version.ref = "hotswan" }

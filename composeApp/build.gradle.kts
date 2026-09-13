@@ -16,6 +16,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kmpNativeCoroutines)
     alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.hotswan.compiler)
 }
 
 kotlin {
@@ -128,6 +129,9 @@ kotlin {
             implementation(libs.harawata.appdirs)
             implementation(libs.kstore.file)
             implementation(libs.ktor.client.java)
+            // Desktop hot reload needs the interpreter runtime on the classpath; the Android and
+            // iOS targets get it from the compiler plugin itself.
+            implementation(libs.hotswan.interpreter.runtime.core)
         }
 
         appleMain.dependencies {
