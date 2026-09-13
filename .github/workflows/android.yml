@@ -29,3 +29,6 @@ jobs:
         run: ./gradlew assembleDebug
       - name: Run Unit Tests
         run: ./gradlew :composeApp:jvmTest
+      # Neither module is reached by assembleDebug, so they need building explicitly
+      - name: Build JVM modules
+        run: ./gradlew :agents:build :mcp-server:build
