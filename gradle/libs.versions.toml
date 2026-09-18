@@ -35,7 +35,7 @@ koogAgents = "1.2.0"
 koogPromptExecutorAll = "1.2.0-beta"
 markdownRenderer = "0.45.0"
 buildkonfig = "0.22.0"
-coil = "3.6.2"
+coil = "3.6.3"
 
 
 [libraries]
