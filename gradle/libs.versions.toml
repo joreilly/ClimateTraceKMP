@@ -34,7 +34,7 @@ googleAdkKotlin = "1.0.1"
 koogAgents = "1.2.0"
 koogPromptExecutorAll = "1.2.0-beta"
 markdownRenderer = "0.45.0"
-buildkonfig = "0.22.0"
+buildkonfig = "0.23.0"
 coil = "3.6.3"
 
 
