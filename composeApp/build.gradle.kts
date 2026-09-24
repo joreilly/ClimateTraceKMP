@@ -120,6 +120,11 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.kstore.file)
             implementation(libs.ktor.client.android)
+
+            implementation(libs.a2ui.model)
+            implementation(libs.a2ui.compose.runtime)
+            implementation(libs.a2ui.compose.ui)
+            implementation(libs.a2ui.material3)
         }
 
         jvmMain.dependencies {

@@ -1,5 +1,7 @@
 package dev.johnoreilly.climatetrace.di
 
+import dev.johnoreilly.climatetrace.agent.A2uiRenderer
+import dev.johnoreilly.climatetrace.agent.UnsupportedA2uiRenderer
 import dev.johnoreilly.climatetrace.remote.Country
 import io.github.xxfast.kstore.KStore
 import io.github.xxfast.kstore.file.storeOf
@@ -18,6 +20,8 @@ fun initKoin() = initKoin(enableNetworkLogs = false) {}
 
 @OptIn(ExperimentalKStoreApi::class)
 actual fun dataModule(): Module = module {
+    // androidx.a2ui is Android-only.
+    single<A2uiRenderer> { UnsupportedA2uiRenderer }
     single<KStore<List<Country>>> {
         val filesDir: String? = NSFileManager.defaultManager.URLForDirectory(
             directory = NSDocumentDirectory,

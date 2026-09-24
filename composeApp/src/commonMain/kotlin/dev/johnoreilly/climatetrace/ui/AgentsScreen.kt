@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
+import dev.johnoreilly.climatetrace.agent.A2uiRenderer
 import dev.johnoreilly.climatetrace.ui.theme.AppDimension
 import dev.johnoreilly.climatetrace.viewmodel.AgentViewModel
 import dev.johnoreilly.climatetrace.viewmodel.Message
@@ -72,7 +73,8 @@ fun AgentScreen() {
         isChatEnded = uiState.isChatEnded,
         onInputTextChanged = viewModel::updateInputText,
         onSendClicked = viewModel::sendMessage,
-        onRestartClicked = viewModel::restartChat
+        onRestartClicked = viewModel::restartChat,
+        a2uiRenderer = viewModel.a2uiRenderer,
     )
 }
 
@@ -86,7 +88,8 @@ private fun AgentScreenContent(
     isChatEnded: Boolean,
     onInputTextChanged: (String) -> Unit,
     onSendClicked: () -> Unit,
-    onRestartClicked: () -> Unit
+    onRestartClicked: () -> Unit,
+    a2uiRenderer: A2uiRenderer,
 ) {
     val listState = rememberLazyListState()
     val focusRequester = remember { FocusRequester() }
@@ -148,6 +151,7 @@ private fun AgentScreenContent(
                             is Message.ErrorMessage -> ErrorMessageItem(message.text)
                             is Message.ToolCallMessage -> ToolCallMessageItem(message.text)
                             is Message.ResultMessage -> ResultMessageItem(message.text)
+                            is Message.UiMessage -> a2uiRenderer.Surface(message.surfaceId, Modifier)
                         }
                     }
 
@@ -558,4 +562,3 @@ private fun WelcomeScreen(
         }
     }
 }
-

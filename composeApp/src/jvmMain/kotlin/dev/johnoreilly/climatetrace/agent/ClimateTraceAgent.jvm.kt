@@ -9,7 +9,7 @@ import ai.koog.prompt.llm.LLMProvider
 import ai.koog.prompt.llm.LLModel
 import dev.johnoreilly.climatetrace.BuildKonfig
 
-actual fun getLLModel() = GoogleModels.Gemini2_5Flash
+actual fun getLLModel() = GoogleModels.Gemini3_5Flash
 
 actual fun getPromptExecutor(): PromptExecutor {
     return simpleGoogleAIExecutor(BuildKonfig.GEMINI_API_KEY)

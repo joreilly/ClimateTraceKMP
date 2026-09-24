@@ -46,10 +46,10 @@ fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { CountryListViewModel() }
     single { CountryDetailsViewModel() }
     factory { AssetDetailViewModel() }
-    single { AgentViewModel(get()) }
+    single { AgentViewModel(get(), get()) }
     single { IssTrackerViewModel() }
     single { ClimateTraceRepository(get(), get(), get(), get(), get()) }
-    single<AgentProvider> { ClimateTraceAgentProvider(get()) }
+    single<AgentProvider> { ClimateTraceAgentProvider(get(), get()) }
     includes(dataModule())
 }
 

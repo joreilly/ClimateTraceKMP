@@ -32,6 +32,8 @@ shadowPlugin = "9.6.1"
 jib = "3.5.4"
 googleAdkKotlin = "1.0.1"
 koogAgents = "1.2.0"
+# Android-only (androidx) renderer for agent-generated UI; see agent/A2uiRenderer.kt
+a2ui = "1.0.0-alpha01"
 koogPromptExecutorAll = "1.2.0-beta"
 markdownRenderer = "0.45.0"
 buildkonfig = "0.22.0"
@@ -56,6 +58,10 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose-multiplatform" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 
+a2ui-model = { module = "androidx.a2ui:a2ui-model", version.ref = "a2ui" }
+a2ui-compose-runtime = { module = "androidx.a2ui.compose:compose-runtime", version.ref = "a2ui" }
+a2ui-compose-ui = { module = "androidx.a2ui.compose:compose-ui", version.ref = "a2ui" }
+a2ui-material3 = { module = "androidx.compose.material3:material3-a2ui", version.ref = "a2ui" }
 koog-agents = { module = "ai.koog:koog-agents", version.ref = "koogAgents" }
 koog-prompt-executor-llms-all = { module = "ai.koog:prompt-executor-llms-all", version.ref = "koogPromptExecutorAll" }
 koog-prompt-executor-litert-client = { module = "ai.koog:prompt-executor-litert-client", version.ref = "koogPromptExecutorAll" }

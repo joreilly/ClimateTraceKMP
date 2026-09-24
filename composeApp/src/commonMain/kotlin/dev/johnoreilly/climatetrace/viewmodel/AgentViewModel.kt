@@ -2,12 +2,15 @@ package dev.johnoreilly.climatetrace.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.johnoreilly.climatetrace.agent.A2uiEvent
+import dev.johnoreilly.climatetrace.agent.A2uiRenderer
 import dev.johnoreilly.climatetrace.agent.AgentProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -20,6 +23,8 @@ sealed class Message {
     data class ErrorMessage(val text: String) : Message()
     data class ToolCallMessage(val text: String) : Message()
     data class ResultMessage(val text: String) : Message()
+    /** Native UI the agent rendered with A2UI (Android only). */
+    data class UiMessage(val surfaceId: String) : Message()
 }
 
 // Define UI state for the agent demo screen
@@ -35,7 +40,10 @@ data class AgentDemoUiState(
     val currentUserResponse: String? = null,
 )
 
-class AgentViewModel(private val agentProvider: AgentProvider) : ViewModel() {
+class AgentViewModel(
+    private val agentProvider: AgentProvider,
+    val a2uiRenderer: A2uiRenderer,
+) : ViewModel() {
     // UI state
     private val _uiState = MutableStateFlow(
         AgentDemoUiState(
@@ -43,6 +51,76 @@ class AgentViewModel(private val agentProvider: AgentProvider) : ViewModel() {
         )
     )
     val uiState: StateFlow<AgentDemoUiState> = _uiState.asStateFlow()
+
+    init {
+        // Show each surface the agent creates as a message in the chat.
+        viewModelScope.launch {
+            val shown = mutableSetOf<String>()
+            a2uiRenderer.surfaceIds.collect { ids ->
+                val newIds = ids.filter { shown.add(it) }
+                if (newIds.isNotEmpty()) {
+                    _uiState.update { state ->
+                        val uiMessages = newIds.map { id -> Message.UiMessage(id) }
+                        // The reply's text is shown before the surface it describes has been created
+                        // (the a2ui block is processed asynchronously), so keep the UI above that summary.
+                        val last = state.messages.lastOrNull()
+                        val messages = if (last is Message.AgentMessage) {
+                            state.messages.dropLast(1) + uiMessages + last
+                        } else {
+                            state.messages + uiMessages
+                        }
+                        state.copy(messages = messages)
+                    }
+                }
+            }
+        }
+
+        // A tap on agent-rendered UI is sent to the agent as the user's next reply.
+        viewModelScope.launch {
+            a2uiRenderer.events.collect { event ->
+                when (event) {
+                    is A2uiEvent.UserAction -> if (_uiState.value.userResponseRequested) {
+                        a2uiCorrections.value = 0
+                        _uiState.update {
+                            it.copy(
+                                messages = it.messages + Message.SystemMessage("UI action: ${event.description}"),
+                                isLoading = true,
+                                userResponseRequested = false,
+                                currentUserResponse = "UI action: ${event.description}"
+                            )
+                        }
+                    }
+                    is A2uiEvent.Error -> {
+                        _uiState.update { it.copy(messages = it.messages + Message.ErrorMessage(event.description)) }
+                        // Errors can arrive while the agent is still working on its reply, so they're
+                        // queued and sent as its next input once it's waiting for one.
+                        pendingA2uiErrors.update { it + event.description }
+                        if (_uiState.value.userResponseRequested) sendPendingA2uiErrors()
+                    }
+                }
+            }
+        }
+    }
+
+    private val pendingA2uiErrors = MutableStateFlow<List<String>>(emptyList())
+    private val a2uiCorrections = MutableStateFlow(0)
+
+    /**
+     * Sends any A2UI errors to the agent (as its next input) so it can correct the UI. Capped so a
+     * model that keeps getting it wrong doesn't loop forever; the errors are still shown in the chat.
+     */
+    private fun sendPendingA2uiErrors() {
+        val errors = pendingA2uiErrors.getAndUpdate { emptyList() }
+        if (errors.isEmpty() || a2uiCorrections.value >= MAX_A2UI_CORRECTIONS) return
+        a2uiCorrections.update { it + 1 }
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                userResponseRequested = false,
+                currentUserResponse = "A2UI error: ${errors.joinToString("; ")}"
+            )
+        }
+    }
 
     // Update input text
     fun updateInputText(text: String) {
@@ -53,6 +131,7 @@ class AgentViewModel(private val agentProvider: AgentProvider) : ViewModel() {
     fun sendMessage() {
         val userInput = _uiState.value.inputText.trim()
         if (userInput.isEmpty()) return
+        a2uiCorrections.value = 0
 
         // If agent is waiting for a response to a question
         if (_uiState.value.userResponseRequested) {
@@ -121,6 +200,7 @@ class AgentViewModel(private val agentProvider: AgentProvider) : ViewModel() {
                                 userResponseRequested = true
                             )
                         }
+                        sendPendingA2uiErrors()
 
                         // Wait for user response
                         val userResponse = _uiState
@@ -174,5 +254,9 @@ class AgentViewModel(private val agentProvider: AgentProvider) : ViewModel() {
                 messages = listOf(Message.SystemMessage(agentProvider.description))
             )
         }
+    }
+
+    private companion object {
+        const val MAX_A2UI_CORRECTIONS = 2
     }
 }

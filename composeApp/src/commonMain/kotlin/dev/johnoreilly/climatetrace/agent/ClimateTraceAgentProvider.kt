@@ -17,7 +17,8 @@ expect fun getLLModel(): LLModel
 expect fun getPromptExecutor(): PromptExecutor
 
 class ClimateTraceAgentProvider(
-    private val climateTraceRepository: ClimateTraceRepository
+    private val climateTraceRepository: ClimateTraceRepository,
+    private val a2uiRenderer: A2uiRenderer,
 ) : AgentProvider {
 
     override val description: String = "Hi, I'm a climate agent. I can provide climate emission information for different countries/years."
@@ -31,6 +32,7 @@ class ClimateTraceAgentProvider(
 
         val toolRegistry = ToolRegistry {
             tool(GetEmissionsTool(climateTraceRepository))
+            tool(GetPerCapitaEmissionsTool(climateTraceRepository))
             tool(GetAssetEmissionsTool(climateTraceRepository))
             tool(createPopulationAgentTool(climateTraceRepository))
         }
@@ -42,8 +44,11 @@ class ClimateTraceAgentProvider(
                     You are an AI assistant specialising in providing information about global climate emissions.
                     The year is currently 2026.
                     You have data up to and including 2025.
-                    Use units of millions of tonnes of CO2 equivalent.
-                    """.trimIndent(),
+                    Report total emissions in millions of tonnes of CO2 equivalent (Mt CO2e) and per capita
+                    emissions in tonnes of CO2 equivalent per person (t CO2e), as returned by the tools.
+                    Write replies as plain text or simple Markdown - no LaTeX (write CO2e, not ${'$'}\text{CO}_2${'$'}).
+                    """.trimIndent() +
+                        if (a2uiRenderer.isSupported) "\n\n" + a2uiInstructions(a2uiRenderer) else "",
                 )
             },
             model = getLLModel(),
@@ -110,11 +115,15 @@ class ClimateTraceAgentProvider(
                 // No more tool calls — extract the assistant's final text response.
                 assistantMessage = response.textContent()
 
+                // Render any a2ui block in the reply and show only the rest of the text.
+                if (a2uiRenderer.isSupported) {
+                    assistantMessage = A2uiReply.render(assistantMessage, a2uiRenderer)
+                }
+
                 // Deliver the response to the UI and suspend until the user replies.
                 // An empty reply will exit the outer loop.
                 inputMessage = onAssistantMessage(assistantMessage)
             }
             assistantMessage
         }
-
 }
