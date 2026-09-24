@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountTree
+import androidx.compose.material.icons.filled.Hub
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import dev.johnoreilly.climatetrace.di.initKoin
 import dev.johnoreilly.climatetrace.ui.AgentScreen
+import dev.johnoreilly.climatetrace.ui.agui.AgUiAgentScreen
 import dev.johnoreilly.climatetrace.ui.ClimateTraceScreen
 import dev.johnoreilly.wordmaster.androidApp.theme.ClimateTraceTheme
 
@@ -65,13 +67,20 @@ fun AndroidApp() {
                     icon = { Icon(Icons.Default.AccountTree, contentDescription = "Agents") },
                     label = { Text("Agent") }
                 )
+                NavigationBarItem(
+                    selected = selectedIndex == 2,
+                    onClick = { selectedIndex = 2 },
+                    icon = { Icon(Icons.Default.Hub, contentDescription = "AG-UI agent") },
+                    label = { Text("AG-UI") }
+                )
             }
         }
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             when (selectedIndex) {
                 0 -> Navigator(screen = ClimateTraceScreen())
-                else -> AgentScreen()
+                1 -> AgentScreen()
+                else -> AgUiAgentScreen()
             }
         }
     }

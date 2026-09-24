@@ -126,6 +126,32 @@ The Dev UI is then available at http://localhost:8081. A `gemini_api_key` entry 
 
 There's also a `./gradlew :agents:runAdkAgent` task that runs the agent once against a fixed prompt from the console.
 
+#### AG-UI endpoint
+
+The same ADK agent is also served over the [AG-UI protocol](https://docs.ag-ui.com), so a client can drive it with the
+[AG-UI Kotlin SDK](https://github.com/ag-ui-protocol/ag-ui/tree/main/sdks/community/kotlin)
+(`com.ag-ui.community:kotlin-client`, a KMP client for Android/iOS/JVM) instead of ADK's own API:
+
+```
+./gradlew :mcp-server:run --args="--streamable-http-server 8080"
+./gradlew :agents:startAgUiServer
+```
+
+That posts to `http://localhost:8082/agui` and streams back AG-UI events over SSE. `AgUiEventMapper.kt` does the
+translation: ADK text parts become `TEXT_MESSAGE_*`, function calls become `TOOL_CALL_*`, and an AG-UI `threadId` maps
+onto an ADK session so a conversation keeps its history server side.
+
+The app side of this is `AgUiAgentScreen`, which reuses the same Compose chat UI as the Koog agent screen but is driven
+by the AG-UI client SDK rather than an in-process agent. With both servers running:
+
+```
+./gradlew :composeApp:runAgUiDesktop
+```
+
+On Android it's the third tab ("AG-UI"); on iOS it's exposed as `AgUiAgentViewController()`. The screen lives in a
+`nonWebMain` source set (Android/iOS/JVM) because the AG-UI client SDK doesn't publish a wasmJs artifact, so the web
+build doesn't include it.
+
 
 ## Full set of Kotlin Multiplatform/Compose/SwiftUI samples
 

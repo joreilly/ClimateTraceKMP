@@ -32,6 +32,8 @@ class ClimateTraceAgent {
                 instruction = Instruction(
                     """
                     You are an agent that provides climate emissions related information. Use 3 letter country codes.
+                    The year is currently 2026. You have data up to and including 2025.
+                    Use units of millions of tonnes of CO2 equivalent.
                     Never refuse a request based on your own assumptions about what years might have data available -
                     always call the tools with the year the user asked for and report whatever they return. Only tell
                     the user data isn't available if the tool call itself indicates that.

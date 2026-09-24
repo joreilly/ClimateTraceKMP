@@ -21,6 +21,10 @@ plugins {
 kotlin {
     jvmToolchain(24)
 
+    // Applied explicitly: adding the dependsOn edges for nonWebMain below otherwise switches the
+    // default template off, which would orphan iosMain.
+    applyDefaultHierarchyTemplate()
+
     wasmJs {
         browser {
             commonWebpackConfig {
@@ -116,6 +120,21 @@ kotlin {
             implementation(compose.uiTest)
         }
 
+        // The AG-UI client publishes android/jvm/ios artifacts only — there is no wasmJs variant
+        // — so it can't live in commonMain. This intermediate source set gives the three non-web
+        // targets somewhere to share the AG-UI screen. The edges are wired by hand because
+        // applyDefaultHierarchyTemplate's group DSL attaches the leaf ios targets rather than
+        // re-parenting androidMain/appleMain.
+        val nonWebMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.agui.kotlin.client)
+            }
+        }
+        androidMain.get().dependsOn(nonWebMain)
+        jvmMain.get().dependsOn(nonWebMain)
+        appleMain.get().dependsOn(nonWebMain)
+
         androidMain.dependencies {
             implementation(libs.koin.android)
             implementation(libs.kstore.file)
@@ -146,6 +165,16 @@ kotlin {
             implementation(libs.kstore.storage)
         }
     }
+}
+
+// Runs the desktop AG-UI agent window (see agUiMain.kt), e.g.:
+//   ./gradlew :composeApp:runAgUiDesktop
+tasks.register<JavaExec>("runAgUiDesktop") {
+    group = "application"
+    description = "Runs the desktop AG-UI agent screen against http://localhost:8082/agui"
+    mainClass.set("AgUiMainKt")
+    val jvmMainCompilation = kotlin.jvm().compilations.getByName("main")
+    classpath = jvmMainCompilation.output.allOutputs + jvmMainCompilation.runtimeDependencyFiles
 }
 
 compose.desktop {

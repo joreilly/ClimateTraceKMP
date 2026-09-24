@@ -78,7 +78,7 @@ fun AgentScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AgentScreenContent(
+internal fun AgentScreenContent(
     messages: List<Message>,
     inputText: String,
     isInputEnabled: Boolean,

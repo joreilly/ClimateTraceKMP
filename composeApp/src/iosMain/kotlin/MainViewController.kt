@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeUIViewController
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.AgentScreen
+import dev.johnoreilly.climatetrace.ui.agui.AgUiAgentScreen
 import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
 import dev.johnoreilly.climatetrace.ui.CountryScreenSuccess
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
@@ -58,4 +59,9 @@ fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewControlle
 
 fun AgentViewController() = ComposeUIViewController {
     AgentScreen()
+}
+
+/** The same chat UI driven by the AG-UI endpoint instead of the in-process Koog agent. */
+fun AgUiAgentViewController() = ComposeUIViewController {
+    AgUiAgentScreen()
 }

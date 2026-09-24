@@ -31,6 +31,10 @@ mcp = "0.15.0"
 shadowPlugin = "9.6.1"
 jib = "3.5.4"
 googleAdkKotlin = "1.0.1"
+# Ktor for the :agents module only. Pinned to the version google-adk-kotlin-webserver is built
+# against: resolving it up to the 3.x used elsewhere would break the ADK Dev UI at runtime.
+ktorAdk = "2.3.13"
+agui = "0.4.1"
 koogAgents = "1.2.0"
 koogPromptExecutorAll = "1.2.0-beta"
 markdownRenderer = "0.45.0"
@@ -50,6 +54,10 @@ compose-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:a
 flagkit = { module = "dev.carlsen.flagkit:flagkit", version.ref = "flagkit" }
 
 google-adk-kotlin-core = { module = "com.google.adk:google-adk-kotlin-core", version.ref = "googleAdkKotlin" }
+agui-kotlin-core = { module = "com.ag-ui.community:kotlin-core", version.ref = "agui" }
+agui-kotlin-client = { module = "com.ag-ui.community:kotlin-client", version.ref = "agui" }
+ktor2-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktorAdk" }
+ktor2-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorAdk" }
 google-adk-kotlin-webserver = { module = "com.google.adk:google-adk-kotlin-webserver", version.ref = "googleAdkKotlin" }
 google-adk-kotlin-processor = { module = "com.google.adk:google-adk-kotlin-processor", version.ref = "googleAdkKotlin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
