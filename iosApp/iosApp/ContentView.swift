@@ -63,7 +63,7 @@ struct ContentView: View {
 */
 
 struct CountryListView: View {
-    @StateViewModel var viewModel = CountryListViewModel()
+    @StateViewModel var viewModel = Koin_iosKt.countryListViewModel()
     @State var query: String = ""
     
     var body: some View {

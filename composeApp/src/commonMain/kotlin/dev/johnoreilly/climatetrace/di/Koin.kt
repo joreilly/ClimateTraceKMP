@@ -48,7 +48,7 @@ internal fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { PopulationApi(get()) }
     single { IssPositionApi(get()) }
     single { ReverseGeocodeApi(get()) }
-    single { CountryListViewModel() }
+    single { CountryListViewModel(get()) }
     single { CountryDetailsViewModel() }
     factory { AssetDetailViewModel() }
     single { AgentViewModel(get()) }
