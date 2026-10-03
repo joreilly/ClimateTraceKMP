@@ -45,7 +45,7 @@ private val SampleYearlyEmissions = mapOf(
 
 @Preview
 @Composable
-fun CountryRowPreview() {
+internal fun CountryRowPreview() {
     ClimateTraceTheme {
         Surface {
             Column {
@@ -68,7 +68,7 @@ fun CountryRowPreview() {
 
 @Preview
 @Composable
-fun CountryRowSelectedPreview() {
+internal fun CountryRowSelectedPreview() {
     ClimateTraceTheme {
         Surface {
             CountryRow(
@@ -83,7 +83,7 @@ fun CountryRowSelectedPreview() {
 
 @Preview
 @Composable
-fun CountryRowUnrankedPreview() {
+internal fun CountryRowUnrankedPreview() {
     // No entry in `rankings`, which is what the row shows before the ranking data has loaded.
     ClimateTraceTheme {
         Surface {
@@ -98,7 +98,7 @@ fun CountryRowUnrankedPreview() {
 
 @Preview
 @Composable
-fun EmptyStatePreview() {
+internal fun EmptyStatePreview() {
     ClimateTraceTheme {
         Surface {
             EmptyState()
@@ -108,7 +108,7 @@ fun EmptyStatePreview() {
 
 @Preview
 @Composable
-fun EmptyStateWithMessagePreview() {
+internal fun EmptyStateWithMessagePreview() {
     ClimateTraceTheme {
         Surface {
             EmptyState(
@@ -121,7 +121,7 @@ fun EmptyStateWithMessagePreview() {
 
 @Preview
 @Composable
-fun KeyFiguresRowPreview() {
+internal fun KeyFiguresRowPreview() {
     ClimateTraceTheme {
         Surface {
             KeyFiguresRow(
@@ -138,7 +138,7 @@ fun KeyFiguresRowPreview() {
 
 @Preview
 @Composable
-fun KeyFiguresRowRisingPreview() {
+internal fun KeyFiguresRowRisingPreview() {
     // The other side of the delta: a rise rather than a fall, and no per-capita ranking yet.
     ClimateTraceTheme {
         Surface {
@@ -156,7 +156,7 @@ fun KeyFiguresRowRisingPreview() {
 
 @Preview
 @Composable
-fun CO2TrendSparklinePreview() {
+internal fun CO2TrendSparklinePreview() {
     ClimateTraceTheme {
         Surface {
             CO2TrendSparkline(
@@ -213,7 +213,7 @@ private fun ColorSchemeSpecimen() {
 
 @Preview
 @Composable
-fun ColorSchemeLightPreview() {
+internal fun ColorSchemeLightPreview() {
     ClimateTraceTheme(useDarkTheme = false) {
         Surface { ColorSchemeSpecimen() }
     }
@@ -221,7 +221,7 @@ fun ColorSchemeLightPreview() {
 
 @Preview
 @Composable
-fun ColorSchemeDarkPreview() {
+internal fun ColorSchemeDarkPreview() {
     ClimateTraceTheme(useDarkTheme = true) {
         Surface { ColorSchemeSpecimen() }
     }
@@ -237,7 +237,7 @@ private fun TypeSample(name: String, style: TextStyle) {
 
 @Preview
 @Composable
-fun TypographySpecimenPreview() {
+internal fun TypographySpecimenPreview() {
     ClimateTraceTheme {
         Surface {
             Column(modifier = Modifier.padding(16.dp)) {

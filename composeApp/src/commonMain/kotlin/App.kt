@@ -37,7 +37,7 @@ import org.koin.compose.KoinApplication
 
 @Preview
 @Composable
-fun App() {
+internal fun App() {
     KoinApplication(application = {
         modules(commonModule())
     }) {

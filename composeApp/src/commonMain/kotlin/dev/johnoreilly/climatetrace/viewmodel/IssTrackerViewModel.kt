@@ -13,18 +13,17 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 
-sealed class IssPositionUiState {
+internal sealed class IssPositionUiState {
     data object Loading : IssPositionUiState()
     data class Error(val message: String) : IssPositionUiState()
     data class OverOcean(val latitude: Double, val longitude: Double) : IssPositionUiState()
     data class OverCountry(val latitude: Double, val longitude: Double, val country: Country) : IssPositionUiState()
 }
 
-open class IssTrackerViewModel : ViewModel(), KoinComponent {
+internal open class IssTrackerViewModel : ViewModel(), KoinComponent {
     private val climateTraceRepository: ClimateTraceRepository by inject()
 
     private val _viewState = MutableStateFlow<IssPositionUiState>(viewModelScope, IssPositionUiState.Loading)
-    @NativeCoroutinesState
     val viewState: StateFlow<IssPositionUiState> = _viewState.asStateFlow()
 
     private var countries: List<Country> = emptyList()

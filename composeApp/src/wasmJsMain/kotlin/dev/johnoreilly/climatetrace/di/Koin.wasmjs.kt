@@ -8,7 +8,7 @@ import io.ktor.client.engine.js.Js
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-actual fun dataModule(): Module = module {
+internal actual fun dataModule(): Module = module {
     single<KStore<List<Country>>> {
         storeOf(key = "countries", default = emptyList())
     }

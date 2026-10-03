@@ -13,7 +13,7 @@ private const val PACKAGE_NAME = "dev.johnoreilly.climatetrace"
 private const val VERSION = "2.0.0"
 private const val AUTHOR = "johnoreilly"
 
-actual fun dataModule(): Module = module {
+internal actual fun dataModule(): Module = module {
     single<KStore<List<Country>>> {
         val filesDir: String = AppDirsFactory.getInstance()
             .getUserCacheDir(PACKAGE_NAME, VERSION, AUTHOR)

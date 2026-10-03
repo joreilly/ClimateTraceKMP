@@ -14,7 +14,7 @@ import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Terrain
 import androidx.compose.ui.graphics.vector.ImageVector
 
-fun sectorIcon(sector: String?): ImageVector = when (sector?.lowercase()) {
+internal fun sectorIcon(sector: String?): ImageVector = when (sector?.lowercase()) {
     "power" -> Icons.Filled.Bolt
     "transportation" -> Icons.Filled.DirectionsCar
     "buildings" -> Icons.Filled.Apartment

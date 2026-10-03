@@ -17,7 +17,7 @@ import platform.Foundation.NSUserDomainMask
 fun initKoin() = initKoin(enableNetworkLogs = false) {}
 
 @OptIn(ExperimentalKStoreApi::class)
-actual fun dataModule(): Module = module {
+internal actual fun dataModule(): Module = module {
     single<KStore<List<Country>>> {
         val filesDir: String? = NSFileManager.defaultManager.URLForDirectory(
             directory = NSDocumentDirectory,

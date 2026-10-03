@@ -25,13 +25,13 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-class SplitterState {
+internal class SplitterState {
     var isResizing by mutableStateOf(false)
     var isResizeEnabled by mutableStateOf(true)
 }
 
 
-class PanelState {
+internal class PanelState {
     val collapsedSize = 40.dp
     var expandedSize by mutableStateOf(250.dp)
     val expandedSizeMin = 120.dp
@@ -40,7 +40,7 @@ class PanelState {
 }
 
 @Composable
-fun ResizablePanel(
+internal fun ResizablePanel(
     modifier: Modifier,
     state: PanelState,
     title: String,

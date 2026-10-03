@@ -39,7 +39,7 @@ import io.github.koalaplot.core.util.generateHueColorPalette
 import io.github.koalaplot.core.util.toString
 
 @Composable
-fun CountryAssetEmissionsInfoTreeMapChart(
+internal fun CountryAssetEmissionsInfoTreeMapChart(
     countryAssetEmissions: List<CountryAssetEmissionsInfo>,
     selectedSector: String? = null,
     onSectorChange: (String?) -> Unit = {}
@@ -148,7 +148,7 @@ private fun formatMt(tonnes: Double): String {
 
 
 @Composable
-fun LeafItem(
+internal fun LeafItem(
     item: ChartNode.Leaf,
     modifier: Modifier = Modifier,
     dimmed: Boolean = false,
@@ -173,11 +173,11 @@ fun LeafItem(
     }
 }
 
-fun Double.toPercent(precision: Int): String = "${(this * 100.0f).toString(precision)}%"
+internal fun Double.toPercent(precision: Int): String = "${(this * 100.0f).toString(precision)}%"
 
 
 @Composable
-fun SectionItem(
+internal fun SectionItem(
     sectionColor: Color?,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -195,7 +195,7 @@ fun SectionItem(
 }
 
 
-fun buildAssetLeaves(assetEmissionInfoList: List<CountryAssetEmissionsInfo>): List<ChartNode.Leaf> {
+internal fun buildAssetLeaves(assetEmissionInfoList: List<CountryAssetEmissionsInfo>): List<ChartNode.Leaf> {
     // API returns both sector totals (subsector == null) and a parallel subsector
     // breakdown that sums to the same totals. Keep only sector-level rows so the
     // treemap doesn't double-count the same emissions at two granularities.
@@ -215,7 +215,7 @@ fun buildAssetLeaves(assetEmissionInfoList: List<CountryAssetEmissionsInfo>): Li
     }
 }
 
-fun buildAssetTree(leaves: List<ChartNode.Leaf>): Tree<ChartNode> {
+internal fun buildAssetTree(leaves: List<ChartNode.Leaf>): Tree<ChartNode> {
     val total = leaves.sumOf { it.value }
     return tree(
         ChartNode.Section(
@@ -233,7 +233,7 @@ fun buildAssetTree(leaves: List<ChartNode.Leaf>): Tree<ChartNode> {
 
 @Suppress("LongParameterList")
 @Composable
-fun ShrinkableHidableText(
+internal fun ShrinkableHidableText(
     text: String,
     minSize: TextUnit,
     modifier: Modifier = Modifier,

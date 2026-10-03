@@ -14,9 +14,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
 
-class ClimateTraceRepository(
+// Public for mcp-server, not needed from Swift
+@OptIn(ExperimentalObjCRefinement::class)
+@HiddenFromObjC
+class ClimateTraceRepository internal constructor(
     private val store: KStore<List<Country>>,
     private val climateTraceApi: ClimateTraceApi,
     private val populationApi: PopulationApi,

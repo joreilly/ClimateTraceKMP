@@ -42,7 +42,7 @@ import dev.johnoreilly.climatetrace.viewmodel.IssTrackerViewModel
 import kotlin.math.roundToInt
 import org.koin.compose.koinInject
 
-class IssTrackerScreen : Screen {
+internal class IssTrackerScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {

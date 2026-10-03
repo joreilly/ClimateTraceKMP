@@ -9,7 +9,7 @@ import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import kotlinx.serialization.Serializable
 import kotlin.time.ExperimentalTime
 
-class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetEmissionsTool.Args>(
+internal class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetEmissionsTool.Args>(
     argsType = typeToken<Args>(),
     name = "GetEmissionsTool",
     description = "Get the emission data for a country for a particular year."
@@ -30,7 +30,7 @@ class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : Sim
 }
 
 
-class GetAssetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetAssetEmissionsTool.Args>(
+internal class GetAssetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetAssetEmissionsTool.Args>(
     argsType = typeToken<Args>(),
     name = "GetAssetEmissionsTool",
     description = "Get the asset emission data for a country."
@@ -48,7 +48,7 @@ class GetAssetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) 
     }
 }
 
-class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPopulationTool.Args>(
+internal class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPopulationTool.Args>(
     argsType = typeToken<Args>(),
     name = "GetPopulationTool",
     description = "Get population data for a country by its country code"

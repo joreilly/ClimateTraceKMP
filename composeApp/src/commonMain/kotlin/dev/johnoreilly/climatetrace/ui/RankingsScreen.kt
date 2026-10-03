@@ -56,7 +56,7 @@ import org.koin.compose.koinInject
 
 private enum class RankingMode { Total, PerCapita }
 
-class RankingsScreen : Screen {
+internal class RankingsScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {

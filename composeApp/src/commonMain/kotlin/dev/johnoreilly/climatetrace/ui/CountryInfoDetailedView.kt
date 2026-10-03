@@ -66,7 +66,7 @@ import dev.johnoreilly.climatetrace.ui.utils.formatEmissionsQuantity
 import dev.johnoreilly.climatetrace.ui.utils.sectorIcon
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsUIState
 @Composable
-fun CountryInfoDetailedView(
+internal fun CountryInfoDetailedView(
     viewState: CountryDetailsUIState,
     perCapitaRank: Int? = null,
     onYearSelected: (String) -> Unit
@@ -132,7 +132,7 @@ fun CountryInfoDetailedView(
 
 
 @Composable
-fun CountryInfoDetailedViewSuccess(
+internal fun CountryInfoDetailedViewSuccess(
     viewState: CountryDetailsUIState.Success,
     perCapitaRank: Int?,
     onYearSelected: (String) -> Unit
@@ -657,7 +657,7 @@ internal fun CO2TrendSparkline(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun YearChips(selectedYear: String, availableYears: List<String>, onYearSelected: (String) -> Unit) {
+internal fun YearChips(selectedYear: String, availableYears: List<String>, onYearSelected: (String) -> Unit) {
     val listState = rememberLazyListState()
     val selectedIndex = availableYears.indexOf(selectedYear)
     LaunchedEffect(selectedYear) {
