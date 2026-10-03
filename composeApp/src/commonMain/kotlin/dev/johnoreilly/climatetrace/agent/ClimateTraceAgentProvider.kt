@@ -13,10 +13,10 @@ import kotlin.time.ExperimentalTime
 
 
 // TODO use Koin for these and inject?
-expect fun getLLModel(): LLModel
-expect fun getPromptExecutor(): PromptExecutor
+internal expect fun getLLModel(): LLModel
+internal expect fun getPromptExecutor(): PromptExecutor
 
-class ClimateTraceAgentProvider(
+internal class ClimateTraceAgentProvider(
     private val climateTraceRepository: ClimateTraceRepository
 ) : AgentProvider {
 

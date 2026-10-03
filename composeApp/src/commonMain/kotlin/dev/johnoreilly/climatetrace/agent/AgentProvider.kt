@@ -5,7 +5,7 @@ import ai.koog.agents.core.agent.AIAgent
 /**
  * Interface for agent factory
  */
-interface AgentProvider {
+internal interface AgentProvider {
     val description: String
 
     suspend fun provideAgent(

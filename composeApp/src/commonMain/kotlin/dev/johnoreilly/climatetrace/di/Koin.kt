@@ -29,21 +29,26 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
+// Public for androidApp/mcp-server; iOS calls the no-arg initKoin() in iosMain
+@OptIn(ExperimentalObjCRefinement::class)
+@HiddenFromObjC
 fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
         appDeclaration()
         modules(commonModule(enableNetworkLogs = enableNetworkLogs))
     }
 
-fun commonModule(enableNetworkLogs: Boolean = false) = module {
+internal fun commonModule(enableNetworkLogs: Boolean = false) = module {
     single { createJson() }
     single { createHttpClient(get(), enableNetworkLogs = enableNetworkLogs) }
     single { ClimateTraceApi(get()) }
     single { PopulationApi(get()) }
     single { IssPositionApi(get()) }
     single { ReverseGeocodeApi(get()) }
-    single { CountryListViewModel() }
+    single { CountryListViewModel(get()) }
     single { CountryDetailsViewModel() }
     factory { AssetDetailViewModel() }
     single { AgentViewModel(get()) }
@@ -53,14 +58,14 @@ fun commonModule(enableNetworkLogs: Boolean = false) = module {
     includes(dataModule())
 }
 
-expect fun dataModule(): Module
+internal expect fun dataModule(): Module
 
-fun createJson() = Json { isLenient = true; ignoreUnknownKeys = true }
+internal fun createJson() = Json { isLenient = true; ignoreUnknownKeys = true }
 
 
 //expect fun createHttpClientEngine(): HttpClientEngine
 
-fun createHttpClient(json: Json, enableNetworkLogs: Boolean) = HttpClient {
+internal fun createHttpClient(json: Json, enableNetworkLogs: Boolean) = HttpClient {
     install(ContentNegotiation) {
         json(json)
     }

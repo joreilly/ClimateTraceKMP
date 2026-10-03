@@ -10,9 +10,9 @@ import ai.koog.prompt.executor.llms.all.simpleGoogleAIExecutor
 import ai.koog.prompt.executor.model.PromptExecutor
 import dev.johnoreilly.climatetrace.BuildKonfig
 
-actual fun getLLModel() = GoogleModels.Gemini2_5Flash
+internal actual fun getLLModel() = GoogleModels.Gemini2_5Flash
 
-actual fun getPromptExecutor(): PromptExecutor {
+internal actual fun getPromptExecutor(): PromptExecutor {
     return simpleGoogleAIExecutor(BuildKonfig.GEMINI_API_KEY, KtorKoogHttpClient.Factory())
 }
 
@@ -27,9 +27,9 @@ val config = LiteRTClientConfig(
 
 val client = LiteRTLLMClient(config)
 
-actual fun getLLModel() = LiteRTLLModels.Gemma4E2B
+internal actual fun getLLModel() = LiteRTLLModels.Gemma4E2B
 
-actual fun getPromptExecutor(): PromptExecutor {
+internal actual fun getPromptExecutor(): PromptExecutor {
     return MultiLLMPromptExecutor(client)
 }
  */

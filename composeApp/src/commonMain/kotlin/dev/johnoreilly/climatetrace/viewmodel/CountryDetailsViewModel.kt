@@ -24,7 +24,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 
-sealed class CountryDetailsUIState {
+internal sealed class CountryDetailsUIState {
     data object NoCountrySelected : CountryDetailsUIState()
     data object Loading : CountryDetailsUIState()
     data class Error(val message: String) : CountryDetailsUIState()
@@ -39,12 +39,12 @@ sealed class CountryDetailsUIState {
     ) : CountryDetailsUIState()
 }
 
-sealed interface CountryDetailsEvents {
+internal sealed interface CountryDetailsEvents {
     data class SetCountry(val country: Country): CountryDetailsEvents
     data class SetYear(val year: String): CountryDetailsEvents
 }
 
-open class CountryDetailsViewModel : ViewModel(), KoinComponent {
+internal open class CountryDetailsViewModel : ViewModel(), KoinComponent {
     private val climateTraceRepository: ClimateTraceRepository by inject()
     private val availableYears = listOf(
         "2016", "2017", "2018", "2019", "2020",

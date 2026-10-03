@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 // Define message types for the chat
-sealed class Message {
+internal sealed class Message {
     data class UserMessage(val text: String) : Message()
     data class AgentMessage(val text: String) : Message()
     data class SystemMessage(val text: String) : Message()
@@ -23,7 +23,7 @@ sealed class Message {
 }
 
 // Define UI state for the agent demo screen
-data class AgentDemoUiState(
+internal data class AgentDemoUiState(
     val messages: List<Message> = listOf(Message.SystemMessage("Hi, I'm an agent that can help you")),
     val inputText: String = "Get emissions for Germany for 2025",
     val isInputEnabled: Boolean = true,
@@ -35,7 +35,7 @@ data class AgentDemoUiState(
     val currentUserResponse: String? = null,
 )
 
-class AgentViewModel(private val agentProvider: AgentProvider) : ViewModel() {
+internal class AgentViewModel(private val agentProvider: AgentProvider) : ViewModel() {
     // UI state
     private val _uiState = MutableStateFlow(
         AgentDemoUiState(

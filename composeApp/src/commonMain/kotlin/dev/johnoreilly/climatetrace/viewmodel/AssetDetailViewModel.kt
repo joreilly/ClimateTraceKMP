@@ -19,17 +19,17 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 
-sealed class AssetDetailUIState {
+internal sealed class AssetDetailUIState {
     data object Loading : AssetDetailUIState()
     data class Error(val message: String) : AssetDetailUIState()
     data class Success(val assetDetail: AssetDetail) : AssetDetailUIState()
 }
 
-sealed interface AssetDetailEvents {
+internal sealed interface AssetDetailEvents {
     data class LoadAsset(val sourceId: Int) : AssetDetailEvents
 }
 
-open class AssetDetailViewModel : ViewModel(), KoinComponent {
+internal open class AssetDetailViewModel : ViewModel(), KoinComponent {
     private val climateTraceRepository: ClimateTraceRepository by inject()
 
     private val events = MutableSharedFlow<AssetDetailEvents>(extraBufferCapacity = 20)

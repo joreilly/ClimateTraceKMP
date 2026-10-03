@@ -58,7 +58,12 @@ import dev.johnoreilly.climatetrace.viewmodel.Message
 import org.koin.compose.koinInject
 import androidx.compose.material.icons.filled.Refresh
 import kotlinx.coroutines.delay
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
+// Public for androidApp, iOS uses AgentViewController()
+@OptIn(ExperimentalObjCRefinement::class)
+@HiddenFromObjC
 @Composable
 fun AgentScreen() {
     val viewModel = koinInject<AgentViewModel>()

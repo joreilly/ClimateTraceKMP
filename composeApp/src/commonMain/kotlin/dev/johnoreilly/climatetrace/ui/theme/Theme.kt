@@ -238,19 +238,19 @@ private val highContrastDarkColorScheme = darkColorScheme(
 )
 
 @Immutable
-data class ColorFamily(
+internal data class ColorFamily(
     val color: Color,
     val onColor: Color,
     val colorContainer: Color,
     val onColorContainer: Color
 )
 
-val unspecified_scheme = ColorFamily(
+internal val unspecified_scheme = ColorFamily(
     Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
 )
 
 @Composable
-fun ClimateTraceTheme(
+internal fun ClimateTraceTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
