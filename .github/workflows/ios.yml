@@ -40,6 +40,16 @@ jobs:
         run: |
           xcodes select 26.3
 
+      - name: Run shared tests on iOS simulator
+        run: ./gradlew :composeApp:iosSimulatorArm64Test
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-test-reports
+          path: "**/build/reports/tests/"
+
       - name: Build iOS app
         run: xcodebuild -allowProvisioningUpdates -workspace iosApp/iosApp.xcodeproj/project.xcworkspace -configuration Debug -scheme iosApp -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' ARCHS=arm64
 
