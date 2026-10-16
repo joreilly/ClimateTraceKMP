@@ -21,9 +21,12 @@ The iOS client as mentioned includes shared Compose Multiplatform UI code.  It a
 
 
 Related posts:
+* [Using Amper with Fleet in a Kotlin/Compose Multiplatform project](https://johnoreilly.dev/posts/amper-kmp-climatetrace/)
 * [Kotlin MCP 💜 Kotlin Multiplatform](https://johnoreilly.dev/posts/kotlin-mcp-kmp/)
 * [Initial exploration of using Koog for developing Kotlin based AI agents](https://johnoreilly.dev/posts/kotlin-koog/)
 * [Using Google's Agent Development Kit for Java from Kotlin code](https://johnoreilly.dev/posts/kotlin-adk/)
+* [Deploying a Kotlin-based remote MCP Server to Google Cloud Run](https://johnoreilly.dev/posts/remote-mcp/)
+* [Rendering AI agent generated UI using Jetpack Compose A2UI and Koog](https://johnoreilly.dev/posts/a2ui-compose-koog/)
 
 
 ## Project structure
