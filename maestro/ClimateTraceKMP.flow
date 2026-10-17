@@ -1,0 +1,17 @@
+# Shared by the Android and iOS apps: CI passes APP_ID with -e
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+
+# Countries and emissions come from the live Climate TRACE API, so allow for a slow network.
+# The country list is long, so the scroll gets extra time.
+- scrollUntilVisible:
+    element: "Ireland"
+    timeout: 90000
+- tapOn: "Ireland"
+
+- extendedWaitUntil:
+    visible: "Emissions Summary"
+    timeout: 30000
+- takeScreenshot: ClimateTraceKMP

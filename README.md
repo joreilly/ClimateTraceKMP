@@ -130,6 +130,11 @@ The Dev UI is then available at http://localhost:8081. A `gemini_api_key` entry 
 There's also a `./gradlew :agents:runAdkAgent` task that runs the agent once against a fixed prompt from the console.
 
 
+### UI tests
+
+There's a [Maestro](https://maestro.mobile.dev/) UI test flow shared by the Android and iOS clients, run by CI on
+an emulator and a simulator (e.g. `maestro test -e APP_ID=dev.johnoreilly.climatetrace maestro/ClimateTraceKMP.flow`).
+
 ## Full set of Kotlin Multiplatform/Compose/SwiftUI samples
 
 *  PeopleInSpace (https://github.com/joreilly/PeopleInSpace)
