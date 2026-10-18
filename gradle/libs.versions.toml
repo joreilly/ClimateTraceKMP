@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.4.21"
+kotlin = "2.5.0-Beta2-58"
 ksp = "2.3.12"
 kotlinx-coroutines = "1.11.0"
 kotlinx-dateTime = "0.8.0-0.6.x-compat"
@@ -19,8 +19,6 @@ httpclient5 = "5.6.5"
 koalaplot = "0.12.1"
 koin = "4.2.2"
 koin-compose-multiplatform = "4.2.2"
-kmpNativeCoroutines = "1.0.6"
-kmpObservableViewModel = "1.1.0"
 lifecycle-viewmodel = "2.11.0"
 kstore = "1.1.0"
 ktor = "3.6.0"
@@ -67,7 +65,6 @@ kotlinx-coroutines-rx3 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-dateTime" }
 
-kmpObservableViewModel = { module = "com.rickclephas.kmp:kmp-observableviewmodel-core", version.ref = "kmpObservableViewModel" }
 lifecycleViewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle-viewmodel" }
 
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
@@ -109,7 +106,6 @@ jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm" }
 shadowPlugin = { id = "com.gradleup.shadow", version.ref = "shadowPlugin" }

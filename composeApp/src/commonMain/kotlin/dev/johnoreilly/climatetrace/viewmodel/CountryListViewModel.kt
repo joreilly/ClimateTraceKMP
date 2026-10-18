@@ -1,9 +1,8 @@
 package dev.johnoreilly.climatetrace.viewmodel
 
-import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
-import com.rickclephas.kmp.observableviewmodel.MutableStateFlow
-import com.rickclephas.kmp.observableviewmodel.ViewModel
-import com.rickclephas.kmp.observableviewmodel.coroutineScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
@@ -27,8 +26,7 @@ open class CountryListViewModel internal constructor(
     private val climateTraceRepository: ClimateTraceRepository
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow<CountryListUIState>(viewModelScope, CountryListUIState.Loading)
-    @NativeCoroutinesState
+    private val _viewState = MutableStateFlow<CountryListUIState>(CountryListUIState.Loading)
     val viewState: StateFlow<CountryListUIState> = _viewState.asStateFlow()
 
 
@@ -41,7 +39,7 @@ open class CountryListViewModel internal constructor(
     }
 
     private fun loadCountryData() {
-        viewModelScope.coroutineScope.launch {
+        viewModelScope.launch {
             _viewState.value = CountryListUIState.Loading
             try {
                 val countries = climateTraceRepository.fetchCountries().sortedBy { it.name }

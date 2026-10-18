@@ -1,13 +1,11 @@
 import UIKit
 import SwiftUI
 import ComposeApp
-import KMPObservableViewModelCore
-import KMPObservableViewModelSwiftUI
 
 
 struct ContentView: View {
     @State private var navigateToDetailsScreen = false
-    @State private var selectedCountry: Country? = nil
+    @State private var selectedCountry: remote.Country? = nil
     
     var body: some View {
         TabView {
@@ -63,52 +61,54 @@ struct ContentView: View {
 */
 
 struct CountryListView: View {
-    @StateViewModel var viewModel = Koin_iosKt.countryListViewModel()
+    @State private var viewModel = di.countryListViewModel()
     @State var query: String = ""
     
     var body: some View {
         
-        switch(viewModel.viewState) {
+        Observing(viewModel.viewState) { viewState in
+            switch viewState.sealedType() {
          
-        case is CountryListUIState.Loading:
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle())
-                .scaleEffect(1.5)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        case is CountryListUIState.Error:  Text("Error")
-        case let state as CountryListUIState.Success:
+            case .loading:
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .scaleEffect(1.5)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            case .error:  Text("Error")
+            case .success(let success):
+                let state = success.value
             
-            NavigationView {
-                ZStack {
-                    List {
-                        ForEach(state.countryList.filter { query.isEmpty || $0.name.contains(query) }, id: \.self) { country in
-                            NavigationLink(destination: CountryInfoDetailedViewShared(country: country)) {
-                                HStack {
-                                    Text(country.name).font(.headline)
+                NavigationView {
+                    ZStack {
+                        List {
+                            ForEach(state.countryList.filter { query.isEmpty || $0.name.contains(query) }, id: \.self) { country in
+                                NavigationLink(destination: CountryInfoDetailedViewShared(country: country)) {
+                                    HStack {
+                                        Text(country.name).font(.headline)
+                                    }
                                 }
                             }
                         }
-                    }
-                    .searchable(text: $query)
-                    .disableAutocorrection(true)
+                        .searchable(text: $query)
+                        .disableAutocorrection(true)
 
-                    if state.countryList.filter({ query.isEmpty || $0.name.contains(query) }).isEmpty {
-                        Text("No Countries Found!")
-                            .font(.headline)
-                            .foregroundColor(.gray)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        if state.countryList.filter({ query.isEmpty || $0.name.contains(query) }).isEmpty {
+                            Text("No Countries Found!")
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
                     }
-                }
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        VStack {
-                            Text("ClimateTrace").font(.headline)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .principal) {
+                            VStack {
+                                Text("ClimateTrace").font(.headline)
+                            }
                         }
                     }
                 }
             }
-        default: EmptyView()
         }
     }
 }
@@ -116,10 +116,10 @@ struct CountryListView: View {
 
 
 struct CountryListViewShared: UIViewControllerRepresentable {
-    let onCountryClicked: (Country) -> Void
+    let onCountryClicked: (remote.Country) -> Void
     
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.CountryListViewController { country in
+        CountryListViewController { country in
             onCountryClicked(country)
         }
     }
@@ -128,10 +128,10 @@ struct CountryListViewShared: UIViewControllerRepresentable {
 }
 
 struct CountryInfoDetailedViewShared: UIViewControllerRepresentable {
-    let country: Country
+    let country: remote.Country
     
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.CountryInfoDetailedViewController(country: country)
+        CountryInfoDetailedViewController(country: country)
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
@@ -139,7 +139,7 @@ struct CountryInfoDetailedViewShared: UIViewControllerRepresentable {
 
 struct AgentViewShared: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        MainViewControllerKt.AgentViewController()
+        AgentViewController()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
