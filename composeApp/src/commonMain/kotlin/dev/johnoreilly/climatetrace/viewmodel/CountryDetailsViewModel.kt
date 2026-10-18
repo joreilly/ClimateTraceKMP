@@ -8,8 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.launchMolecule
-import com.rickclephas.kmp.observableviewmodel.ViewModel
-import com.rickclephas.kmp.observableviewmodel.coroutineScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.Asset
 import dev.johnoreilly.climatetrace.remote.Country
@@ -53,7 +53,7 @@ internal open class CountryDetailsViewModel : ViewModel(), KoinComponent {
 
     private val events = MutableSharedFlow<CountryDetailsEvents>(extraBufferCapacity = 20)
 
-    val viewState: StateFlow<CountryDetailsUIState> = viewModelScope.coroutineScope.launchMolecule(mode = RecompositionMode.Immediate) {
+    val viewState: StateFlow<CountryDetailsUIState> = viewModelScope.launchMolecule(mode = RecompositionMode.Immediate) {
         CountryDetailsPresenter(events)
     }
 

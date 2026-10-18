@@ -1,9 +1,8 @@
 package dev.johnoreilly.climatetrace.viewmodel
 
-import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
-import com.rickclephas.kmp.observableviewmodel.MutableStateFlow
-import com.rickclephas.kmp.observableviewmodel.ViewModel
-import com.rickclephas.kmp.observableviewmodel.coroutineScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.Country
 import kotlinx.coroutines.flow.StateFlow
@@ -23,13 +22,13 @@ internal sealed class IssPositionUiState {
 internal open class IssTrackerViewModel : ViewModel(), KoinComponent {
     private val climateTraceRepository: ClimateTraceRepository by inject()
 
-    private val _viewState = MutableStateFlow<IssPositionUiState>(viewModelScope, IssPositionUiState.Loading)
+    private val _viewState = MutableStateFlow<IssPositionUiState>(IssPositionUiState.Loading)
     val viewState: StateFlow<IssPositionUiState> = _viewState.asStateFlow()
 
     private var countries: List<Country> = emptyList()
 
     init {
-        viewModelScope.coroutineScope.launch {
+        viewModelScope.launch {
             try {
                 countries = climateTraceRepository.fetchCountries()
             } catch (_: Exception) {

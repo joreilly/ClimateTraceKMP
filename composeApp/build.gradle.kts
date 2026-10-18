@@ -14,7 +14,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.kmpNativeCoroutines)
     alias(libs.plugins.buildkonfig)
 }
 
@@ -87,7 +86,6 @@ kotlin {
 
             implementation(libs.voyager)
 
-            implementation(libs.kmpObservableViewModel)
             implementation(libs.lifecycleViewmodel)
 
             implementation(libs.koalaplot)

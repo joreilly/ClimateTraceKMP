@@ -8,8 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.launchMolecule
-import com.rickclephas.kmp.observableviewmodel.ViewModel
-import com.rickclephas.kmp.observableviewmodel.coroutineScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.AssetDetail
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +34,7 @@ internal open class AssetDetailViewModel : ViewModel(), KoinComponent {
 
     private val events = MutableSharedFlow<AssetDetailEvents>(extraBufferCapacity = 20)
 
-    val viewState: StateFlow<AssetDetailUIState> = viewModelScope.coroutineScope.launchMolecule(mode = RecompositionMode.Immediate) {
+    val viewState: StateFlow<AssetDetailUIState> = viewModelScope.launchMolecule(mode = RecompositionMode.Immediate) {
         AssetDetailPresenter(events)
     }
 
