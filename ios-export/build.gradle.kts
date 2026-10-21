@@ -26,10 +26,6 @@ kotlin {
         swift {
             moduleName = "Shared"
             xcodeIntegration {
-                configure(projects.composeApp) {
-                    moduleName = "ComposeApp"
-                    rootPackage = "dev.johnoreilly.climatetrace"
-                }
                 listOf(
                     "io.insert-koin:koin-core",
                     "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel",
