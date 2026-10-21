@@ -18,6 +18,15 @@ plugins {
 }
 
 kotlin {
+    // Swift module name and package flattening for this module, picked up by :ios-export.
+    @OptIn(org.jetbrains.kotlin.gradle.swiftexport.ExperimentalSwiftExportDsl::class)
+    export {
+        swift {
+            moduleName = "ComposeApp"
+            rootPackage = "dev.johnoreilly.climatetrace"
+        }
+    }
+
     jvmToolchain(24)
 
     wasmJs {
