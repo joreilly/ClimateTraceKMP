@@ -18,7 +18,7 @@ import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
  * GetPopulationTool, keeping the population lookup context separate from the
  * main agent's context.
  */
-fun createPopulationAgentTool(
+internal fun createPopulationAgentTool(
     climateTraceRepository: ClimateTraceRepository
 ): Tool<*, *> {
     val toolRegistry = ToolRegistry {

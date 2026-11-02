@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.emptyFlow
  * [UnsupportedA2uiRenderer] in their Koin `dataModule()`: [isSupported] is false and the agent isn't
  * told it can show UI there, so it answers in plain text.
  */
-interface A2uiRenderer {
+internal interface A2uiRenderer {
     val isSupported: Boolean
 
     /** Id of the component catalog the client renders, used in `createSurface`. */
@@ -43,14 +43,14 @@ interface A2uiRenderer {
     fun Surface(surfaceId: String, modifier: Modifier)
 }
 
-sealed interface A2uiEvent {
+internal sealed interface A2uiEvent {
     val description: String
 
     data class UserAction(override val description: String) : A2uiEvent
     data class Error(override val description: String) : A2uiEvent
 }
 
-object UnsupportedA2uiRenderer : A2uiRenderer {
+internal object UnsupportedA2uiRenderer : A2uiRenderer {
     override val isSupported = false
     override val catalogId = ""
     override val catalogSchema = ""

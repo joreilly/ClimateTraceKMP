@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 
 @Stable
-sealed class ChartNode {
+internal sealed class ChartNode {
 
     abstract val name: String
     abstract val value: Double

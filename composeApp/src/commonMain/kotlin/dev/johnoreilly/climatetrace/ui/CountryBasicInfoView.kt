@@ -32,7 +32,7 @@ import io.github.koalaplot.core.util.toString
 // Stripped-down companion to CountryInfoDetailedView: header, key stats, year
 // picker, trend, and a compact sector breakdown - no asset list or treemap.
 @Composable
-fun CountryBasicEmissionsView(
+internal fun CountryBasicEmissionsView(
     viewState: CountryDetailsUIState,
     perCapitaRank: Int? = null,
     onYearSelected: (String) -> Unit = {}

@@ -14,11 +14,19 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.kmpNativeCoroutines)
     alias(libs.plugins.buildkonfig)
 }
 
 kotlin {
+    // Swift module name and package flattening for this module, picked up by :ios-export.
+    @OptIn(org.jetbrains.kotlin.gradle.swiftexport.ExperimentalSwiftExportDsl::class)
+    export {
+        swift {
+            moduleName = "ComposeApp"
+            rootPackage = "dev.johnoreilly.climatetrace"
+        }
+    }
+
     jvmToolchain(24)
 
     wasmJs {
@@ -87,7 +95,6 @@ kotlin {
 
             implementation(libs.voyager)
 
-            implementation(libs.kmpObservableViewModel)
             implementation(libs.lifecycleViewmodel)
 
             implementation(libs.koalaplot)

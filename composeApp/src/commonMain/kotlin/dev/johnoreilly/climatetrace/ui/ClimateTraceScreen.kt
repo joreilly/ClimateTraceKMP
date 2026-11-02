@@ -65,8 +65,13 @@ import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryListUIState
 import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
 import org.koin.compose.koinInject
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
 
+// Public for androidApp
+@OptIn(ExperimentalObjCRefinement::class)
+@HiddenFromObjC
 class ClimateTraceScreen: Screen {
     @Composable
     override fun Content() {
@@ -91,7 +96,7 @@ class ClimateTraceScreen: Screen {
 }
 
 @Composable
-fun CountryScreenSuccess(
+internal fun CountryScreenSuccess(
     countryList: List<Country>,
     rankings: Map<String, Int> = emptyMap(),
     perCapitaRankings: Map<String, Int> = emptyMap()
@@ -168,7 +173,7 @@ private fun ExpandedCountryLayout(
 
 
 @Composable
-fun CountryListView(
+internal fun CountryListView(
     countryList: List<Country>,
     selectedCountry: Country?,
     countrySelected: (country: Country) -> Unit,
@@ -192,11 +197,11 @@ fun CountryListView(
     }
 }
 
-enum class CountrySort { Name, Rank }
+internal enum class CountrySort { Name, Rank }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchableList(
+internal fun SearchableList(
     searchQuery: MutableState<String>,
     onSearchQueryChange: (String) -> Unit,
     countryList: List<Country>,
@@ -324,7 +329,7 @@ fun SearchableList(
 }
 
 @Composable
-fun ErrorState(
+internal fun ErrorState(
     message: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
@@ -360,7 +365,7 @@ fun ErrorState(
 }
 
 @Composable
-fun EmptyState(
+internal fun EmptyState(
     title: String? = null,
     message: String? = null
 ) {
@@ -378,7 +383,7 @@ fun EmptyState(
 
 
 @Composable
-fun CountryRow(
+internal fun CountryRow(
     country: Country,
     selectedCountry: Country?,
     countrySelected: (country: Country) -> Unit,

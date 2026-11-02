@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
  * Renders A2UI surfaces with the Material 3 Basic Catalog (`androidx.compose.material3:material3-a2ui`)
  * plus ClimateTrace's own components ([climateTraceA2uiComponents]).
  */
-class AndroidA2uiRenderer(context: Context) : A2uiRenderer {
+internal class AndroidA2uiRenderer(context: Context) : A2uiRenderer {
 
     private val basicCatalog = materialA2uiBasicCatalogV1(
         image = MaterialA2uiBasicCatalogV1Defaults.image { url, contentDescription, contentScale, modifier, onError ->

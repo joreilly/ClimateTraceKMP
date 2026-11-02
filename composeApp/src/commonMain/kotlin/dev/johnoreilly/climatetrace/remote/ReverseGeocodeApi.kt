@@ -28,7 +28,7 @@ private data class NominatimReverseResponse(
 // User-Agent - see https://operations.osmfoundation.org/policies/nominatim/. The shared
 // HttpClient sends that header by default (see Koin.kt).
 // zoom=3 caps detail at country level; coordinates over open ocean return no address.
-class ReverseGeocodeApi(
+internal class ReverseGeocodeApi(
     private val client: HttpClient,
     private val baseUrl: String = "https://nominatim.openstreetmap.org/reverse",
 ) {

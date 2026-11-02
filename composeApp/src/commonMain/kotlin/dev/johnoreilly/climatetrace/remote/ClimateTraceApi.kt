@@ -115,7 +115,7 @@ data class AggregatedEmissionsResponse(
     val subsectors: AggregatedEmissionsOverview? = null,
 )
 
-class ClimateTraceApi(
+internal class ClimateTraceApi(
     private val client: HttpClient,
     private val baseUrl: String = "https://api.climatetrace.org/v7",
 ) {

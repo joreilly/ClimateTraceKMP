@@ -44,10 +44,10 @@ import dev.johnoreilly.climatetrace.ui.utils.alpha3ToAlpha2
  * ClimateTrace-specific A2UI components, added alongside the Material 3 Basic Catalog. Their
  * descriptions and properties end up in the catalog JSON Schema the agent is given.
  */
-val climateTraceA2uiComponents: List<A2uiComponent> = listOf(CountryFlagComponent, EmissionsChartComponent)
+internal val climateTraceA2uiComponents: List<A2uiComponent> = listOf(CountryFlagComponent, EmissionsChartComponent)
 
 /** A country's flag, drawn with the same FlagKit flags used elsewhere in the app. */
-object CountryFlagComponent : A2uiComponent {
+internal object CountryFlagComponent : A2uiComponent {
     private val countryCode = A2uiProperty.string(
         "countryCode",
         required = true,
@@ -67,7 +67,7 @@ object CountryFlagComponent : A2uiComponent {
 }
 
 /** Horizontal bar chart, styled like the Rankings screen's rows. */
-object EmissionsChartComponent : A2uiComponent {
+internal object EmissionsChartComponent : A2uiComponent {
     private val title = A2uiProperty.string("title", description = "Optional chart title.")
     private val unit = A2uiProperty.string("unit", description = "Unit shown after each value, e.g. 'Mt CO2e'.")
     private val label = A2uiProperty.string("label", required = true, description = "Bar label, e.g. a country name.")
@@ -158,7 +158,7 @@ private fun FlagImage(alpha3Code: String, modifier: Modifier) {
  * isn't given the height either. Here the Row is measured at its intrinsic height and each child
  * component is told to fill it. Other alignments use the library's Row unchanged.
  */
-object EqualHeightRow : A2uiBasicCatalogV1.Row {
+internal object EqualHeightRow : A2uiBasicCatalogV1.Row {
     private val materialRow = MaterialA2uiBasicCatalogV1Defaults.row
 
     @Composable

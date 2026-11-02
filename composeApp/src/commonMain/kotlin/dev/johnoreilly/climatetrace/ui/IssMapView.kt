@@ -32,7 +32,7 @@ private const val MAP_ZOOM = 3
 // The modifier determines the overall (square) size - e.g. fillMaxWidth().aspectRatio(1f) -
 // and each of the 9 tiles is sized to a third of that.
 @Composable
-fun IssMapView(latitude: Double, longitude: Double, modifier: Modifier = Modifier) {
+internal fun IssMapView(latitude: Double, longitude: Double, modifier: Modifier = Modifier) {
     val tilesPerAxis = 1 shl MAP_ZOOM
 
     val latRad = latitude * PI / 180.0

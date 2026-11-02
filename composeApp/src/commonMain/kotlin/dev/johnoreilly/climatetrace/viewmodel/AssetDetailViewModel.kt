@@ -8,8 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.launchMolecule
-import com.rickclephas.kmp.observableviewmodel.ViewModel
-import com.rickclephas.kmp.observableviewmodel.coroutineScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
 import dev.johnoreilly.climatetrace.remote.AssetDetail
 import kotlinx.coroutines.flow.Flow
@@ -19,22 +19,22 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 
-sealed class AssetDetailUIState {
+internal sealed class AssetDetailUIState {
     data object Loading : AssetDetailUIState()
     data class Error(val message: String) : AssetDetailUIState()
     data class Success(val assetDetail: AssetDetail) : AssetDetailUIState()
 }
 
-sealed interface AssetDetailEvents {
+internal sealed interface AssetDetailEvents {
     data class LoadAsset(val sourceId: Int) : AssetDetailEvents
 }
 
-open class AssetDetailViewModel : ViewModel(), KoinComponent {
+internal open class AssetDetailViewModel : ViewModel(), KoinComponent {
     private val climateTraceRepository: ClimateTraceRepository by inject()
 
     private val events = MutableSharedFlow<AssetDetailEvents>(extraBufferCapacity = 20)
 
-    val viewState: StateFlow<AssetDetailUIState> = viewModelScope.coroutineScope.launchMolecule(mode = RecompositionMode.Immediate) {
+    val viewState: StateFlow<AssetDetailUIState> = viewModelScope.launchMolecule(mode = RecompositionMode.Immediate) {
         AssetDetailPresenter(events)
     }
 

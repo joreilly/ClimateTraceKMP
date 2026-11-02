@@ -8,7 +8,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 
-class PopulationApi(
+internal class PopulationApi(
     private val client: HttpClient,
     private val baseUrl: String = "https://api.worldbank.org/v2/country/"
 ) {

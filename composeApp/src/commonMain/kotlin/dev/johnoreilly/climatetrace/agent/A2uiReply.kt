@@ -8,7 +8,7 @@ import kotlinx.serialization.json.JsonArray
  * the block out and sends its messages to the renderer, returning the rest of the reply as the text
  * to show in the chat. Any errors come back on [A2uiRenderer.events] and are sent to the agent.
  */
-object A2uiReply {
+internal object A2uiReply {
     private val blockRegex = Regex("```a2ui\\s*\\n(.*?)```", RegexOption.DOT_MATCHES_ALL)
 
     fun render(reply: String, renderer: A2uiRenderer): String {
@@ -31,7 +31,7 @@ object A2uiReply {
 }
 
 /** System prompt addition telling the LLM when and how to show UI. */
-fun a2uiInstructions(renderer: A2uiRenderer) =
+internal fun a2uiInstructions(renderer: A2uiRenderer) =
     """
     The user's device can display native UI. When an answer contains data that suits a visual layout
     (comparisons, rankings, several countries or years), include the UI in your final reply as A2UI

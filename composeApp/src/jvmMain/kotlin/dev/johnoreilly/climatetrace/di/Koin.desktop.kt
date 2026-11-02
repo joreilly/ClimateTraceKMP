@@ -15,7 +15,7 @@ private const val PACKAGE_NAME = "dev.johnoreilly.climatetrace"
 private const val VERSION = "2.0.0"
 private const val AUTHOR = "johnoreilly"
 
-actual fun dataModule(): Module = module {
+internal actual fun dataModule(): Module = module {
     // androidx.a2ui is Android-only.
     single<A2uiRenderer> { UnsupportedA2uiRenderer }
     single<KStore<List<Country>>> {

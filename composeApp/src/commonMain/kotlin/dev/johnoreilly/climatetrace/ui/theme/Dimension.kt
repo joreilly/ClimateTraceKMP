@@ -5,7 +5,7 @@ import androidx.compose.ui.unit.dp
 // Material 3 spacing grid system
 // Based on 4dp grid: https://m3.material.io/foundations/layout/understanding-layout/spacing
 
-object AppDimension {
+internal object AppDimension {
     // Base spacing units
     val spacingExtraSmall = 4.dp
     val spacingSmall = 8.dp

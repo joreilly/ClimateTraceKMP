@@ -10,7 +10,7 @@ import io.ktor.client.engine.js.Js
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-actual fun dataModule(): Module = module {
+internal actual fun dataModule(): Module = module {
     // androidx.a2ui is Android-only.
     single<A2uiRenderer> { UnsupportedA2uiRenderer }
     single<KStore<List<Country>>> {

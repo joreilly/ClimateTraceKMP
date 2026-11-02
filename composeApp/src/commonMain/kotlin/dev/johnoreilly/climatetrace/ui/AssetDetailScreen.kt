@@ -44,7 +44,7 @@ import dev.johnoreilly.climatetrace.viewmodel.AssetDetailUIState
 import dev.johnoreilly.climatetrace.viewmodel.AssetDetailViewModel
 import org.koin.compose.koinInject
 
-data class AssetDetailScreen(val sourceId: Int, val assetName: String) : Screen {
+internal data class AssetDetailScreen(val sourceId: Int, val assetName: String) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -107,7 +107,7 @@ data class AssetDetailScreen(val sourceId: Int, val assetName: String) : Screen 
 }
 
 @Composable
-fun AssetDetailContent(assetDetail: AssetDetail) {
+internal fun AssetDetailContent(assetDetail: AssetDetail) {
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())

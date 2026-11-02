@@ -15,7 +15,7 @@ fun initKoin(context: Context) = initKoin(enableNetworkLogs = false) {
     androidContext(context)
 }
 
-actual fun dataModule(): Module = module {
+internal actual fun dataModule(): Module = module {
     single<A2uiRenderer> { AndroidA2uiRenderer(androidContext()) }
     single<KStore<List<Country>>> {
         val filesDir: String = androidContext().filesDir.path

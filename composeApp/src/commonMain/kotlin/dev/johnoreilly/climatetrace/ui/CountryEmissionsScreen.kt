@@ -18,7 +18,7 @@ import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
-data class CountryEmissionsScreen(val country: Country, val perCapitaRank: Int? = null) : Screen {
+internal data class CountryEmissionsScreen(val country: Country, val perCapitaRank: Int? = null) : Screen {
 
     @Composable
     override fun Content() {

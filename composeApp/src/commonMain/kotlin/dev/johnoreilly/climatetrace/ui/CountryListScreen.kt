@@ -24,7 +24,7 @@ import org.koin.compose.koinInject
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-class CountryListScreen : Screen {
+internal class CountryListScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow

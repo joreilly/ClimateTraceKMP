@@ -6,33 +6,79 @@ import ai.koog.agents.core.tools.SimpleTool
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.serialization.typeToken
 import dev.johnoreilly.climatetrace.data.ClimateTraceRepository
+import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
 import dev.johnoreilly.climatetrace.remote.CountryEmissionsInfo
-import io.github.koalaplot.core.util.toString
+import dev.johnoreilly.climatetrace.ui.utils.alpha2ToAlpha3
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.Serializable
+import kotlin.math.roundToLong
 import kotlin.time.ExperimentalTime
 
-class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetEmissionsTool.Args>(
+// Tool results are read by the LLM, so label every figure and pre-convert to the units the
+// system prompt asks for -- small on-device models misread raw tonnes like 1.8631950821185857E8.
+private fun Double.oneDecimal() = (this * 10).roundToLong() / 10.0
+private fun Double.toMillionTonnes() = "${(this / 1_000_000).oneDecimal()} million tonnes CO2e"
+
+/** One line per requested country, in request order (the API returns ranking order). */
+internal fun formatCountryEmissions(countryCodes: List<String>, year: String, infos: List<CountryEmissionsInfo>): String {
+    val byCountry = infos.associateBy { it.country }
+    return countryCodes.joinToString("\n") { code ->
+        val info = byCountry[code]
+        if (info == null) "$code ($year): no data" else "$code ($year): ${info.emissionsQuantity.toMillionTonnes()}"
+    }
+}
+
+/** Like [formatCountryEmissions], with ClimateTrace's own per-capita figure (as on the Rankings screen). */
+internal fun formatPerCapitaEmissions(countryCodes: List<String>, year: String, infos: List<CountryEmissionsInfo>): String {
+    val byCountry = infos.associateBy { it.country }
+    return countryCodes.joinToString("\n") { code ->
+        val info = byCountry[code]
+        if (info == null) "$code ($year): no data" else "$code ($year): ${info.emissionsPerCapita.oneDecimal()} tonnes CO2e per person"
+    }
+}
+
+/** Sectors largest first, then the top subsectors; the API mixes both in one list. */
+internal fun formatSectorEmissions(countryCode: String, year: String, summaries: List<CountryAssetEmissionsInfo>): String {
+    val (subsectors, sectors) = summaries.partition { it.subsector != null }
+    return buildString {
+        appendLine("$countryCode ($year) emissions by sector, largest first:")
+        sectors.sortedByDescending { it.emissionsQuantity }.forEach {
+            appendLine("- ${it.sector}: ${it.emissionsQuantity.toMillionTonnes()} (${it.percentage.oneDecimal()}%)")
+        }
+        appendLine("Top subsectors:")
+        subsectors.sortedByDescending { it.emissionsQuantity }.take(10).forEach {
+            appendLine("- ${it.sector} / ${it.subsector}: ${it.emissionsQuantity.toMillionTonnes()} (${it.percentage.oneDecimal()}%)")
+        }
+    }.trimEnd()
+}
+
+private const val COUNTRY_CODES_DESCRIPTION = "ISO 3166-1 alpha-3 country code list (e.g., 'USA', 'GBR', 'IRL')"
+
+// Models often send alpha-2 codes ('IE'); the API only accepts alpha-3.
+internal fun normalizeCountryCode(code: String): String =
+    code.trim().uppercase().let { if (it.length == 2) alpha2ToAlpha3(it) ?: it else it }
+
+internal class GetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetEmissionsTool.Args>(
     argsType = typeToken<Args>(),
     name = "GetEmissionsTool",
-    description = "Get total emissions for one or more countries for a particular year. " +
-        "Pass all the countries needed in a single call."
+    description = "Get the total emissions for one or more countries for a particular year. " +
+        "Use this for totals, comparisons and changes over time; use GetPerCapitaEmissionsTool for per-capita figures."
 ) {
     @Serializable
     data class Args(
-        @property:LLMDescription("ISO country code list (e.g., 'USA', 'GBR', 'FRA')")
+        @property:LLMDescription(COUNTRY_CODES_DESCRIPTION)
         val countryCodeList: List<String>,
         @property:LLMDescription("Year for which emissions occurred")
         val year: String
     )
 
-    // Labelled per country (the bare numbers used before couldn't be attributed, so the LLM fell
-    // back to one call per country) and already converted to the unit the agent reports in.
-    override suspend fun execute(args: Args): String =
-        climateTraceRepository.fetchCountryEmissionsInfo(args.countryCodeList, args.year)
-            .formatPerCountry(args.countryCodeList) { "${(it.emissionsQuantity / 1_000_000).toString(2)} Mt CO2e" }
+    override suspend fun execute(args: Args): String {
+        val codes = args.countryCodeList.map(::normalizeCountryCode)
+        return formatCountryEmissions(codes, args.year, climateTraceRepository.fetchCountryEmissionsInfo(codes, args.year))
+    }
 }
 
-class GetPerCapitaEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPerCapitaEmissionsTool.Args>(
+internal class GetPerCapitaEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPerCapitaEmissionsTool.Args>(
     argsType = typeToken<Args>(),
     name = "GetPerCapitaEmissionsTool",
     description = "Get per capita emissions (tonnes of CO2e per person) for one or more countries for a " +
@@ -41,49 +87,48 @@ class GetPerCapitaEmissionsTool(val climateTraceRepository: ClimateTraceReposito
 ) {
     @Serializable
     data class Args(
-        @property:LLMDescription("ISO country code list (e.g., 'USA', 'GBR', 'FRA')")
+        @property:LLMDescription(COUNTRY_CODES_DESCRIPTION)
         val countryCodeList: List<String>,
         @property:LLMDescription("Year for which emissions occurred")
         val year: String
     )
 
-    // ClimateTrace's own per-capita figure (as shown on the Rankings screen), from the same single
-    // rankings request as GetEmissionsTool - no population lookups needed.
-    override suspend fun execute(args: Args): String =
-        climateTraceRepository.fetchCountryEmissionsInfo(args.countryCodeList, args.year)
-            .formatPerCountry(args.countryCodeList) { "${it.emissionsPerCapita.toString(2)} t CO2e per person" }
-}
-
-private fun List<CountryEmissionsInfo>.formatPerCountry(
-    requested: List<String>,
-    value: (CountryEmissionsInfo) -> String,
-): String {
-    val found = associateBy { it.country }
-    return requested.joinToString("\n") { code ->
-        found[code]?.let { "$code (${it.name ?: code}): ${value(it)}" } ?: "$code: no data"
+    // Same single rankings request as GetEmissionsTool - no population lookups needed.
+    override suspend fun execute(args: Args): String {
+        val codes = args.countryCodeList.map(::normalizeCountryCode)
+        return formatPerCapitaEmissions(codes, args.year, climateTraceRepository.fetchCountryEmissionsInfo(codes, args.year))
     }
 }
 
-
-class GetAssetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetAssetEmissionsTool.Args>(
+internal class GetAssetEmissionsTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetAssetEmissionsTool.Args>(
     argsType = typeToken<Args>(),
     name = "GetAssetEmissionsTool",
-    description = "Get the asset emission data for a country."
+    description = "Get the emissions broken down by sector (e.g. power, transportation, agriculture) for one or more " +
+        "countries for a particular year. Only use this when a sector breakdown is needed; use GetEmissionsTool for totals."
 ) {
     @Serializable
     data class Args(
-        @property:LLMDescription("ISO country code list (e.g., 'USA', 'GBR', 'FRA')")
+        @property:LLMDescription(COUNTRY_CODES_DESCRIPTION)
         val countryCodeList: List<String>,
         @property:LLMDescription("Year for which emissions occurred")
         val year: String
     )
 
     override suspend fun execute(args: Args): String {
-        return climateTraceRepository.fetchCountryAssetEmissionsInfo(args.countryCodeList, args.year).toString()
+        return args.countryCodeList.map(::normalizeCountryCode).map { code ->
+            // Report a bad code back to the model so it can retry, rather than failing the whole call
+            try {
+                formatSectorEmissions(code, args.year, climateTraceRepository.fetchCountryAssetEmissionsInfo(code, args.year))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                "$code (${args.year}): no sector data found; check this is an ISO 3166-1 alpha-3 country code"
+            }
+        }.joinToString("\n\n")
     }
 }
 
-class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPopulationTool.Args>(
+internal class GetPopulationTool(val climateTraceRepository: ClimateTraceRepository) : SimpleTool<GetPopulationTool.Args>(
     argsType = typeToken<Args>(),
     name = "GetPopulationTool",
     description = "Get population data for a country by its country code"
