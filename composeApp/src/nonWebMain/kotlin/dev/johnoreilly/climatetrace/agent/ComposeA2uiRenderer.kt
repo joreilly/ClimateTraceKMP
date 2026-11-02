@@ -1,13 +1,10 @@
 package dev.johnoreilly.climatetrace.agent
 
-import android.content.Context
-import android.content.Intent
-import android.icu.text.MessageFormat
 import androidx.a2ui.compose.runtime.A2uiMessageParser
 import androidx.a2ui.compose.ui.A2uiCatalog
 import androidx.a2ui.compose.ui.A2uiMessageProcessor
+import androidx.a2ui.compose.ui.catalog.A2uiBasicCatalogV1
 import androidx.a2ui.compose.ui.toJsonSchemaString
-import androidx.a2ui.model.catalog.functions.A2uiLocaleProvider
 import androidx.a2ui.model.processor.A2uiMessageProcessor
 import androidx.a2ui.model.processor.processInput
 import androidx.a2ui.model.protocol.A2uiClientErrorMessage
@@ -19,9 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.material3.a2ui.catalog.A2uiAudioPlayerRenderer
+import androidx.compose.material3.a2ui.catalog.A2uiImageRenderer
+import androidx.compose.material3.a2ui.catalog.A2uiVideoRenderer
 import androidx.compose.material3.a2ui.catalog.MaterialA2uiBasicCatalogV1Defaults
 import androidx.compose.material3.a2ui.catalog.materialA2uiBasicCatalogV1
-import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import dev.johnoreilly.climatetrace.ui.EqualHeightRow
 import dev.johnoreilly.climatetrace.ui.climateTraceA2uiComponents
@@ -36,31 +36,20 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * Renders A2UI surfaces with the Material 3 Basic Catalog (`androidx.compose.material3:material3-a2ui`)
- * plus ClimateTrace's own components ([climateTraceA2uiComponents]).
+ * Renders A2UI surfaces with the Material 3 Basic Catalog plus ClimateTrace's own components
+ * ([climateTraceA2uiComponents]). On Android this is Google's `androidx.a2ui`; on desktop and iOS
+ * it's the same API built by a2ui-kmp (`ai.littlepress.a2ui`), which has no web target.
+ *
+ * [functions] (formatting, openUrl, ...) is the one platform-specific piece: it's built from an
+ * Android `Context` on Android and a2ui-kmp's compat `Context()` elsewhere, see each `dataModule()`.
  */
-internal class AndroidA2uiRenderer(context: Context) : A2uiRenderer {
+internal class ComposeA2uiRenderer(functions: A2uiBasicCatalogV1.Functions) : A2uiRenderer {
 
     private val basicCatalog = materialA2uiBasicCatalogV1(
-        image = MaterialA2uiBasicCatalogV1Defaults.image { url, contentDescription, contentScale, modifier, onError ->
-            AsyncImage(
-                model = url,
-                contentDescription = contentDescription,
-                modifier = modifier,
-                contentScale = contentScale,
-                onError = { onError(it.result.throwable) },
-            )
-        },
-        // The agent has no media to show, so video/audio just show their URL.
-        video = MaterialA2uiBasicCatalogV1Defaults.video { url, modifier, _ -> Text("Video: $url", modifier) },
-        audioPlayer = MaterialA2uiBasicCatalogV1Defaults.audioPlayer { url, _, modifier, _ ->
-            Text("Audio: $url", modifier)
-        },
-        urlOpener = { url ->
-            context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-        },
-        messageFormatter = { pattern, locale, arguments -> MessageFormat(pattern, locale).format(arguments) },
-        localeProvider = A2uiLocaleProvider.Default,
+        image = MaterialA2uiBasicCatalogV1Defaults.image(CoilImageRenderer),
+        video = MaterialA2uiBasicCatalogV1Defaults.video(UrlVideoRenderer),
+        audioPlayer = MaterialA2uiBasicCatalogV1Defaults.audioPlayer(UrlAudioPlayerRenderer),
+        functions = functions,
         row = EqualHeightRow,
     )
 
@@ -125,5 +114,48 @@ internal class AndroidA2uiRenderer(context: Context) : A2uiRenderer {
         val surfaces by processor.activeSurfaces.collectAsState()
         val surface = surfaces.firstOrNull { it.id == surfaceId } ?: return
         A2uiSurface(surfaceModel = surface, modifier = modifier.fillMaxWidth())
+    }
+}
+
+// The renderers below are objects with @Composable overrides rather than lambdas: on iOS, a
+// SAM-converted lambda for these composable fun interfaces links against the un-lowered method
+// (no Composer parameter) and fails at runtime with an IrLinkageError.
+
+private object CoilImageRenderer : A2uiImageRenderer {
+    @Composable
+    override fun Image(
+        url: String,
+        contentDescription: String?,
+        contentScale: ContentScale,
+        modifier: Modifier,
+        onError: (throwable: Throwable?) -> Unit,
+    ) {
+        AsyncImage(
+            model = url,
+            contentDescription = contentDescription,
+            modifier = modifier,
+            contentScale = contentScale,
+            onError = { onError(it.result.throwable) },
+        )
+    }
+}
+
+// The agent has no media to show, so video/audio just show their URL.
+private object UrlVideoRenderer : A2uiVideoRenderer {
+    @Composable
+    override fun Video(url: String, modifier: Modifier, onError: (throwable: Throwable?) -> Unit) {
+        Text("Video: $url", modifier)
+    }
+}
+
+private object UrlAudioPlayerRenderer : A2uiAudioPlayerRenderer {
+    @Composable
+    override fun AudioPlayer(
+        url: String,
+        contentDescription: String?,
+        modifier: Modifier,
+        onError: (throwable: Throwable?) -> Unit,
+    ) {
+        Text("Audio: $url", modifier)
     }
 }

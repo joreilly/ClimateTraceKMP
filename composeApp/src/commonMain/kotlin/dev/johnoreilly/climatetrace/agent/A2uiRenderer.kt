@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.emptyFlow
 /**
  * Renders agent-generated UI described with the [A2UI protocol](https://a2ui.org).
  *
- * The renderer (`androidx.a2ui`) is Android-only, so the other platforms bind
- * [UnsupportedA2uiRenderer] in their Koin `dataModule()`: [isSupported] is false and the agent isn't
+ * Android, desktop and iOS bind `ComposeA2uiRenderer` (in the `nonWeb` source set). A2UI has no web
+ * renderer, so wasmJs binds [UnsupportedA2uiRenderer]: [isSupported] is false and the agent isn't
  * told it can show UI there, so it answers in plain text.
  */
 internal interface A2uiRenderer {

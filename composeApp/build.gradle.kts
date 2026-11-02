@@ -3,6 +3,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import java.util.Properties
 import com.codingfeline.buildkonfig.compiler.FieldSpec
@@ -67,6 +68,19 @@ kotlin {
         }
     }
 
+    // nonWeb: Android, JVM and iOS - the platforms a2ui-kmp supports (it has no wasm/js target).
+    applyDefaultHierarchyTemplate {
+        common {
+            group("nonWeb") {
+                withCompilations {
+                    it.platformType == KotlinPlatformType.jvm || it.platformType == KotlinPlatformType.androidJvm
+                }
+                // iosMain (where Koin.ios.kt lives) as well as the iOS targets' own source sets
+                group("ios")
+            }
+        }
+    }
+
     sourceSets {
         all {
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
@@ -127,10 +141,11 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.kstore.file)
             implementation(libs.ktor.client.android)
+        }
 
-            implementation(libs.a2ui.model)
-            implementation(libs.a2ui.compose.runtime)
-            implementation(libs.a2ui.compose.ui)
+        val nonWebMain by getting
+        nonWebMain.dependencies {
+            // Material 3 basic catalog, plus the renderer and protocol model it's built on.
             implementation(libs.a2ui.material3)
         }
 

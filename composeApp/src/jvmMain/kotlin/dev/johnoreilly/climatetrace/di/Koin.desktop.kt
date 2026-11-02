@@ -1,7 +1,9 @@
 package dev.johnoreilly.climatetrace.di
 
 import dev.johnoreilly.climatetrace.agent.A2uiRenderer
-import dev.johnoreilly.climatetrace.agent.UnsupportedA2uiRenderer
+import ai.littlepress.a2ui.compat.android.content.Context
+import androidx.a2ui.compose.ui.catalog.A2uiBasicCatalogV1
+import dev.johnoreilly.climatetrace.agent.ComposeA2uiRenderer
 import dev.johnoreilly.climatetrace.remote.Country
 import io.github.xxfast.kstore.KStore
 import io.github.xxfast.kstore.file.storeOf
@@ -16,8 +18,8 @@ private const val VERSION = "2.0.0"
 private const val AUTHOR = "johnoreilly"
 
 internal actual fun dataModule(): Module = module {
-    // androidx.a2ui is Android-only.
-    single<A2uiRenderer> { UnsupportedA2uiRenderer }
+    // a2ui-kmp's Context opens URLs with the platform.
+    single<A2uiRenderer> { ComposeA2uiRenderer(A2uiBasicCatalogV1.Functions(Context())) }
     single<KStore<List<Country>>> {
         val filesDir: String = AppDirsFactory.getInstance()
             .getUserCacheDir(PACKAGE_NAME, VERSION, AUTHOR)

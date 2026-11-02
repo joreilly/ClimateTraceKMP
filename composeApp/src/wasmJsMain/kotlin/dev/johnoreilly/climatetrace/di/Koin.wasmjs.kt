@@ -11,7 +11,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 internal actual fun dataModule(): Module = module {
-    // androidx.a2ui is Android-only.
+    // a2ui-kmp has no web target, so the agent answers in plain text here.
     single<A2uiRenderer> { UnsupportedA2uiRenderer }
     single<KStore<List<Country>>> {
         storeOf(key = "countries", default = emptyList())

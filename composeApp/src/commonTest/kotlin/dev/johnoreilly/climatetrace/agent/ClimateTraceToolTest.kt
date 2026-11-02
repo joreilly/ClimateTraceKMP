@@ -24,6 +24,21 @@ class ClimateTraceToolTest {
     }
 
     @Test
+    fun perCapitaEmissionsAreLabelledInRequestOrder() {
+        val infos = listOf(
+            CountryEmissionsInfo(country = "JPN", rank = 5, emissionsPerCapita = 10.04),
+            CountryEmissionsInfo(country = "DEU", rank = 12, emissionsPerCapita = 8.26),
+        )
+
+        assertEquals(
+            "DEU (2023): 8.3 tonnes CO2e per person\n" +
+                "JPN (2023): 10.0 tonnes CO2e per person\n" +
+                "ATL (2023): no data",
+            formatPerCapitaEmissions(listOf("DEU", "JPN", "ATL"), "2023", infos),
+        )
+    }
+
+    @Test
     fun countryCodesAreNormalizedToAlpha3() {
         assertEquals("IRL", normalizeCountryCode("ie"))
         assertEquals("IRL", normalizeCountryCode(" irl "))

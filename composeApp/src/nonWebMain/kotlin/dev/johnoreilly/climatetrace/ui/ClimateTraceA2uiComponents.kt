@@ -39,6 +39,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.carlsen.flagkit.FlagKit
 import dev.johnoreilly.climatetrace.ui.utils.alpha3ToAlpha2
+import kotlin.math.abs
+import kotlin.math.roundToLong
 
 /**
  * ClimateTrace-specific A2UI components, added alongside the Material 3 Basic Catalog. Their
@@ -130,7 +132,7 @@ internal object EmissionsChartComponent : A2uiComponent {
                     }
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "%,.1f".format(bar.value) + unitText,
+                        bar.value.formatOneDecimal() + unitText,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.widthIn(min = 72.dp)
@@ -141,6 +143,13 @@ internal object EmissionsChartComponent : A2uiComponent {
     }
 
     private class Bar(val label: String, val value: Double, val countryCode: String?)
+}
+
+/** "%,.1f" (e.g. 12,345.6), which isn't available outside the JVM. */
+internal fun Double.formatOneDecimal(): String {
+    val tenths = abs(this * 10).roundToLong()
+    val whole = (tenths / 10).toString().reversed().chunked(3).joinToString(",").reversed()
+    return (if (this < 0 && tenths != 0L) "-" else "") + "$whole.${tenths % 10}"
 }
 
 @Composable
