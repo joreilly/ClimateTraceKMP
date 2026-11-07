@@ -17,12 +17,4 @@ internal sealed class ChartNode {
         override val percentage: Double,
         val color: Color,
     ) : ChartNode()
-
-    @Stable
-    data class Section(
-        override val name: String,
-        override val value: Double,
-        override val percentage: Double,
-        val color: Color?,
-    ) : ChartNode()
 }
