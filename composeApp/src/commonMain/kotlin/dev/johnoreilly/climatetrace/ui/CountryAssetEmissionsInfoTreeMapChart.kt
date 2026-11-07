@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,8 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
 import by.overpass.treemapchart.compose.TreemapChart
-import by.overpass.treemapchart.core.tree.Tree
-import by.overpass.treemapchart.core.tree.tree
 import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
 import io.github.koalaplot.core.util.generateHueColorPalette
 import io.github.koalaplot.core.util.toString
@@ -45,7 +44,6 @@ internal fun CountryAssetEmissionsInfoTreeMapChart(
     onSectorChange: (String?) -> Unit = {}
 ) {
     val leaves = remember(countryAssetEmissions) { buildAssetLeaves(countryAssetEmissions) }
-    val tree = remember(leaves) { buildAssetTree(leaves) }
 
     val toggle: (String) -> Unit = { sector ->
         onSectorChange(if (selectedSector == sector) null else sector)
@@ -53,21 +51,16 @@ internal fun CountryAssetEmissionsInfoTreeMapChart(
 
     Column(Modifier.fillMaxWidth()) {
         Box(Modifier.height(360.dp).fillMaxWidth()) {
-            TreemapChart(
-                data = tree,
-                evaluateItem = ChartNode::value
-            ) { node, groupContent ->
-                val export = node.data
-                if (node.children.isEmpty() && export is ChartNode.Leaf) {
-                    LeafItem(
-                        item = export,
-                        dimmed = selectedSector != null && selectedSector != export.name,
-                        isSelected = selectedSector == export.name,
-                        onClick = { toggle(export.name) }
-                    )
-                } else if (export is ChartNode.Section) {
-                    SectionItem(export.color) {
-                        groupContent(node)
+            if (leaves.isNotEmpty()) {
+                TreemapChart(Modifier.fillMaxSize()) {
+                    leaves.forEach { leaf ->
+                        LeafItem(
+                            item = leaf,
+                            modifier = Modifier.weight(leaf.value),
+                            dimmed = selectedSector != null && selectedSector != leaf.name,
+                            isSelected = selectedSector == leaf.name,
+                            onClick = { toggle(leaf.name) }
+                        )
                     }
                 }
             }
@@ -176,23 +169,6 @@ internal fun LeafItem(
 internal fun Double.toPercent(precision: Int): String = "${(this * 100.0f).toString(precision)}%"
 
 
-@Composable
-internal fun SectionItem(
-    sectionColor: Color?,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
-    if (sectionColor != null) {
-        Box(
-            modifier = modifier
-                .background(sectionColor)
-        ) {
-            content()
-        }
-    } else {
-        content()
-    }
-}
 
 
 internal fun buildAssetLeaves(assetEmissionInfoList: List<CountryAssetEmissionsInfo>): List<ChartNode.Leaf> {
@@ -215,19 +191,6 @@ internal fun buildAssetLeaves(assetEmissionInfoList: List<CountryAssetEmissionsI
     }
 }
 
-internal fun buildAssetTree(leaves: List<ChartNode.Leaf>): Tree<ChartNode> {
-    val total = leaves.sumOf { it.value }
-    return tree(
-        ChartNode.Section(
-            name = "Total",
-            value = total,
-            percentage = 1.0,
-            color = null,
-        ),
-    ) {
-        leaves.forEach { leaf -> node(leaf) }
-    }
-}
 
 
 
