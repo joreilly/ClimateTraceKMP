@@ -89,6 +89,23 @@ See [ClimateTrace.ipynb](composeApp/ClimateTrace.ipynb)
 The `mcp-server` module uses the [Kotlin MCP SDK](https://github.com/modelcontextprotocol/kotlin-sdk) to expose an MCP tools endpoint (returning per country emission data) that
 can for example be plugged in to Claude Desktop as shown below.  That module uses same KMP shared code.
 
+The tools it exposes are:
+
+| Tool | Returns |
+|---|---|
+| `get-data-coverage` | Which years have data, whether the latest is still in progress, and the data release |
+| `get-countries` | Every country with its ISO alpha-3 code |
+| `get-emissions` | Total emissions for countries in a year, with rank, per-person emissions, global share and year-on-year change |
+| `get-country-asset-emissions` | Emissions by sector and subsector for countries in a year |
+| `get-monthly-emissions` | Month-by-month emissions for countries in a year |
+| `get-rankings` | Top emitting countries in a year, by total or per person |
+| `get-country-sources` | The largest individual emission sources in a country, with ids and locations |
+| `get-source-details` | One source's owners, location, yearly and monthly emissions |
+| `get-population` | A country's population |
+
+Totals exclude the forestry and land use sector by default, matching climatetrace.org; the emissions tools take an
+optional `includeForestry` argument for net figures. The in-app Koog agent has the same tools, sharing the same code.
+
 <img width="1608" alt="Screenshot 2025-07-06 at 17 24 20" src="https://github.com/user-attachments/assets/7e4fd599-3ade-47b7-bbe3-a4f36148c170" />
 
 

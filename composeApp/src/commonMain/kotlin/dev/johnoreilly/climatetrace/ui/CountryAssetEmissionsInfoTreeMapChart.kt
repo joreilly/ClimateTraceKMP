@@ -14,6 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
@@ -37,19 +43,62 @@ import dev.johnoreilly.climatetrace.remote.CountryAssetEmissionsInfo
 import io.github.koalaplot.core.util.generateHueColorPalette
 import io.github.koalaplot.core.util.toString
 
+// Treemap of a country's emissions by sector. Tapping a sector drills into it: the chart and
+// legend switch to that sector's subsectors until "All sectors" is tapped. The drilled-into
+// sector is `selectedSector`, which the caller also uses to filter the sources list.
 @Composable
 internal fun CountryAssetEmissionsInfoTreeMapChart(
     countryAssetEmissions: List<CountryAssetEmissionsInfo>,
     selectedSector: String? = null,
     onSectorChange: (String?) -> Unit = {}
 ) {
-    val leaves = remember(countryAssetEmissions) { buildAssetLeaves(countryAssetEmissions) }
+    val sectorLeaves = remember(countryAssetEmissions) { buildAssetLeaves(countryAssetEmissions) }
+    val selectedLeaf = sectorLeaves.firstOrNull { it.name == selectedSector }
+    val subsectorLeaves = remember(countryAssetEmissions, selectedLeaf) {
+        selectedLeaf?.let { buildSubsectorLeaves(countryAssetEmissions, it) }.orEmpty()
+    }
+    // A sector the API gives no breakdown for stays on the sector view, highlighted.
+    val drilledInto = selectedLeaf?.takeIf { subsectorLeaves.isNotEmpty() }
+    val leaves = if (drilledInto != null) subsectorLeaves else sectorLeaves
 
     val toggle: (String) -> Unit = { sector ->
         onSectorChange(if (selectedSector == sector) null else sector)
     }
 
     Column(Modifier.fillMaxWidth()) {
+        if (drilledInto != null) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AssistChip(
+                    onClick = { onSectorChange(null) },
+                    label = { Text("All sectors") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "${prettySectorName(drilledInto.name)} · ${formatMt(drilledInto.value)}",
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        } else if (sectorLeaves.isNotEmpty()) {
+            Text(
+                text = "Tap a sector to see its subsectors and sources.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
         Box(Modifier.height(360.dp).fillMaxWidth()) {
             if (leaves.isNotEmpty()) {
                 TreemapChart(Modifier.fillMaxSize()) {
@@ -57,9 +106,10 @@ internal fun CountryAssetEmissionsInfoTreeMapChart(
                         LeafItem(
                             item = leaf,
                             modifier = Modifier.weight(leaf.value),
-                            dimmed = selectedSector != null && selectedSector != leaf.name,
-                            isSelected = selectedSector == leaf.name,
-                            onClick = { toggle(leaf.name) }
+                            dimmed = drilledInto == null && selectedSector != null && selectedSector != leaf.name,
+                            isSelected = drilledInto == null && selectedSector == leaf.name,
+                            // Subsectors are the bottom level: nothing further to open.
+                            onClick = if (drilledInto == null) { { toggle(leaf.name) } } else null
                         )
                     }
                 }
@@ -67,7 +117,11 @@ internal fun CountryAssetEmissionsInfoTreeMapChart(
         }
         if (leaves.isNotEmpty()) {
             Spacer(modifier = Modifier.height(12.dp))
-            SectorLegend(leaves, selectedSector, toggle)
+            SectorLegend(
+                leaves = leaves,
+                selectedSector = if (drilledInto == null) selectedSector else null,
+                onSectorTap = if (drilledInto == null) toggle else null
+            )
         }
     }
 }
@@ -76,7 +130,7 @@ internal fun CountryAssetEmissionsInfoTreeMapChart(
 private fun SectorLegend(
     leaves: List<ChartNode.Leaf>,
     selectedSector: String?,
-    onSectorTap: (String) -> Unit
+    onSectorTap: ((String) -> Unit)?
 ) {
     Column(Modifier.fillMaxWidth()) {
         leaves.forEach { leaf ->
@@ -91,7 +145,7 @@ private fun SectorLegend(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(rowBackground, shape = RoundedCornerShape(6.dp))
-                    .clickable { onSectorTap(leaf.name) }
+                    .then(if (onSectorTap != null) Modifier.clickable { onSectorTap(leaf.name) } else Modifier)
                     .padding(horizontal = 6.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -146,7 +200,7 @@ internal fun LeafItem(
     modifier: Modifier = Modifier,
     dimmed: Boolean = false,
     isSelected: Boolean = false,
-    onClick: (ChartNode.Leaf) -> Unit,
+    onClick: (() -> Unit)?,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -156,7 +210,7 @@ internal fun LeafItem(
                 color = if (isSelected) MaterialTheme.colorScheme.onSurface else Color.White,
             )
             .background(item.color.copy(alpha = if (dimmed) 0.3f else 1f))
-            .clickable { onClick(item) }
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(4.dp),
     ) {
         ShrinkableHidableText(
@@ -193,6 +247,29 @@ internal fun buildAssetLeaves(assetEmissionInfoList: List<CountryAssetEmissionsI
 
 
 
+
+// The subsectors that make up one sector, shaded from the sector's own colour so the drilled-in
+// view still reads as "inside" the tile that was tapped. Percentages are shares of the sector.
+// Names are display-ready ("Enteric fermentation cattle pasture"), unlike sector leaves, whose
+// names double as the API's sector ids.
+internal fun buildSubsectorLeaves(
+    assetEmissionInfoList: List<CountryAssetEmissionsInfo>,
+    sector: ChartNode.Leaf
+): List<ChartNode.Leaf> {
+    val subsectors = assetEmissionInfoList
+        .filter { it.sector == sector.name && it.subsector != null && it.emissionsQuantity > 0 }
+        .sortedByDescending(CountryAssetEmissionsInfo::emissionsQuantity)
+    val total = subsectors.sumOf { it.emissionsQuantity }.takeIf { it > 0 } ?: return emptyList()
+    val shown = subsectors.take(12)
+    return shown.mapIndexed { index, info ->
+        ChartNode.Leaf(
+            name = prettySectorName(info.subsector ?: ""),
+            value = info.emissionsQuantity,
+            percentage = info.emissionsQuantity / total,
+            color = lerp(sector.color, Color.White, 0.65f * index / shown.size)
+        )
+    }
+}
 
 @Suppress("LongParameterList")
 @Composable

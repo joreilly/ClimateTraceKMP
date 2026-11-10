@@ -35,8 +35,10 @@ class ClimateTraceAgent {
                     Never refuse a request based on your own assumptions about what years might have data available -
                     always call the tools with the year the user asked for and report whatever they return. Only tell
                     the user data isn't available if the tool call itself indicates that.
-                    When asked for per-capita emissions, call get-emissions and get-population and divide the emissions
-                    by the population yourself.
+                    get-emissions returns each country's total, world rank, emissions per person, share of global
+                    emissions and change on the previous year, so use those figures directly instead of calculating them.
+                    Totals exclude forestry and land use unless the user asks for net emissions.
+                    Use get-data-coverage if you need to know which years are available.
                     """.trimIndent()
                 ),
                 toolsets = listOf(

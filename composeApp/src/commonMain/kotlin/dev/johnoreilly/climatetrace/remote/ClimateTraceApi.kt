@@ -63,6 +63,7 @@ data class AssetDetail(
     val name: String,
     val country: String? = null,
     val sector: String? = null,
+    val subsector: String? = null,
     val assetType: String? = null,
     val sourceType: String? = null,
     val owners: List<AssetOwner>? = null,
@@ -105,14 +106,42 @@ data class CountryAssetEmissionsInfo(
 )
 
 @Serializable
+data class MonthlyEmissions(
+    val year: Int = 0,
+    val month: Int = 0,
+    val sector: String? = null,
+    val subsector: String? = null,
+    val gas: String? = null,
+    val emissionsQuantity: Double = 0.0,
+)
+
+@Serializable
 data class AggregatedEmissionsOverview(
     val summaries: List<CountryAssetEmissionsInfo> = emptyList(),
+    val timeseries: List<MonthlyEmissions> = emptyList(),
 )
 
 @Serializable
 data class AggregatedEmissionsResponse(
+    val totals: AggregatedEmissionsOverview? = null,
     val sectors: AggregatedEmissionsOverview? = null,
     val subsectors: AggregatedEmissionsOverview? = null,
+)
+
+@Serializable
+data class TemporalCoverage(
+    val start: String? = null,
+    val end: String? = null,
+    val frequency: String? = null,
+)
+
+@Serializable
+data class DataMetadata(
+    val dataVersion: String? = null,
+    val releaseDate: String? = null,
+    val lastUpdated: String? = null,
+    val temporalCoverage: TemporalCoverage? = null,
+    val changelogUrl: String? = null,
 )
 
 internal class ClimateTraceApi(
@@ -127,23 +156,23 @@ internal class ClimateTraceApi(
 
     suspend fun fetchAssets() = client.get("$baseUrl/sources").body<List<Asset>>()
 
-    suspend fun fetchRankings(year: String): CountryEmissionsRankingsResponse {
+    suspend fun fetchMetadata() = client.get("$baseUrl/metadata").body<DataMetadata>()
+
+    // `excludeForestry` asks for every sector except forestry-and-land-use, which is how
+    // https://climatetrace.org/explore totals are calculated by default. Including it nets
+    // land-use sinks off the total, which can take a country's figure below zero.
+    suspend fun fetchRankings(year: String, excludeForestry: Boolean = false): CountryEmissionsRankingsResponse {
         return client.get("$baseUrl/rankings/countries") {
             url {
                 parameters.append("start", "$year-01-01")
                 parameters.append("end", "$year-12-31")
+                if (excludeForestry) parameters.append("sectors", ALL_NO_FOREST)
             }
         }.body<CountryEmissionsRankingsResponse>()
     }
 
-    suspend fun fetchCountryEmissionsInfo(countryCodeList: List<String>, year: String): List<CountryEmissionsInfo> {
-        val response = client.get("$baseUrl/rankings/countries") {
-            url {
-                parameters.append("start", "$year-01-01")
-                parameters.append("end", "$year-12-31")
-            }
-        }.body<CountryEmissionsRankingsResponse>()
-        return response.rankings.filter { it.country in countryCodeList }
+    suspend fun fetchCountryEmissionsInfo(countryCodeList: List<String>, year: String, excludeForestry: Boolean = false): List<CountryEmissionsInfo> {
+        return fetchRankings(year, excludeForestry).rankings.filter { it.country in countryCodeList }
     }
 
     suspend fun fetchCountryAssetEmissionsInfo(countryCode: String, year: String): List<CountryAssetEmissionsInfo> {
@@ -157,23 +186,42 @@ internal class ClimateTraceApi(
         return countryCodeList.associateWith { fetchCountryAssetEmissionsInfo(it, year) }
     }
 
-    suspend fun fetchCountryEmissionsResponse(countryCode: String, year: String): AggregatedEmissionsResponse {
+    suspend fun fetchCountryEmissionsResponse(countryCode: String, year: String, excludeForestry: Boolean = false): AggregatedEmissionsResponse {
         return client.get("$baseUrl/sources/emissions") {
             url {
                 parameters.append("gadmId", countryCode)
                 parameters.append("year", year)
+                if (excludeForestry) parameters.append("sectors", ALL_NO_FOREST)
             }
         }.body<AggregatedEmissionsResponse>()
     }
 
     suspend fun fetchAssetDetail(sourceId: Int): AssetDetail = client.get("$baseUrl/sources/$sourceId").body<AssetDetail>()
 
-    suspend fun fetchAssetsByCountry(countryCode: String, limit: Int = 20): List<Asset> {
+    // The same source, with its emissions broken down by month for one calendar year.
+    suspend fun fetchAssetMonthlyEmissions(sourceId: Int, year: Int): List<EmissionMeasurement> {
+        return client.get("$baseUrl/sources/$sourceId") {
+            url {
+                parameters.append("start", "$year-01-01")
+                parameters.append("end", "$year-12-31")
+                parameters.append("timeGranularity", "month")
+            }
+        }.body<AssetDetail>().emissions.orEmpty()
+    }
+
+    // Sources ranked by emissions; `year` defaults to the API's latest when null.
+    suspend fun fetchAssetsByCountry(countryCode: String, limit: Int = 20, excludeForestry: Boolean = false, year: String? = null): List<Asset> {
         return client.get("$baseUrl/sources") {
             url {
                 parameters.append("gadmId", countryCode)
                 parameters.append("limit", limit.toString())
+                if (year != null) parameters.append("year", year)
+                if (excludeForestry) parameters.append("sectors", ALL_NO_FOREST)
             }
         }.body<List<Asset>>()
-     }
+    }
+
+    private companion object {
+        const val ALL_NO_FOREST = "all_no_forest"
+    }
 }
