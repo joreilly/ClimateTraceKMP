@@ -18,19 +18,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
-import coil3.ImageLoader
-import coil3.compose.setSingletonImageLoaderFactory
-import coil3.network.ktor3.KtorNetworkFetcherFactory
 import dev.johnoreilly.climatetrace.di.commonModule
 import dev.johnoreilly.climatetrace.ui.AgentScreen
 import dev.johnoreilly.climatetrace.ui.ClimateTraceScreen
 import dev.johnoreilly.climatetrace.ui.IssTrackerScreen
 import dev.johnoreilly.climatetrace.ui.RankingsScreen
 import dev.johnoreilly.climatetrace.ui.theme.ClimateTraceTheme
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.request.header
-import io.ktor.http.HttpHeaders
+import dev.johnoreilly.climatetrace.ui.utils.ConfigureImageLoader
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 
@@ -42,28 +36,7 @@ internal fun App() {
         modules(commonModule())
     }) {
         ClimateTraceTheme {
-            // OSM's tile usage policy (https://operations.osmfoundation.org/policies/tiles/)
-            // asks for a descriptive User-Agent identifying the app.
-            setSingletonImageLoaderFactory { context ->
-                ImageLoader.Builder(context)
-                    .components {
-                        add(
-                            KtorNetworkFetcherFactory(
-                                httpClient = {
-                                    HttpClient {
-                                        defaultRequest {
-                                            header(
-                                                HttpHeaders.UserAgent,
-                                                "ClimateTraceKMP/1.0 (+https://github.com/joreilly/ClimateTraceKMP)"
-                                            )
-                                        }
-                                    }
-                                }
-                            )
-                        )
-                    }
-                    .build()
-            }
+            ConfigureImageLoader()
 
             var selectedIndex by remember { mutableIntStateOf(0) }
 

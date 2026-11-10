@@ -36,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,7 +66,10 @@ internal class RankingsScreen : Screen {
 
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(title = { Text("Rankings") })
+                CenterAlignedTopAppBar(title = {
+                    val year = (state as? CountryListUIState.Success)?.year.orEmpty()
+                    Text(if (year.isEmpty()) "Rankings" else "Rankings · $year")
+                })
             }
         ) { paddingValues ->
             Column(Modifier.padding(paddingValues).fillMaxSize()) {
@@ -80,7 +84,7 @@ internal class RankingsScreen : Screen {
                         ErrorState(message = s.message, onRetry = { viewModel.refresh() })
                     }
                     is CountryListUIState.Success -> {
-                        RankingsContent(s)
+                        RankingsContent(s, onIncludeForestryChange = { viewModel.setIncludeForestry(it) })
                     }
                 }
             }
@@ -89,8 +93,8 @@ internal class RankingsScreen : Screen {
 }
 
 @Composable
-private fun RankingsContent(state: CountryListUIState.Success) {
-    var mode by remember { mutableIntStateOf(RankingMode.Total.ordinal) }
+private fun RankingsContent(state: CountryListUIState.Success, onIncludeForestryChange: (Boolean) -> Unit) {
+    var mode by rememberSaveable { mutableIntStateOf(RankingMode.Total.ordinal) }
     val countriesById = remember(state.countryList) {
         state.countryList.associateBy { it.id }
     }
@@ -120,6 +124,12 @@ private fun RankingsContent(state: CountryListUIState.Success) {
                 text = { Text("Per Capita") }
             )
         }
+        ForestryToggle(
+            includeForestry = !state.excludeForestry,
+            onIncludeForestryChange = onIncludeForestryChange,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+        HorizontalDivider()
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             itemsIndexed(rows) { idx, info ->
                 val valueText = if (mode == RankingMode.Total.ordinal) {
@@ -175,7 +185,7 @@ private fun RankingRow(
                 flag?.let {
                     Image(
                         imageVector = it,
-                        contentDescription = info.name ?: info.country,
+                        contentDescription = null,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -195,7 +205,7 @@ private fun RankingRow(
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = "View details",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -13,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -42,6 +42,7 @@ import dev.johnoreilly.climatetrace.remote.EmissionMeasurement
 import dev.johnoreilly.climatetrace.ui.utils.formatEmissionsQuantity
 import dev.johnoreilly.climatetrace.viewmodel.AssetDetailUIState
 import dev.johnoreilly.climatetrace.viewmodel.AssetDetailViewModel
+import io.github.koalaplot.core.util.toString
 import org.koin.compose.koinInject
 
 internal data class AssetDetailScreen(val sourceId: Int, val assetName: String) : Screen {
@@ -81,24 +82,27 @@ internal data class AssetDetailScreen(val sourceId: Int, val assetName: String) 
                 when (val state = viewState) {
                     is AssetDetailUIState.Loading -> {
                         Column(
-                            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
+                            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             CircularProgressIndicator()
-                        }
-                    }
-                    is AssetDetailUIState.Error -> {
-                        Column(
-                            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
-                        ) {
                             Text(
-                                text = state.message,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.error
+                                text = "Loading source details…",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
+                    is AssetDetailUIState.Error -> {
+                        ErrorState(
+                            title = "Unable to Load Source",
+                            message = state.message,
+                            onRetry = { viewModel.retry() }
+                        )
+                    }
                     is AssetDetailUIState.Success -> {
-                        AssetDetailContent(state.assetDetail)
+                        AssetDetailContent(state.assetDetail, state.monthlyEmissions, state.monthlyYear)
                     }
                 }
             }
@@ -107,7 +111,11 @@ internal data class AssetDetailScreen(val sourceId: Int, val assetName: String) 
 }
 
 @Composable
-internal fun AssetDetailContent(assetDetail: AssetDetail) {
+internal fun AssetDetailContent(
+    assetDetail: AssetDetail,
+    monthlyEmissions: List<EmissionMeasurement> = emptyList(),
+    monthlyYear: Int? = null
+) {
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -123,6 +131,25 @@ internal fun AssetDetailContent(assetDetail: AssetDetail) {
         AssetInfoChips(assetDetail)
 
         Spacer(modifier = Modifier.size(16.dp))
+
+        // Location
+        val latitude = assetDetail.centroid?.latitude
+        val longitude = assetDetail.centroid?.longitude
+        if (latitude != null && longitude != null) {
+            LocationSection(assetDetail.id, assetDetail.name, latitude, longitude)
+            Spacer(modifier = Modifier.size(16.dp))
+        }
+
+        // Monthly emissions
+        val monthlyValues = monthlyEmissions.mapNotNull { measurement ->
+            val month = measurement.month
+            val quantity = measurement.emissionsQuantity
+            if (month != null && quantity != null) month to quantity else null
+        }
+        if (monthlyValues.size >= 2 && monthlyYear != null) {
+            MonthlyEmissionsSection(monthlyYear.toString(), monthlyValues)
+            Spacer(modifier = Modifier.size(16.dp))
+        }
 
         // Ownership Section
         if (!assetDetail.owners.isNullOrEmpty()) {
@@ -176,36 +203,66 @@ private fun AssetHeader(assetDetail: AssetDetail) {
 }
 
 @Composable
+private fun LocationSection(id: Int, name: String, latitude: Double, longitude: Double) {
+    Surface(
+        tonalElevation = 1.dp,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+            Text(
+                text = "Location",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            SourceMapView(
+                points = listOf(MapPoint(id, latitude, longitude, name, weight = 1.0)),
+                maxZoom = 8,
+                modifier = Modifier.fillMaxWidth().height(180.dp)
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(
+                text = "${latitude.toString(4)}, ${longitude.toString(4)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
 private fun AssetInfoChips(assetDetail: AssetDetail) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         assetDetail.assetType?.takeIf { it.isNotBlank() }?.let {
-            AssistChip(
-                onClick = {},
-                label = {
-                    Column {
-                        Text(
-                            text = "Type",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                        Text(text = it, style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-            )
+            InfoTag(label = "Type", value = it, modifier = Modifier.weight(1f, fill = false))
         }
-        assetDetail.sourceType?.let {
-            AssistChip(
-                onClick = {},
-                label = {
-                    Column {
-                        Text(
-                            text = "Reporting Entity",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                        Text(text = it, style = MaterialTheme.typography.bodySmall)
-                    }
-                }
+        assetDetail.sourceType?.takeIf { it.isNotBlank() }?.let {
+            InfoTag(label = "Reporting Entity", value = it, modifier = Modifier.weight(1f, fill = false))
+        }
+    }
+}
+
+// Read-only label/value tag. Deliberately not a chip: these have nothing to do when tapped.
+@Composable
+private fun InfoTag(label: String, value: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.75f)
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

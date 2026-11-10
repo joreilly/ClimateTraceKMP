@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,6 +14,8 @@ import dev.johnoreilly.climatetrace.remote.Country
 import dev.johnoreilly.climatetrace.ui.AgentScreen
 import dev.johnoreilly.climatetrace.ui.CountryInfoDetailedView
 import dev.johnoreilly.climatetrace.ui.CountryScreenSuccess
+import dev.johnoreilly.climatetrace.ui.ErrorState
+import dev.johnoreilly.climatetrace.ui.utils.ConfigureImageLoader
 import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsViewModel
 import dev.johnoreilly.climatetrace.viewmodel.CountryListUIState
 import dev.johnoreilly.climatetrace.viewmodel.CountryListViewModel
@@ -33,7 +34,7 @@ fun CountryListViewController(onCountryClicked: (country: Country) -> Unit) = Co
             }
         }
         is CountryListUIState.Error -> {
-            Text("Error")
+            ErrorState(message = state.message, onRetry = { viewModel.refresh() })
         }
         is CountryListUIState.Success -> {
             CountryScreenSuccess(state.countryList)
@@ -50,7 +51,12 @@ fun CountryInfoDetailedViewController(country: Country) = ComposeUIViewControlle
         viewModel.setCountry(country)
     }
 
-    CountryInfoDetailedView(viewState) {
+    ConfigureImageLoader()
+    CountryInfoDetailedView(
+        viewState,
+        onRetry = { viewModel.retry() },
+        onIncludeForestryChange = { viewModel.setIncludeForestry(it) }
+    ) {
         viewModel.setYear(it)
     }
 }

@@ -32,18 +32,26 @@ internal class ClimateTraceAgentProvider(
         val toolRegistry = ToolRegistry {
             tool(GetEmissionsTool(climateTraceRepository))
             tool(GetAssetEmissionsTool(climateTraceRepository))
+            tool(GetMonthlyEmissionsTool(climateTraceRepository))
+            tool(GetRankingsTool(climateTraceRepository))
+            tool(GetCountrySourcesTool(climateTraceRepository))
+            tool(GetSourceDetailsTool(climateTraceRepository))
             tool(createPopulationAgentTool(climateTraceRepository))
         }
+
+        // Which years exist comes from the API rather than being baked into the prompt.
+        val dataCoverage = formatDataCoverage(climateTraceRepository.fetchDataCoverage())
 
         val agentConfig = AIAgentConfig(
             prompt = prompt("climateTrace") {
                 system(
-                    """                
-                    You are an AI assistant specialising in providing information about global climate emissions.
-                    The year is currently 2026.
-                    You have data up to and including 2025.
-                    Use units of millions of tonnes of CO2 equivalent.
-                    """.trimIndent(),
+                    """
+                    |You are an AI assistant specialising in providing information about global climate emissions.
+                    |$dataCoverage
+                    |Use units of millions of tonnes of CO2 equivalent for country totals.
+                    |Emission totals exclude forestry and land use unless the user asks for net emissions.
+                    |GetEmissionsTool already returns emissions per person; you do not need to calculate it.
+                    """.trimMargin(),
                 )
             },
             model = getLLModel(),

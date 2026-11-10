@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,22 +19,23 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,6 +64,7 @@ import kotlin.math.roundToInt
 import cafe.adriel.voyager.navigator.LocalNavigator
 import dev.carlsen.flagkit.FlagKit
 import dev.johnoreilly.climatetrace.remote.Asset
+import dev.johnoreilly.climatetrace.remote.DataMetadata
 import dev.johnoreilly.climatetrace.ui.utils.alpha3ToAlpha2
 import dev.johnoreilly.climatetrace.ui.utils.formatEmissionsQuantity
 import dev.johnoreilly.climatetrace.ui.utils.sectorIcon
@@ -69,16 +73,17 @@ import dev.johnoreilly.climatetrace.viewmodel.CountryDetailsUIState
 internal fun CountryInfoDetailedView(
     viewState: CountryDetailsUIState,
     perCapitaRank: Int? = null,
+    onRetry: (() -> Unit)? = null,
+    onIncludeForestryChange: ((Boolean) -> Unit)? = null,
     onYearSelected: (String) -> Unit
 ) {
     when (viewState) {
         CountryDetailsUIState.NoCountrySelected -> {
-            Column(
-                modifier = Modifier.fillMaxSize()
-                    .wrapContentSize(Alignment.Center)
-            ) {
-                Text(text = "No Country Selected.", style = MaterialTheme.typography.titleMedium)
-            }
+            EmptyState(
+                title = "Select a country",
+                message = "Choose a country from the list to see its emissions, sectors and largest sources.",
+                icon = Icons.Default.Public
+            )
         }
         is CountryDetailsUIState.Loading -> {
             Column(
@@ -95,37 +100,14 @@ internal fun CountryInfoDetailedView(
             }
         }
         is CountryDetailsUIState.Error -> {
-            Column(
-                modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center).padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ErrorOutline,
-                    contentDescription = "Error",
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(48.dp)
-                )
-                Text(
-                    text = "Unable to Load Details",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onErrorContainer
-                )
-                Text(
-                    text = viewState.message,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.75f),
-                    textAlign = TextAlign.Center
-                )
-                Button(onClick = { onYearSelected("2025") }) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Retry", modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Retry")
-                }
-            }
+            ErrorState(
+                title = "Unable to Load Details",
+                message = viewState.message,
+                onRetry = onRetry
+            )
         }
         is CountryDetailsUIState.Success -> {
-            CountryInfoDetailedViewSuccess(viewState, perCapitaRank, onYearSelected)
+            CountryInfoDetailedViewSuccess(viewState, perCapitaRank, onYearSelected, onIncludeForestryChange)
         }
     }
 }
@@ -135,7 +117,8 @@ internal fun CountryInfoDetailedView(
 internal fun CountryInfoDetailedViewSuccess(
     viewState: CountryDetailsUIState.Success,
     perCapitaRank: Int?,
-    onYearSelected: (String) -> Unit
+    onYearSelected: (String) -> Unit,
+    onIncludeForestryChange: ((Boolean) -> Unit)? = null
 ) {
     var selectedSector by remember(viewState.country.id) { mutableStateOf<String?>(null) }
 
@@ -170,8 +153,16 @@ internal fun CountryInfoDetailedViewSuccess(
                 share = percentage,
                 perCapita = perCapita,
                 perCapitaRank = perCapitaRank,
-                yearlyEmissions = viewState.yearlyEmissions
+                yearlyEmissions = viewState.yearlyEmissions,
+                isRefreshing = viewState.isRefreshing,
+                includeForestry = !viewState.excludeForestry,
+                partialThroughMonth = viewState.partialThroughMonth,
+                onIncludeForestryChange = onIncludeForestryChange
             )
+
+            if (viewState.monthlyEmissions.size >= 2) {
+                MonthlyEmissionsSection(year, viewState.monthlyEmissions.map { it.month to it.emissionsQuantity })
+            }
 
             // Emissions by Sector Section
             val filteredCountryAssetEmissionsList = countryAssetEmissionsList.filter { it.sector != null }
@@ -207,6 +198,78 @@ internal fun CountryInfoDetailedViewSuccess(
                 onClearSector = { selectedSector = null }
             )
         }
+
+        viewState.dataMetadata?.let { DataReleaseFooter(it) }
+    }
+}
+
+@Composable
+internal fun MonthlyEmissionsSection(year: String, values: List<Pair<Int, Double>>) {
+    Surface(
+        tonalElevation = 1.dp,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Monthly Emissions · $year",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            MonthlyEmissionsChart(values = values, modifier = Modifier.fillMaxWidth())
+        }
+    }
+}
+
+@Composable
+private fun DataReleaseFooter(metadata: DataMetadata) {
+    val parts = listOfNotNull(
+        metadata.dataVersion?.let { "Climate TRACE data $it" },
+        metadata.releaseDate?.let { "released $it" },
+        metadata.temporalCoverage?.let { coverage ->
+            if (coverage.start != null && coverage.end != null) "covers ${coverage.start} to ${coverage.end}" else null
+        }
+    )
+    if (parts.isEmpty()) return
+    Text(
+        text = parts.joinToString(" · "),
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+// Switch for whether totals include the forestry-and-land-use sector. It's an app-wide setting:
+// flipping it here also re-ranks the country list and the rankings tab.
+@Composable
+internal fun ForestryToggle(
+    includeForestry: Boolean,
+    onIncludeForestryChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .toggleable(value = includeForestry, role = Role.Switch, onValueChange = onIncludeForestryChange),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = "Include forestry & land use", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = if (includeForestry) {
+                    "Net totals: land-use sinks are subtracted"
+                } else {
+                    "Matches the totals on climatetrace.org"
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Switch(checked = includeForestry, onCheckedChange = null)
     }
 }
 
@@ -221,7 +284,11 @@ private fun EmissionsSummarySection(
     share: String,
     perCapita: String,
     perCapitaRank: Int?,
-    yearlyEmissions: Map<String, Double>
+    yearlyEmissions: Map<String, Double>,
+    isRefreshing: Boolean = false,
+    includeForestry: Boolean = false,
+    partialThroughMonth: Int? = null,
+    onIncludeForestryChange: ((Boolean) -> Unit)? = null
 ) {
     Surface(
         tonalElevation = 1.dp,
@@ -236,9 +303,27 @@ private fun EmissionsSummarySection(
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.size(8.dp))
+            if (onIncludeForestryChange != null) {
+                ForestryToggle(includeForestry, onIncludeForestryChange)
+                Spacer(modifier = Modifier.size(8.dp))
+            }
             YearChips(year, availableYears, onYearSelected)
-            Spacer(modifier = Modifier.size(12.dp))
+            // Fixed-height slot so the figures below don't jump when the bar comes and goes.
+            Box(modifier = Modifier.fillMaxWidth().height(12.dp), contentAlignment = Alignment.Center) {
+                if (isRefreshing) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+            }
+            if (partialThroughMonth != null) {
+                Text(
+                    text = "$year is still in progress: figures cover January to ${monthName(partialThroughMonth, short = false)}.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+            }
             KeyFiguresRow(
+                co2Label = if (partialThroughMonth != null) "CO₂e · Jan–${monthName(partialThroughMonth)}" else "CO₂e",
                 co2Value = co2Value,
                 co2PercentChange = co2PercentChange,
                 rank = rank,
@@ -349,6 +434,61 @@ private fun AssetsSection(
                 return@Column
             }
 
+            val mapPoints = remember(filtered) {
+                filtered.mapNotNull { asset ->
+                    val latitude = asset.centroid?.latitude
+                    val longitude = asset.centroid?.longitude
+                    if (latitude == null || longitude == null) {
+                        null
+                    } else {
+                        MapPoint(asset.id, latitude, longitude, asset.name, asset.emissionsQuantity ?: 0.0)
+                    }
+                }
+            }
+            if (mapPoints.isNotEmpty()) {
+                var selectedSourceId by remember(filtered) { mutableStateOf<Int?>(null) }
+                val selectedSource = filtered.firstOrNull { it.id == selectedSourceId }
+                SourceMapView(
+                    points = mapPoints,
+                    selectedId = selectedSourceId,
+                    onPointSelected = { selectedSourceId = if (it.id == selectedSourceId) null else it.id },
+                    modifier = Modifier.fillMaxWidth().height(220.dp)
+                )
+                if (selectedSource != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { navigator?.push(AssetDetailScreen(selectedSource.id, selectedSource.name)) }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = listOfNotNull(
+                                selectedSource.name,
+                                selectedSource.emissionsQuantity?.let { formatEmissionsQuantity(it) }
+                            ).joinToString(" · "),
+                            style = MaterialTheme.typography.labelLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "View details",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                } else {
+                    Text(
+                        text = "Tap a marker to identify the source. Larger markers emit more.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 12.dp)
+                    )
+                }
+                HorizontalDivider()
+            }
+
             filtered.forEachIndexed { index, asset ->
                 Row(
                     modifier = Modifier
@@ -368,7 +508,7 @@ private fun AssetsSection(
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 imageVector = sectorIcon(asset.sector),
-                                contentDescription = asset.sector,
+                                contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -402,7 +542,7 @@ private fun AssetsSection(
                     }
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "View details",
+                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -430,7 +570,7 @@ internal fun CountryHeader(viewState: CountryDetailsUIState.Success) {
             if (flag != null) {
                 Image(
                     imageVector = flag,
-                    contentDescription = c.name,
+                    contentDescription = null,
                     modifier = Modifier
                         .size(width = 56.dp, height = 38.dp)
                         .clip(RoundedCornerShape(4.dp))
@@ -456,6 +596,7 @@ internal fun CountryHeader(viewState: CountryDetailsUIState.Success) {
 @Composable
 internal fun KeyFiguresRow(
     co2Value: String,
+    co2Label: String = "CO₂e",
     co2PercentChange: Double,
     rank: Int,
     share: String,
@@ -474,12 +615,9 @@ internal fun KeyFiguresRow(
         deltaPositive = co2PercentChange > 0
     }
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+    val co2Card: @Composable (Modifier) -> Unit = { modifier ->
         StatCard(
-            label = "CO₂e",
+            label = co2Label,
             value = co2Value,
             secondary = deltaText,
             secondaryColor = if (deltaText == null) {
@@ -489,16 +627,41 @@ internal fun KeyFiguresRow(
             } else {
                 MaterialTheme.colorScheme.primary
             },
-            modifier = Modifier.weight(1f)
+            modifier = modifier
         )
-        StatCard(label = "Rank", value = "#$rank", modifier = Modifier.weight(1f))
-        StatCard(
-            label = "Per Capita",
-            value = perCapita,
-            secondary = perCapitaSecondary,
-            modifier = Modifier.weight(1f)
-        )
-        StatCard(label = "Global Share", value = share, modifier = Modifier.weight(1f))
+    }
+    val rankCard: @Composable (Modifier) -> Unit = { modifier ->
+        StatCard(label = "Rank", value = "#$rank", modifier = modifier)
+    }
+    val perCapitaCard: @Composable (Modifier) -> Unit = { modifier ->
+        StatCard(label = "Per Capita", value = perCapita, secondary = perCapitaSecondary, modifier = modifier)
+    }
+    val shareCard: @Composable (Modifier) -> Unit = { modifier ->
+        StatCard(label = "Global Share", value = share, modifier = modifier)
+    }
+
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        // Four cards across leave each one too narrow for its value on a phone, where they'd
+        // truncate to "53.0…" — fall back to a 2x2 grid there.
+        if (maxWidth < 440.dp) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    co2Card(Modifier.weight(1f))
+                    rankCard(Modifier.weight(1f))
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    perCapitaCard(Modifier.weight(1f))
+                    shareCard(Modifier.weight(1f))
+                }
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                co2Card(Modifier.weight(1f))
+                rankCard(Modifier.weight(1f))
+                perCapitaCard(Modifier.weight(1f))
+                shareCard(Modifier.weight(1f))
+            }
+        }
     }
 }
 

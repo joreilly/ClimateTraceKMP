@@ -35,7 +35,16 @@ internal open class IssTrackerViewModel : ViewModel(), KoinComponent {
                 // country lookup will just fall back to "over ocean" until this succeeds on retry
             }
 
-            climateTraceRepository.pollISSPosition().collect { position ->
+            climateTraceRepository.pollISSPosition().collect { result ->
+                val position = result.getOrElse {
+                    // A missed poll while a position is on screen isn't worth interrupting for;
+                    // with nothing to show yet, say so rather than spinning forever.
+                    val current = _viewState.value
+                    if (current is IssPositionUiState.Loading || current is IssPositionUiState.Error) {
+                        _viewState.value = IssPositionUiState.Error("Couldn't get the ISS position. Trying again shortly.")
+                    }
+                    return@collect
+                }
                 try {
                     val countryCode = climateTraceRepository.reverseGeocodeCountry(position.latitude, position.longitude)
                     val country = countryCode?.let { code -> countries.find { it.id == code } }

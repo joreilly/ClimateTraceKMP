@@ -49,6 +49,8 @@ internal data class CountryEmissionsScreen(val country: Country, val perCapitaRa
                 CountryInfoDetailedView(
                     viewState = viewState,
                     perCapitaRank = perCapitaRank,
+                    onRetry = { viewModel.retry() },
+                    onIncludeForestryChange = { viewModel.setIncludeForestry(it) },
                     onYearSelected = { year -> viewModel.setYear(year) }
                 )
             }
