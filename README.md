@@ -102,6 +102,7 @@ The tools it exposes are:
 | `get-country-sources` | The largest individual emission sources in a country, with ids and locations |
 | `get-source-details` | One source's owners, location, yearly and monthly emissions |
 | `get-population` | A country's population |
+| `show-emissions-dashboard` | An interactive dashboard (an [MCP App](https://modelcontextprotocol.github.io/ext-apps/)) of countries' emissions by sector and by month, plus the same figures as text |
 
 Totals exclude the forestry and land use sector by default, matching climatetrace.org; the emissions tools take an
 optional `includeForestry` argument for net figures. The in-app Koog agent has the same tools, sharing the same code.
@@ -126,6 +127,19 @@ like the following (update with your path)
   }
 }
 ```
+
+
+#### Emissions dashboard (MCP App)
+
+`show-emissions-dashboard` is an [MCP App](https://claude.com/docs/connectors/building/mcp-apps/getting-started): in hosts
+that support MCP Apps (such as Claude) its result is shown as interactive charts, where you can compare countries, switch
+year and include forestry. Other hosts just get the figures as text. The view is
+`mcp-server/src/main/resources/emissions-dashboard.html`, served as the `ui://climate-trace/emissions-dashboard.html`
+resource; it loads the MCP Apps SDK from jsDelivr.
+
+When the server is deployed remotely (e.g. `--streamable-http-server` on Cloud Run) and added to Claude as a custom
+connector, set the `MCP_SERVER_URL` environment variable to its public MCP endpoint (e.g. `https://example.com/mcp`):
+Claude serves the view from an origin derived from that URL.
 
 
 ### AI Agents

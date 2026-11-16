@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emissions dashboard</title>
+<!--
+  MCP App view for the show-emissions-dashboard tool. The host renders it in a sandboxed
+  iframe and sends it the tool's result; the figures come from the result's structuredContent
+  (an EmissionsDashboard, see composeApp/.../agent/EmissionsDashboard.kt).
+  Host colours and fonts arrive as CSS variables; the fallbacks below are for hosts without them.
+-->
+<style>
+  :root {
+    color-scheme: light;
+    --bg: var(--color-background-primary, #fcfcfb);
+    --bg-2: var(--color-background-secondary, #f3f2ef);
+    --ink: var(--color-text-primary, #0b0b0b);
+    --ink-2: var(--color-text-secondary, #52514e);
+    --ink-3: var(--color-text-tertiary, #7a7975);
+    --line: var(--color-border-tertiary, #e4e3df);
+    --line-2: var(--color-border-secondary, #d2d1cc);
+    --danger: var(--color-text-danger, #b42318);
+    --bar: #2a78d6;
+    --bar-neg: #1baf7a;
+    --radius: var(--border-radius-md, 8px);
+    --font: var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: var(--color-background-primary, #1a1a19);
+      --bg-2: var(--color-background-secondary, #252523);
+      --ink: var(--color-text-primary, #f0efec);
+      --ink-2: var(--color-text-secondary, #c3c2b7);
+      --ink-3: var(--color-text-tertiary, #94938c);
+      --line: var(--color-border-tertiary, #2f2f2c);
+      --line-2: var(--color-border-secondary, #3d3d39);
+      --danger: var(--color-text-danger, #f97066);
+      --bar: #3987e5;
+      --bar-neg: #199e70;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: var(--color-background-primary, #1a1a19);
+    --bg-2: var(--color-background-secondary, #252523);
+    --ink: var(--color-text-primary, #f0efec);
+    --ink-2: var(--color-text-secondary, #c3c2b7);
+    --ink-3: var(--color-text-tertiary, #94938c);
+    --line: var(--color-border-tertiary, #2f2f2c);
+    --line-2: var(--color-border-secondary, #3d3d39);
+    --danger: var(--color-text-danger, #f97066);
+    --bar: #3987e5;
+    --bar-neg: #199e70;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 14px/1.45 var(--font);
+    padding: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 13px; font-weight: 600; margin: 0 0 10px; color: var(--ink-2); }
+  .muted { color: var(--ink-3); font-size: 12px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  header { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  select, label.toggle {
+    font: inherit; font-size: 13px; color: var(--ink);
+  }
+  select {
+    background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 6px; padding: 3px 6px;
+  }
+  label.toggle { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--ink-2); }
+  #notes { margin: 6px 0 0; }
+
+  section { margin-top: 18px; }
+  .hero { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .hero .value { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+  .hero .unit { color: var(--ink-2); }
+
+  /* Horizontal bars: label | track | value */
+  .bars { display: grid; grid-template-columns: minmax(90px, max-content) 1fr max-content; gap: 6px 10px; align-items: center; }
+  .bars .row { display: contents; }
+  .bars .label { color: var(--ink-2); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+  .bars .track { height: 14px; position: relative; }
+  .bars .fill { position: absolute; top: 0; bottom: 0; background: var(--bar); border-radius: 0 4px 4px 0; min-width: 2px; }
+  .bars .fill.neg { background: var(--bar-neg); border-radius: 4px 0 0 4px; }
+  .bars .zero { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--line-2); }
+  .bars .value { font-size: 12px; color: var(--ink-2); text-align: right; }
+  .bars .row.dim .fill { opacity: 0.35; }
+  .bars .row.selected .label { color: var(--ink); font-weight: 600; }
+  .bars .row.clickable > * { cursor: pointer; }
+
+  .card { border-top: 1px solid var(--line); padding-top: 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr; gap: 22px; }
+  @media (min-width: 640px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { fill: var(--ink-3); font: 11px var(--font); }
+  svg .grid { stroke: var(--line); stroke-width: 1; }
+  svg .col { fill: var(--bar); }
+  svg .col.neg { fill: var(--bar-neg); }
+  svg .zero { stroke: var(--line-2); stroke-width: 1; }
+  svg .hit { fill: transparent; }
+  svg .hit:hover + .col, svg g.m:hover .col { opacity: 0.8; }
+
+  #tip {
+    position: fixed; pointer-events: none; z-index: 10; display: none;
+    background: var(--ink); color: var(--bg); padding: 5px 8px; border-radius: 6px;
+    font-size: 12px; line-height: 1.35; white-space: nowrap; box-shadow: 0 2px 8px #0003;
+  }
+
+  details { margin-top: 18px; }
+  summary { cursor: pointer; color: var(--ink-2); font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 8px; font-size: 13px; }
+  th, td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--line); }
+  td.r, th.r { text-align: right; }
+
+  #status { padding: 24px 0; color: var(--ink-2); }
+  #status.error { color: var(--danger); }
+  .loading main { opacity: 0.5; transition: opacity 0.2s; }
+  .error-text { color: var(--danger); }
+</style>
+</head>
+<body>
+<div id="status">Loading emissions…</div>
+<main hidden>
+  <header>
+    <h1 id="title"></h1>
+    <div class="controls">
+      <select id="year" aria-label="Year"></select>
+      <label class="toggle"><input type="checkbox" id="forestry"> Include forestry &amp; land use</label>
+    </div>
+  </header>
+  <p id="notes" class="muted"></p>
+
+  <section id="compare" hidden>
+    <h2>Total emissions <span class="muted">· select a country for its breakdown</span></h2>
+    <div class="bars" id="compare-bars" role="list"></div>
+  </section>
+
+  <section id="country" class="card"></section>
+
+  <details>
+    <summary>Show figures as a table</summary>
+    <div id="table"></div>
+  </details>
+</main>
+<div id="tip" role="tooltip"></div>
+
+<script type="module">
+  // Self-contained ESM build of the MCP Apps SDK; its origin is allowed in the resource's CSP
+  // (_meta.ui.csp.resourceDomains, set in EmissionsDashboardApp.kt).
+  import {
+    App, applyDocumentTheme, applyHostStyleVariables, applyHostFonts,
+  } from "https://cdn.jsdelivr.net/npm/@modelcontextprotocol/ext-apps@2.0.4/dist/src/app-with-deps.js";
+
+  const TOOL = "show-emissions-dashboard";
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  /** 81585405 -> { value: "81.6", unit: "Mt" } */
+  function tonnes(t) {
+    const a = Math.abs(t);
+    if (a >= 1e9) return { value: (t / 1e9).toFixed(2), unit: "Gt" };
+    if (a >= 1e6) return { value: (t / 1e6).toFixed(1), unit: "Mt" };
+    if (a >= 1e3) return { value: (t / 1e3).toFixed(1), unit: "kt" };
+    return { value: t.toFixed(0), unit: "t" };
+  }
+  const fmt = (t) => { const { value, unit } = tonnes(t); return `${value} ${unit}`; };
+  const sectorName = (s) => s.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
+  const countryName = (c) => c.name ?? c.code;
+
+  let data = null;        // the current EmissionsDashboard
+  let selected = null;    // selected country code
+  let requestedCodes = []; // country codes the dashboard was asked for
+
+  // ---- tooltip ----------------------------------------------------------------------------
+  const tip = $("tip");
+  document.addEventListener("pointerover", (e) => {
+    const el = e.target.closest("[data-tip]");
+    if (!el) return;
+    tip.innerHTML = el.dataset.tip;
+    tip.style.display = "block";
+  });
+  document.addEventListener("pointermove", (e) => {
+    if (tip.style.display !== "block") return;
+    const pad = 12, w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = e.clientX + pad, y = e.clientY - h - pad;
+    if (x + w > innerWidth - 4) x = e.clientX - w - pad;
+    if (y < 4) y = e.clientY + pad;
+    tip.style.left = `${x}px`; tip.style.top = `${y}px`;
+  });
+  document.addEventListener("pointerout", (e) => {
+    if (e.target.closest("[data-tip]") && !e.relatedTarget?.closest?.("[data-tip]")) tip.style.display = "none";
+  });
+
+  // ---- rendering ----------------------------------------------------------------------------
+  /** Bars share one scale with a zero line, so net-negative values (land-use carbon sinks) extend left. */
+  function barRows(items, { onSelect, selectedKey } = {}) {
+    const values = items.map((i) => i.value).filter((v) => v != null);
+    const lo = Math.min(0, ...values), hi = Math.max(0, ...values), span = hi - lo || 1;
+    const zero = (-lo / span) * 100;
+    return items.map((i) => {
+      const fill = i.value == null ? "" : i.value < 0
+        ? `<div class="fill neg" style="right:${100 - zero}%;width:${(-i.value / span) * 100}%"></div>`
+        : `<div class="fill" style="left:${zero}%;width:${(i.value / span) * 100}%"></div>`;
+      const zeroLine = lo < 0 ? `<div class="zero" style="left:${zero}%"></div>` : "";
+      const cls = ["row"];
+      if (onSelect) cls.push("clickable");
+      if (selectedKey !== undefined) cls.push(i.key === selectedKey ? "selected" : "dim");
+      const attrs = onSelect ? ` role="listitem" tabindex="0" data-key="${esc(i.key)}" aria-label="${esc(i.label)}: ${esc(i.valueText)}"` : "";
+      return `<div class="${cls.join(" ")}"${attrs}>
+          <div class="label" title="${esc(i.label)}">${esc(i.label)}</div>
+          <div class="track" data-tip="${esc(i.tip)}">${zeroLine}${fill}</div>
+          <div class="value num">${esc(i.valueText)}</div>
+        </div>`;
+    }).join("");
+  }
+
+  function monthlyChart(country) {
+    const byMonth = new Map(country.monthly.map((m) => [m.month, m.tonnes]));
+    const values = country.monthly.map((m) => m.tonnes);
+    const min = Math.min(0, ...values), max = Math.max(0, ...values);
+    // A tidy step, so the gridlines carry readable values; the axis always includes zero.
+    const raw = (max - min || 1) / 3, mag = 10 ** Math.floor(Math.log10(raw));
+    const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw);
+    const lo = Math.floor(min / step) * step, hi = Math.ceil(max / step) * step || step;
+    const W = 360, H = 170, L = 40, B = 20, T = 6, plotH = H - B - T, colW = (W - L) / 12;
+    const yOf = (v) => T + plotH - ((v - lo) / (hi - lo)) * plotH;
+    const y0 = yOf(0);
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Monthly emissions for ${esc(countryName(country))}">`;
+    for (let v = lo; v <= hi + step / 2; v += step) {
+      const y = yOf(v), isZero = Math.abs(v) < step / 2;
+      svg += `<line class="${isZero ? "zero" : "grid"}" x1="${L}" x2="${W}" y1="${y}" y2="${y}"/>`;
+      svg += `<text x="${L - 6}" y="${y + 3.5}" text-anchor="end">${isZero ? "0" : fmt(v)}</text>`;
+    }
+    for (let m = 1; m <= 12; m++) {
+      const x = L + (m - 1) * colW;
+      const t = byMonth.get(m);
+      svg += `<text x="${x + colW / 2}" y="${H - 5}" text-anchor="middle">${MONTHS[m - 1][0]}</text>`;
+      if (t === undefined) continue;
+      // Rounded at the data end only, square at the zero baseline.
+      const w = colW - 4, xl = x + 2, h = Math.max(1, Math.abs(yOf(t) - y0)), r = Math.min(4, w / 2, h);
+      const e = t >= 0 ? y0 - h : y0 + h, s = t >= 0 ? 1 : -1; // data end, and which way it lies
+      const d = `M${xl},${y0} V${e + s * r} Q${xl},${e} ${xl + r},${e} H${xl + w - r} Q${xl + w},${e} ${xl + w},${e + s * r} V${y0} Z`;
+      svg += `<g class="m" data-tip="${esc(`<b>${MONTH_NAMES[m - 1]} ${data.year}</b><br>${fmt(t)} CO₂e`)}">
+          <rect class="hit" x="${x}" y="${T}" width="${colW}" height="${plotH}"/>
+          <path class="col${t < 0 ? " neg" : ""}" d="${d}"/></g>`;
+    }
+    return svg + "</svg>";
+  }
+
+  function renderCountry() {
+    const c = data.countries.find((x) => x.code === selected) ?? data.countries[0];
+    const el = $("country");
+    if (!c) { el.innerHTML = ""; return; }
+    if (c.error || c.totalTonnes == null) {
+      el.innerHTML = `<h2>${esc(countryName(c))}</h2><p class="error-text">${esc(c.error ?? "No data for this year.")}</p>`;
+      return;
+    }
+    const total = tonnes(c.totalTonnes);
+    // A share of a net-negative total (forestry included) means nothing, and the API sends 0 for it.
+    const share = (s) => (c.totalTonnes > 0 ? ` · ${s.percentage.toFixed(1)}%` : "");
+    const sectors = c.sectors.map((s) => ({
+      key: s.sector,
+      label: sectorName(s.sector),
+      value: s.tonnes,
+      valueText: `${fmt(s.tonnes)}${share(s)}`,
+      tip: `<b>${esc(sectorName(s.sector))}</b><br>${fmt(s.tonnes)} CO₂e${share(s)}`,
+    }));
+    const monthsNote = c.monthly.length && c.monthly.length < 12 ? `<span class="muted"> · ${c.monthly.length} months so far</span>` : "";
+    el.innerHTML = `
+      <div class="hero">
+        <span class="muted">${esc(countryName(c))}</span>
+        <span class="value num">${total.value}</span><span class="unit">${total.unit} CO₂e</span>
+      </div>
+      <div class="grid2">
+        <div><h2>By sector</h2><div class="bars">${sectors.length ? barRows(sectors) : `<span class="muted">No sector breakdown.</span>`}</div></div>
+        <div><h2>By month${monthsNote}</h2>${c.monthly.length ? monthlyChart(c) : `<span class="muted">No monthly data.</span>`}</div>
+      </div>`;
+  }
+
+  function renderCompare() {
+    $("compare").hidden = data.countries.length < 2;
+    if (data.countries.length < 2) return;
+    const items = [...data.countries]
+      .sort((a, b) => (b.totalTonnes ?? -1) - (a.totalTonnes ?? -1))
+      .map((c) => ({
+        key: c.code,
+        label: countryName(c),
+        value: c.totalTonnes ?? null,
+        valueText: c.totalTonnes == null ? "no data" : fmt(c.totalTonnes),
+        tip: c.totalTonnes == null ? `${esc(countryName(c))}: no data` : `<b>${esc(countryName(c))}</b><br>${fmt(c.totalTonnes)} CO₂e`,
+      }));
+    $("compare-bars").innerHTML = barRows(items, { onSelect: true, selectedKey: selected });
+  }
+
+  function renderTable() {
+    const rows = data.countries.flatMap((c) =>
+      c.error ? [`<tr><td>${esc(countryName(c))}</td><td colspan="3">${esc(c.error)}</td></tr>`]
+        : c.sectors.map((s) => `<tr><td>${esc(countryName(c))}</td><td>${esc(sectorName(s.sector))}</td>
+            <td class="r num">${fmt(s.tonnes)}</td><td class="r num">${s.percentage.toFixed(1)}%</td></tr>`));
+    $("table").innerHTML = `<table><thead><tr><th>Country</th><th>Sector</th><th class="r">CO₂e</th><th class="r">Share</th></tr></thead>
+      <tbody>${rows.join("")}</tbody></table>`;
+  }
+
+  function render(dashboard) {
+    data = dashboard;
+    requestedCodes = dashboard.countries.map((c) => c.code);
+    if (!dashboard.countries.some((c) => c.code === selected)) {
+      selected = dashboard.countries.find((c) => c.totalTonnes != null)?.code ?? dashboard.countries[0]?.code;
+    }
+    $("status").hidden = true;
+    document.querySelector("main").hidden = false;
+    document.body.classList.remove("loading");
+
+    const names = dashboard.countries.map(countryName);
+    // Full names only for one country; several are named in the comparison below.
+    $("title").textContent = `${names.length === 1 ? names[0] : dashboard.countries.map((c) => c.code).join(", ")} · ${dashboard.year}`;
+    $("year").innerHTML = dashboard.years.map((y) => `<option${y === dashboard.year ? " selected" : ""}>${esc(y)}</option>`).join("");
+    $("forestry").checked = dashboard.includeForestry;
+    const partial = dashboard.partialThroughMonth
+      ? ` ${dashboard.year} is still in progress: figures cover January to ${MONTH_NAMES[dashboard.partialThroughMonth - 1]}.` : "";
+    $("notes").textContent = (dashboard.includeForestry
+      ? "Net of forestry and land use carbon sinks."
+      : "Excludes forestry and land use, as on climatetrace.org.") + partial + " Source: Climate TRACE.";
+
+    renderCompare();
+    renderCountry();
+    renderTable();
+  }
+
+  function showError(message) {
+    document.body.classList.remove("loading");
+    const s = $("status");
+    s.hidden = false; s.className = "error"; s.textContent = message;
+  }
+
+  // ---- selecting a country ----------------------------------------------------------------
+  function select(key) {
+    if (!key || key === selected) return;
+    selected = key;
+    renderCompare();
+    renderCountry();
+  }
+  $("compare-bars").addEventListener("click", (e) => select(e.target.closest("[data-key]")?.dataset.key));
+  $("compare-bars").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(e.target.closest("[data-key]")?.dataset.key); }
+  });
+
+  // ---- talking to the host ------------------------------------------------------------------
+  const app = new App({ name: "ClimateTrace emissions dashboard", version: "1.0.0" });
+
+  function textOf(result) {
+    return (result.content ?? []).filter((c) => c.type === "text").map((c) => c.text).join("\n");
+  }
+
+  function applyResult(result) {
+    if (result.isError || !result.structuredContent) {
+      showError(textOf(result) || "The emissions data could not be loaded.");
+      return false;
+    }
+    render(result.structuredContent);
+    return true;
+  }
+
+  // Year or forestry changed in the view: fetch again through the same tool, and tell the
+  // model what the user is now looking at so its next answer matches the chart.
+  async function reload() {
+    const args = { countryCodeList: requestedCodes, year: $("year").value, includeForestry: $("forestry").checked };
+    document.body.classList.add("loading");
+    try {
+      const result = await app.callServerTool({ name: TOOL, arguments: args });
+      if (applyResult(result)) {
+        app.updateModelContext({
+          content: [{ type: "text", text: `The user changed the emissions dashboard to ${args.year}` +
+            `${args.includeForestry ? ", including forestry and land use" : ""}. It now shows:\n${textOf(result)}` }],
+        }).catch(() => { /* host may not support model context updates */ });
+      }
+    } catch (e) {
+      showError(`Could not load ${args.year}: ${e.message ?? e}`);
+    }
+  }
+  $("year").addEventListener("change", reload);
+  $("forestry").addEventListener("change", reload);
+
+  function applyHostContext(ctx) {
+    if (!ctx) return;
+    if (ctx.theme) applyDocumentTheme(ctx.theme);
+    if (ctx.styles?.variables) applyHostStyleVariables(ctx.styles.variables);
+    if (ctx.styles?.css?.fonts) applyHostFonts(ctx.styles.css.fonts);
+    if (ctx.safeAreaInsets) {
+      const i = ctx.safeAreaInsets;
+      document.body.style.padding = `${16 + i.top}px ${16 + i.right}px ${16 + i.bottom}px ${16 + i.left}px`;
+    }
+  }
+
+  // Handlers go on before connect() so the initial tool result isn't missed.
+  app.ontoolinput = ({ arguments: args }) => {
+    if (Array.isArray(args?.countryCodeList)) requestedCodes = args.countryCodeList;
+    $("status").textContent = `Loading emissions${args?.year ? ` for ${args.year}` : ""}…`;
+  };
+  app.ontoolresult = applyResult;
+  app.ontoolcancelled = () => showError("The request was cancelled.");
+  app.onhostcontextchanged = applyHostContext;
+
+  await app.connect();
+  applyHostContext(app.getHostContext());
+</script>
+</body>
+</html>

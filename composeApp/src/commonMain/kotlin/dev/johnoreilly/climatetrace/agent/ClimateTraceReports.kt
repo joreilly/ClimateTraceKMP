@@ -220,6 +220,44 @@ class ClimateTraceReports(private val repository: ClimateTraceRepository) {
         return sections.joinToString("\n\n") + "\n" + basisNote(includeForestry)
     }
 
+    /**
+     * Sector and monthly figures to chart, from one request per country, with the same text
+     * [sectorEmissions] and [monthlyEmissions] give so the model can talk about the chart.
+     */
+    suspend fun emissionsDashboard(countryCodes: List<String>, year: String, includeForestry: Boolean = false): DashboardReport {
+        val coverage = repository.fetchDataCoverage()
+        val names = optional { repository.fetchCountries() }.orEmpty().associate { it.id to it.name }
+        val sections = mutableListOf<String>()
+        val noData = "no data found; check this is an ISO 3166-1 alpha-3 country code"
+        val countries = countryCodes.map(::normalizeCountryCode).distinct().map { code ->
+            // An unknown code is an error from some endpoints and an empty breakdown from this one.
+            val breakdown = try {
+                repository.fetchCountryEmissionsBreakdown(code, year, excludeForestry = !includeForestry)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                null
+            }
+            val country = breakdown?.let { countryDashboard(code, names[code], it) }
+            if (breakdown == null || country?.totalTonnes == null) {
+                sections += "$code ($year): $noData"
+                CountryDashboard(code = code, name = names[code], error = noData)
+            } else {
+                sections += formatSectorEmissions(code, year, breakdown.sectors?.summaries.orEmpty() + breakdown.subsectors?.summaries.orEmpty()) +
+                    "\n" + formatMonthlyEmissions(code, year, country.monthly.map { it.month to it.tonnes })
+                country
+            }
+        }
+        val dashboard = EmissionsDashboard(
+            year = year,
+            includeForestry = includeForestry,
+            years = coverage.years,
+            partialThroughMonth = coverage.partialThroughMonth.takeIf { year == coverage.partialYear },
+            countries = countries,
+        )
+        return DashboardReport(dashboard, withNotes(sections.joinToString("\n\n"), year, includeForestry))
+    }
+
     suspend fun rankings(year: String, limit: Int = 10, perCapita: Boolean = false, includeForestry: Boolean = false): String =
         report("No rankings data found for $year") {
             val rankings = repository.fetchRankings(year, excludeForestry = !includeForestry).rankings

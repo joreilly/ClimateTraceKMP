@@ -14,6 +14,9 @@ import io.modelcontextprotocol.kotlin.sdk.types.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.types.Implementation
 import io.modelcontextprotocol.kotlin.sdk.types.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.asSink
@@ -93,7 +96,14 @@ private fun missing(vararg names: String) = CallToolResult(
     isError = true
 )
 
-fun configureMcpServer(): Server {
+// structuredContent for the dashboard view; leave out nulls rather than send them.
+private val dashboardJson = Json { explicitNulls = false }
+
+/**
+ * [serverUrl] is the server's public MCP endpoint URL when it is deployed remotely (the
+ * MCP_SERVER_URL environment variable); Claude derives the dashboard view's origin from it.
+ */
+fun configureMcpServer(serverUrl: String? = System.getenv("MCP_SERVER_URL")): Server {
     val climateTraceRepository = koin.get<ClimateTraceRepository>()
     // Fetching and wording are shared with the in-app agent's tools.
     val reports = ClimateTraceReports(climateTraceRepository)
@@ -105,7 +115,8 @@ fun configureMcpServer(): Server {
         ),
         ServerOptions(
             capabilities = ServerCapabilities(
-                tools = ServerCapabilities.Tools(listChanged = true)
+                tools = ServerCapabilities.Tools(listChanged = true),
+                resources = ServerCapabilities.Resources(),
             )
         )
     )
@@ -180,6 +191,33 @@ fun configureMcpServer(): Server {
         val year = request.arguments.string("year")
         if (countryCodes == null || year == null) return@addTool missing("countryCodeList", "year")
         text(reports.monthlyEmissions(countryCodes, year, request.arguments.boolean("includeForestry")))
+    }
+
+    server.addEmissionsDashboardResource(serverUrl)
+    server.addTool(
+        name = "show-emissions-dashboard",
+        title = "Emissions dashboard",
+        description = "Show the user an interactive dashboard of emissions by sector and by month for one or more " +
+            "countries in a year, where they can switch year and compare countries. Also returns the figures as text. " +
+            "Use when the user wants to see or explore the data, rather than only get an answer.",
+        inputSchema = ToolSchema(
+            properties = buildJsonObject {
+                countryCodeList()
+                year()
+                includeForestry()
+            },
+            required = listOf("countryCodeList", "year")
+        ),
+        meta = dashboardToolMeta(),
+    ) { request ->
+        val countryCodes = request.arguments.stringList("countryCodeList")
+        val year = request.arguments.string("year")
+        if (countryCodes == null || year == null) return@addTool missing("countryCodeList", "year")
+        val report = reports.emissionsDashboard(countryCodes, year, request.arguments.boolean("includeForestry"))
+        CallToolResult(
+            content = listOf(TextContent(report.text)),
+            structuredContent = dashboardJson.encodeToJsonElement(report.dashboard).jsonObject,
+        )
     }
 
     server.addTool(
